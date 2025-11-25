@@ -143,7 +143,7 @@ export default function GuardForm() {
             <FormInput
               label="Password"
               name="password"
-              type="password"
+              type="text"
               value={guardformData.password}
               onChange={handle_gd_Change}
             />

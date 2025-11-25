@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-// import { adminLogout } from "../api/auth";
+import { logoutUser } from "../api/auth";
 import axios from "axios";
 import { useAdminStore } from "../context/AdminContext";
 const BASE_URL = process.env.REACT_APP_BASE_URL;
@@ -53,7 +53,7 @@ export default function Navbar() {
   //  Handle Logout
   const handleLogout = (e) => {
     e.preventDefault();
-    const result = adminLogout();
+    const result = logoutUser();
     if (result.success) {
       navigate("/login");
     }
@@ -131,13 +131,13 @@ export default function Navbar() {
                 <li><div className="dropdown-divider"></div></li>
 
                 <li>
-                  {/* <button
+                  <button
                     className="dropdown-item text-danger"
                     onClick={handleLogout}
                     style={{ border: "none", background: "none" }}
                   >
                     Logout
-                  </button> */}
+                  </button>
                 </li>
 
               </ul>

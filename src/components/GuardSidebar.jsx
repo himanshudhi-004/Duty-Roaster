@@ -1,7 +1,16 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { logoutUser } from "../api/auth";
 
 export default function GuardSidebar() {
+  const navigate = useNavigate();
+  //  Handle Logout
+  const handleLogout = () => {
+    localStorage.removeItem("guardToken");
+    localStorage.removeItem("role");
+    navigate("/login");
+  };
   return (
     <div style={styles.sidebarContainer} className="sidebar">
 
@@ -31,10 +40,10 @@ export default function GuardSidebar() {
           </li>
 
           {/* Section Title */}
-          <li style={styles.sectionTitle}>Manage Forms</li>
+          {/* <li style={styles.sectionTitle}>Manage Forms</li> */}
 
           {/* Guard Dashboard */}
-          <li style={styles.menuItem}>
+          {/* <li style={styles.menuItem}>
             <NavLink
               to="/guardform"
               style={styles.menuLink}
@@ -44,21 +53,41 @@ export default function GuardSidebar() {
               <span>Guard Registration</span>
             </NavLink>
           </li>
-            
-             <li style={styles.sectionTitle}>Notifications</li>
+             */}
+          <li style={styles.sectionTitle}>Manage</li>
 
-               <li style={styles.menuItem}>
-                          <NavLink
-                            to="/viplist"
-                            style={styles.menuLink}
-                            className="menu-link"
-                          >
-                            <i className="fas fa-bell" style={styles.icon}></i>
-                            <span>VIP Notifications</span>
-                          </NavLink>
-                        </li>
-              
-                      
+          <li style={styles.menuItem}>
+            <NavLink
+              to="/guardshift"
+              style={styles.menuLink}
+              className="menu-link"
+            >
+              <i className="fas fa-bell" style={styles.icon}></i>
+              <span>My Shift</span>
+            </NavLink>
+          </li>
+
+
+
+          <li style={styles.menuItem}>
+            <NavLink
+              to="/guardprofile"
+              style={styles.menuLink}
+              className="menu-link"
+            >
+              <i className="fas fa-user" style={styles.icon}></i>
+              <span>My Profile</span>
+            </NavLink>
+          </li>
+          <li>
+            <button to="/login" className="menu-link" style={styles.menuLink} onClick={handleLogout}>
+              <i className="fas fa-sign-out-alt" style={styles.icon}></i>
+              <span>Logout</span>
+            </button>
+
+          </li>
+
+
         </ul>
       </div>
     </div>

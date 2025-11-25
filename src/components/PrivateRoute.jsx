@@ -23,7 +23,7 @@ export default function PrivateRoute({ children, role }) {
 
   if (!isValid) {
     logoutUser(role);
-    return <Navigate to={`/${role}dashboard`} replace />;
+    return <Navigate to={`/login`} replace />;
   }
 
   return children;

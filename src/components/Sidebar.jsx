@@ -1,8 +1,18 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
+import {useNavigate } from "react-router-dom";
+import { logoutUser } from "../api/auth";
 
 export default function Sidebar() {
+  const navigate = useNavigate();
+  //  Handle Logout
+  const handleLogout = () => {
+    localStorage.removeItem("adminToken");
+    localStorage.removeItem("role");
+    navigate("/login");
+  };
   return (
+
     <div style={styles.sidebarContainer} className="sidebar">
 
       {/* LOGO SECTION */}
@@ -30,7 +40,7 @@ export default function Sidebar() {
             </NavLink>
           </li>
 
-          <li style={styles.menuItem}>
+          {/* <li style={styles.menuItem}>
             <NavLink
               to="/vipdashboard"
               style={styles.menuLink}
@@ -50,7 +60,7 @@ export default function Sidebar() {
               <i className="fas fa-home" style={styles.icon}></i>
               <span>Guard Dashboard</span>
             </NavLink>
-          </li> 
+          </li>  */}
 
           {/* Section */}
           <li style={styles.sectionTitle}>Manage Forms</li>
@@ -149,7 +159,7 @@ export default function Sidebar() {
               <span>Guard Notifications</span>
             </NavLink>
           </li> */}
-           <li style={styles.menuItem}>
+          <li style={styles.menuItem}>
             <NavLink
               to="/adminprofile"
               style={styles.menuLink}
@@ -158,6 +168,13 @@ export default function Sidebar() {
               <i className="fas fa-user" style={styles.icon}></i>
               <span>My Profile</span>
             </NavLink>
+          </li>
+          <li>
+            <NavLink to="/login" className="menu-link"  style={styles.menuLink} onClick={handleLogout}>
+             <i className="fas fa-sign-out-alt" style={styles.icon}></i>
+              <span>Logout</span>
+            </NavLink>
+            
           </li>
         </ul>
       </div>
@@ -238,6 +255,7 @@ const styles = {
     position: "relative",
     overflow: "hidden",
   },
+
 
   icon: {
     fontSize: "18px",

@@ -6,8 +6,13 @@ import { toast } from "react-toastify";
 export default function GuardDetails() {
   const { handleEdit, refreshTrigger } = useGuardStore();
   const [guardList, setGuardList] = useState([]);
+
   const [selectedRank, setSelectedRank] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
+
+  /* PAGINATION STATES */
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(30); // DEFAULT 30
 
   /* FETCH GUARDS */
   useEffect(() => {
@@ -48,9 +53,20 @@ export default function GuardDetails() {
     return rankMatch && statusMatch;
   });
 
+  /* PAGINATION */
+  const totalPages = Math.ceil(filteredGuards.length / rowsPerPage);
+
+  const currentData = filteredGuards.slice(
+    (currentPage - 1) * rowsPerPage,
+    currentPage * rowsPerPage
+  );
+
+  const goToPage = (page) => {
+    if (page >= 1 && page <= totalPages) setCurrentPage(page);
+  };
+
   return (
     <div style={styles.page}>
-
       {/* HEADER */}
       <div style={styles.headerRow}>
         <h2 style={styles.title}>Guard Records</h2>
@@ -61,15 +77,16 @@ export default function GuardDetails() {
         </div>
       </div>
 
-      {/* FILTERS — TWO BOXES IN ONE ROW */}
+      {/* FILTER ROW */}
       <div style={styles.filterRow}>
-        
-        {/* RANK FILTER */}
         <div style={styles.filterCard}>
           <label style={styles.filterLabel}>Rank</label>
           <select
             value={selectedRank}
-            onChange={(e) => setSelectedRank(e.target.value)}
+            onChange={(e) => {
+              setSelectedRank(e.target.value);
+              setCurrentPage(1);
+            }}
             style={styles.select}
           >
             <option value="">All</option>
@@ -79,26 +96,26 @@ export default function GuardDetails() {
           </select>
         </div>
 
-        {/* STATUS FILTER */}
         <div style={styles.filterCard}>
           <label style={styles.filterLabel}>Status</label>
           <select
             value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
+            onChange={(e) => {
+              setSelectedStatus(e.target.value);
+              setCurrentPage(1);
+            }}
             style={styles.select}
           >
             <option value="">All</option>
             <option>Active</option>
             <option>Inactive</option>
-            {/* <option>Other</option> */}
           </select>
         </div>
-
       </div>
 
       {/* TABLE */}
       <div style={styles.tableCard}>
-        {filteredGuards.length === 0 ? (
+        {currentData.length === 0 ? (
           <div style={styles.noData}>No Guards Found</div>
         ) : (
           <table style={styles.table}>
@@ -107,8 +124,6 @@ export default function GuardDetails() {
                 <th style={styles.th}>#</th>
                 <th style={styles.th}>Name</th>
                 <th style={styles.th}>Email</th>
-                <th style={styles.th}>Username</th>
-                <th style={styles.th}>Password</th>
                 <th style={styles.th}>Rank</th>
                 <th style={styles.th}>Experience</th>
                 <th style={styles.th}>Contact</th>
@@ -118,39 +133,22 @@ export default function GuardDetails() {
             </thead>
 
             <tbody>
-              {filteredGuards.map((g, i) => {
+              {currentData.map((g, i) => {
                 const statusStyle =
                   g.status === "Active"
                     ? styles.statusActive
-                    : g.status === "Inactive"
-                    ? styles.statusInactive
-                    : styles.statusOther;
+                    : styles.statusInactive;
 
                 return (
-                  <tr
-                    key={i}
-                    style={styles.row}
-                    onMouseEnter={(e) =>
-                      (e.currentTarget.style.background =
-                        "rgba(25,103,210,0.06)")
-                    }
-                    onMouseLeave={(e) =>
-                      (e.currentTarget.style.background = "transparent")
-                    }
-                  >
-                    <td style={styles.td}>{i + 1}</td>
+                  <tr key={i} style={styles.row}>
+                    <td style={styles.td}>{i + 1 + (currentPage - 1) * rowsPerPage}</td>
                     <td style={styles.td}>{g.name}</td>
                     <td style={styles.td}>{g.email}</td>
-                    <td style={styles.td}>{g.username}</td>
-                    <td style={styles.td}>{g.password}</td>
-
                     <td style={styles.td}>
                       <span style={styles.rankBadge}>{g.rank}</span>
                     </td>
-
                     <td style={styles.td}>{g.experience}</td>
                     <td style={styles.td}>{g.contactno}</td>
-
                     <td style={styles.td}>
                       <span style={statusStyle}>{g.status}</span>
                     </td>
@@ -159,9 +157,6 @@ export default function GuardDetails() {
                       <button style={styles.editBtn} onClick={() => handleEdit(g)}>
                         <i className="fa fa-edit"></i>
                       </button>
-                      {/* <button style={styles.deleteBtn} onClick={() => handleDelete(g.id)}>
-                        <i className="fa fa-trash"></i>
-                      </button> */}
                     </td>
                   </tr>
                 );
@@ -169,159 +164,103 @@ export default function GuardDetails() {
             </tbody>
           </table>
         )}
-      </div>
 
+        {/* PAGINATION */}
+        {totalPages > 1 && (
+          <div style={styles.paginationContainer}>
+            <button
+              disabled={currentPage === 1}
+              style={styles.pageBtn}
+              onClick={() => goToPage(currentPage - 1)}
+            >
+              Prev
+            </button>
+
+            {[...Array(totalPages)].map((_, i) => (
+              <button
+                key={i}
+                style={{
+                  ...styles.pageBtn,
+                  ...(currentPage === i + 1 ? styles.activePage : {}),
+                }}
+                onClick={() => goToPage(i + 1)}
+              >
+                {i + 1}
+              </button>
+            ))}
+
+            <button
+              disabled={currentPage === totalPages}
+              style={styles.pageBtn}
+              onClick={() => goToPage(currentPage + 1)}
+            >
+              Next
+            </button>
+
+            <select
+              value={rowsPerPage}
+              style={styles.rowsSelect}
+              onChange={(e) => {
+                setRowsPerPage(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+            >
+              <option value={30}>30 / Page</option>
+              <option value={20}>20 / Page</option>
+              <option value={10}>10 / Page</option>
+            </select>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
 
-/* ------------------ STYLES ------------------ */
-
+/* -------- STYLES -------- */
 const styles = {
-  /* FULL WIDTH — NO LEFT/RIGHT SPACE AT ALL */
-  page: {
-    width: "100%",
-    padding: "0px 0px",
-    background: "#fff",
-    margin: 0,
-  },
-
-  headerRow: {
-    width: "100%",
-    display: "flex",
-    justifyContent: "space-between",
-    padding: "10px 20px",
-  },
-
-  title: {
-    fontSize: 28,
-    fontWeight: "800",
-    color: "#1967d2",
-  },
+  page: { width: "100%", padding: "0px", margin: 0, background: "#fff" },
+  headerRow: { display: "flex", justifyContent: "space-between", padding: "10px 20px" },
+  title: { fontSize: 28, fontWeight: 800, color: "#1967d2" },
 
   totalBox: {
-    display: "flex",
-    alignItems: "center",
-    gap: 10,
-    background: "#e8f1ff",
-    padding: "12px 18px",
-    borderRadius: 12,
+    display: "flex", alignItems: "center", gap: 10, background: "#e8f1ff",
+    padding: "12px 18px", borderRadius: 12,
   },
+  totalNumber: { fontSize: 26, fontWeight: 800, color: "#1967d2" },
+  totalLabel: { fontSize: 15, fontWeight: 600, color: "#1967d2" },
 
-  totalNumber: { fontSize: 26, fontWeight: "800", color: "#1967d2" },
-  totalLabel: { fontSize: 15, fontWeight: "600", color: "#1967d2" },
-
-  /* FILTERS ROW (SIDE-BY-SIDE) */
-  filterRow: {
-    display: "flex",
-    gap: 20,
-    width: "100%",
-    padding: "0px 20px",
-    marginBottom: 20,
-  },
-
+  filterRow: { display: "flex", gap: 20, padding: "0 20px", marginBottom: 20 },
   filterCard: {
-    flex: 1,
-    background: "#fff",
-    padding: 15,
-    borderRadius: 12,
+    flex: 1, background: "#fff", padding: 15, borderRadius: 12,
     boxShadow: "0 4px 15px rgba(0,0,0,0.08)",
   },
-
-  filterLabel: {
-    fontWeight: 600,
-    marginBottom: 6,
-    fontSize: 15,
-  },
-
-  select: {
-    width: "100%",
-    padding: 12,
-    borderRadius: 10,
-    border: "1.5px solid #1a73e8",
-    fontSize: 15,
-  },
+  filterLabel: { fontSize: 15, fontWeight: 600, marginBottom: 6 },
+  select: { width: "100%", padding: 12, borderRadius: 10, border: "1.5px solid #1a73e8" },
 
   tableCard: {
-    width: "100%",
-    background: "#fff",
-    padding: "10px 20px",
-    borderRadius: 15,
-    boxShadow: "0 6px 25px rgba(0,0,0,0.1)",
+    width: "100%", background: "#fff", padding: "10px 20px",
+    borderRadius: 12, boxShadow: "0 6px 25px rgba(0,0,0,0.1)",
   },
-
   table: { width: "100%", borderCollapse: "collapse" },
-
-  th: {
-    background: "#f4f4f6",
-    padding: "14px 10px",
-    textAlign: "left",
-    fontWeight: 700,
-  },
-
-  td: {
-    padding: "12px 10px",
-    borderBottom: "1px solid #eee",
-  },
-
+  th: { background: "#f4f4f6", padding: "14px 10px", textAlign: "left", fontWeight: 700 },
+  td: { padding: "12px 10px", borderBottom: "1px solid #eee" },
   row: { height: 50, transition: "0.25s" },
 
-  rankBadge: {
-    background: "#d7ecff",
-    padding: "6px 12px",
-    borderRadius: 8,
-    color: "#005bb7",
-    fontWeight: 600,
-  },
-
+  rankBadge: { background: "#d7ecff", padding: "6px 12px", borderRadius: 8, color: "#005bb7", fontWeight: 600 },
   actionCol: { display: "flex", gap: 10 },
 
-  editBtn: {
-    background: "#28a745",
-    marginTop:"7px",
-    padding: "7px 12px",
-    borderRadius: 6,
-    color: "#fff",
-    border: 0,
-  },
+  editBtn: { background: "#28a745", padding: "7px 12px", borderRadius: 6, color: "#fff", border: 0, marginTop: 7 },
 
-  deleteBtn: {
-    background: "#d32f2f",
-     marginTop:"7px",
-    padding: "7px 12px",
-    borderRadius: 6,
-    color: "#fff",
-    border: 0,
-  },
+  statusActive: { background: "#e6ffe6", padding: "5px 12px", borderRadius: 20, color: "#2e7d32", fontWeight: 600 },
+  statusInactive: { background: "#ffe6e6", padding: "5px 12px", borderRadius: 20, color: "#d32f2f", fontWeight: 600 },
 
-  statusActive: {
-    background: "#e6ffe6",
-    padding: "5px 12px",
-    borderRadius: 20,
-    color: "#2e7d32",
-    fontWeight: 600,
-  },
+  noData: { textAlign: "center", padding: 40, fontSize: 18, color: "#888" },
 
-  statusInactive: {
-    background: "#ffe6e6",
-    padding: "5px 12px",
-    borderRadius: 20,
-    color: "#d32f2f",
-    fontWeight: 600,
+  paginationContainer: { display: "flex", justifyContent: "center", gap: 10, padding: 15 },
+  pageBtn: {
+    padding: "6px 14px", borderRadius: 6, border: "1px solid #1967d2",
+    background: "white", cursor: "pointer",
   },
-
-  statusOther: {
-    background: "#fff8e1",
-    padding: "5px 12px",
-    borderRadius: 20,
-    color: "#ff9800",
-    fontWeight: 600,
-  },
-
-  noData: {
-    textAlign: "center",
-    padding: 40,
-    fontSize: 18,
-    color: "#888",
-  },
+  activePage: { background: "#1967d2", color: "white", fontWeight: 700 },
+  rowsSelect: { padding: "6px 14px", borderRadius: 6, border: "1px solid #1967d2" },
 };

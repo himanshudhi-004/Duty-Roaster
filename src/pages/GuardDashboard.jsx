@@ -75,7 +75,10 @@ export default function GuardDashboard() {
             LOGOUT
   ----------------------------------------- */
   const handleLogout = () => {
+
     localStorage.removeItem("guardToken");
+    localStorage.removeItem("role");
+    console.log("Logged out successfully");
     navigate("/login");
   };
 

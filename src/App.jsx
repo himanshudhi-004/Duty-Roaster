@@ -1,27 +1,25 @@
+// src/App.jsx
 import React, { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-// ===================== CONTEXT =====================
+// CONTEXT
 import { VipProvider } from "./context/VipContext";
 import { GuardProvider } from "./context/GuardContext";
 import { AdminProvider } from "./context/AdminContext";
 
-// ===================== AUTH =====================
+// AUTH
 import AdminLogin from "./components/AdminLogin";
 import Logout from "./components/Logout";
 import PrivateRoute from "./components/PrivateRoute";
 
-// ===================== ADMIN =====================
+// ADMIN
 import AdminForm from "./components/AdminForm";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminListPage from "./pages/AdminListPage";
 import AdminProfile from "./components/AdminProfile";
-import AdminEditPage from "./pages/AdminEditPage";   
+import AdminEditPage from "./pages/AdminEditPage";
 
-
-//import VipPrivateRoute from "./components/VipPrivateRoute";
-
-// ===================== VIP =====================
+// VIP
 import VIPForm from "./components/VIPForm";
 import VipListPage from "./pages/VipListPage";
 import VipGuardManagement from "./components/VipGuardManagement";
@@ -29,26 +27,26 @@ import VipDashboard from "./pages/VipDashboard";
 import VipLayout from "./layouts/Viplayout";
 import VipProfile from "./components/VipProfile";
 
-// ===================== GUARD =====================
+// GUARD
 import GuardForm from "./components/GuardForm";
 import GuardListPage from "./pages/GuardListPage";
 import GuardDashboard from "./pages/GuardDashboard";
 import GuardProfile from "./components/GuardProfile";
 import Guardlayout from "./layouts/Guardlayout";
 
-// ===================== LAYOUTS =====================
+// LAYOUTS
 import Adminlayout from "./layouts/Adminlayout";
 
-// ===================== VIP AUTO ASSIGN =====================
+// AUTO ASSIGN
 import VipAutoAssign from "./pages/VipAutoAssign";
 
-// ===================== TOAST =====================
+// TOAST
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import GuardShift from "./components/GuardShift";
 
 function App() {
-  // Auto logout activity tracker
+  // Auto logout activity timer
   useEffect(() => {
     const resetActivityTimer = () => {
       localStorage.setItem("lastActiveTime", Date.now());
@@ -68,22 +66,15 @@ function App() {
       <AdminProvider>
         <VipProvider>
           <GuardProvider>
-            <ToastContainer
-              position="top-right"
-              autoClose={2000}
-              pauseOnHover
-              draggable
-              theme="colored"
-            />
+            <ToastContainer position="top-right" autoClose={2000} pauseOnHover draggable theme="colored" />
 
             <Routes>
-
-              {/* ============ AUTH ROUTES ============ */}
+              {/* AUTH ROUTES */}
               <Route path="/" element={<AdminLogin />} />
               <Route path="/login" element={<AdminLogin />} />
               <Route path="/logout" element={<Logout />} />
 
-              {/* ============ ADMIN ROUTES ============ */}
+              {/* ADMIN ROUTES */}
               <Route path="/register" element={<AdminForm />} />
 
               <Route
@@ -98,7 +89,7 @@ function App() {
               <Route
                 path="/adminlist"
                 element={
-                  <PrivateRoute>
+                  <PrivateRoute role="admin">
                     <Adminlayout><AdminListPage /></Adminlayout>
                   </PrivateRoute>
                 }
@@ -107,17 +98,16 @@ function App() {
               <Route
                 path="/adminprofile"
                 element={
-                  <PrivateRoute>
+                  <PrivateRoute role="admin">
                     <Adminlayout><AdminProfile /></Adminlayout>
                   </PrivateRoute>
                 }
               />
 
-              {/*  FIXED: ADMIN EDIT PAGE */}
               <Route
                 path="/adminedit"
                 element={
-                  <PrivateRoute>
+                  <PrivateRoute role="admin">
                     <Adminlayout><AdminEditPage /></Adminlayout>
                   </PrivateRoute>
                 }
@@ -126,27 +116,27 @@ function App() {
               <Route
                 path="/vip-auto-assign"
                 element={
-                  <PrivateRoute>
+                  <PrivateRoute role="admin">
                     <Adminlayout><VipAutoAssign /></Adminlayout>
                   </PrivateRoute>
                 }
               />
 
-              {/* ============ VIP ROUTES ============ */}
-                 <Route
+              {/* VIP ROUTES */}
+              <Route
                 path="/vipdashboard"
                 element={
-                     <PrivateRoute role="vip">
-                      <VipLayout><VipDashboard /></VipLayout>
-                     </PrivateRoute>  
+                  <PrivateRoute role="vip">
+                    <VipLayout><VipDashboard /></VipLayout>
+                  </PrivateRoute>
                 }
               />
 
               <Route
                 path="/vipform"
                 element={
-                  <PrivateRoute>
-                    <VIPForm />
+                  <PrivateRoute role="admin">
+                    <Adminlayout><VIPForm /></Adminlayout>
                   </PrivateRoute>
                 }
               />
@@ -154,7 +144,7 @@ function App() {
               <Route
                 path="/viplist"
                 element={
-                  <PrivateRoute>
+                  <PrivateRoute role="admin">
                     <Adminlayout><VipListPage /></Adminlayout>
                   </PrivateRoute>
                 }
@@ -163,7 +153,7 @@ function App() {
               <Route
                 path="/vgmang"
                 element={
-                  <PrivateRoute>
+                  <PrivateRoute role="admin">
                     <Adminlayout><VipGuardManagement /></Adminlayout>
                   </PrivateRoute>
                 }
@@ -172,35 +162,43 @@ function App() {
               <Route
                 path="/vipprofile"
                 element={
-                  <PrivateRoute>
+                  <PrivateRoute role="vip">
                     <VipLayout><VipProfile /></VipLayout>
                   </PrivateRoute>
                 }
               />
 
-              {/* ============ GUARD ROUTES ============ */}
-                <Route
+              {/* GUARD ROUTES */}
+              <Route
                 path="/guarddashboard"
                 element={
-                    <PrivateRoute role="guard">
-                      <Guardlayout><GuardDashboard /></Guardlayout>
-                   </PrivateRoute>  
+                  <PrivateRoute role="guard">
+                    <Guardlayout><GuardDashboard /></Guardlayout>
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/guardshift"
+                element={
+                  <PrivateRoute role="guard">
+                    <Guardlayout><GuardShift /></Guardlayout>
+                  </PrivateRoute>
                 }
               />
 
               <Route
                 path="/guardform"
                 element={
-                   <PrivateRoute>
-                    <GuardForm />
-                   </PrivateRoute>
+                  <PrivateRoute role="admin">
+                    <Adminlayout><GuardForm /></Adminlayout>
+                  </PrivateRoute>
                 }
               />
 
               <Route
                 path="/guardlist"
                 element={
-                  <PrivateRoute>
+                  <PrivateRoute role="admin">
                     <Adminlayout><GuardListPage /></Adminlayout>
                   </PrivateRoute>
                 }
@@ -209,12 +207,11 @@ function App() {
               <Route
                 path="/guardprofile"
                 element={
-                  <PrivateRoute>
+                  <PrivateRoute role="guard">
                     <Guardlayout><GuardProfile /></Guardlayout>
                   </PrivateRoute>
                 }
               />
-
             </Routes>
           </GuardProvider>
         </VipProvider>

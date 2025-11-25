@@ -6,9 +6,12 @@ import { toast } from "react-toastify";
 export default function VipDetails() {
   const { handleEdit, refreshTrigger } = useVipStore();
   const [vipList, setVipList] = useState([]);
-
   const [selectedDesignation, setSelectedDesignation] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
+
+  /* PAGINATION STATES */
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(30); // DEFAULT SHOW 30
 
   /* FETCH VIP LIST */
   useEffect(() => {
@@ -24,7 +27,7 @@ export default function VipDetails() {
     fetchVips();
   }, [refreshTrigger]);
 
-  /* DELETE VIP */
+  /* DELETE */
   const handleDelete = async (id) => {
     try {
       await deleteVip(id);
@@ -36,15 +39,27 @@ export default function VipDetails() {
     }
   };
 
-  /* UNIQUE DESIGNATIONS */
+  /* Unique designations */
   const designations = [...new Set(vipList.map((v) => v.designation))];
 
-  /* FILTERING LOGIC */
+  /* FILTER */
   const filteredVips = vipList.filter((v) => {
     const desMatch = selectedDesignation ? v.designation === selectedDesignation : true;
     const statusMatch = selectedStatus ? v.status === selectedStatus : true;
     return desMatch && statusMatch;
   });
+
+  /* PAGINATION */
+  const totalPages = Math.ceil(filteredVips.length / rowsPerPage);
+
+  const currentData = filteredVips.slice(
+    (currentPage - 1) * rowsPerPage,
+    currentPage * rowsPerPage
+  );
+
+  const goToPage = (page) => {
+    if (page >= 1 && page <= totalPages) setCurrentPage(page);
+  };
 
   return (
     <div style={styles.page}>
@@ -52,22 +67,22 @@ export default function VipDetails() {
       {/* HEADER */}
       <div style={styles.headerRow}>
         <h2 style={styles.title}>VIP Records</h2>
-
         <div style={styles.totalBox}>
           <span style={styles.totalNumber}>{vipList.length}</span>
           <span style={styles.totalLabel}>Total VIPs</span>
         </div>
       </div>
 
-      {/* FILTER ROW (TWO BOXES SIDE BY SIDE) */}
+      {/* FILTER ROW */}
       <div style={styles.filterRow}>
-
-        {/* DESIGNATION FILTER */}
         <div style={styles.filterCard}>
           <label style={styles.filterLabel}>Designation</label>
           <select
             value={selectedDesignation}
-            onChange={(e) => setSelectedDesignation(e.target.value)}
+            onChange={(e) => {
+              setSelectedDesignation(e.target.value);
+              setCurrentPage(1);
+            }}
             style={styles.select}
           >
             <option value="">All</option>
@@ -77,26 +92,26 @@ export default function VipDetails() {
           </select>
         </div>
 
-        {/* STATUS FILTER */}
         <div style={styles.filterCard}>
           <label style={styles.filterLabel}>Status</label>
           <select
             value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
+            onChange={(e) => {
+              setSelectedStatus(e.target.value);
+              setCurrentPage(1);
+            }}
             style={styles.select}
           >
             <option value="">All</option>
             <option>Active</option>
             <option>Inactive</option>
-            {/* <option>Other</option> */}
           </select>
         </div>
-
       </div>
 
       {/* TABLE */}
       <div style={styles.tableCard}>
-        {filteredVips.length === 0 ? (
+        {currentData.length === 0 ? (
           <div style={styles.noData}>No VIP Records Found</div>
         ) : (
           <table style={styles.table}>
@@ -105,8 +120,6 @@ export default function VipDetails() {
                 <th style={styles.th}>#</th>
                 <th style={styles.th}>Name</th>
                 <th style={styles.th}>Email</th>
-                <th style={styles.th}>Username</th>
-                <th style={styles.th}>Password</th>
                 <th style={styles.th}>Designation</th>
                 <th style={styles.th}>Contact</th>
                 <th style={styles.th}>Status</th>
@@ -115,40 +128,20 @@ export default function VipDetails() {
             </thead>
 
             <tbody>
-              {filteredVips.map((vip, index) => {
+              {currentData.map((vip, index) => {
                 const statusStyle =
                   vip.status === "Active"
                     ? styles.statusActive
-                    : vip.status === "Inactive"
-                    ? styles.statusInactive
-                    : styles.statusOther;
+                    : styles.statusInactive;
 
                 return (
-                  <tr
-                    key={vip.id}
-                    style={styles.row}
-                    onMouseEnter={(e) =>
-                      (e.currentTarget.style.background = "rgba(25,103,210,0.06)")
-                    }
-                    onMouseLeave={(e) =>
-                      (e.currentTarget.style.background = "transparent")
-                    }
-                  >
-                    <td style={styles.td}>{index + 1}</td>
+                  <tr key={vip.id} style={styles.row}>
+                    <td style={styles.td}>{index + 1 + (currentPage - 1) * rowsPerPage}</td>
                     <td style={styles.td}>{vip.name}</td>
                     <td style={styles.td}>{vip.email}</td>
-                    <td style={styles.td}>{vip.username}</td>
-                    <td style={styles.td}>{vip.password}</td>
-
-                    <td style={styles.td}>
-                      <span style={styles.badge}>{vip.designation}</span>
-                    </td>
-
+                    <td style={styles.td}><span style={styles.badge}>{vip.designation}</span></td>
                     <td style={styles.td}>{vip.contactno}</td>
-
-                    <td style={styles.td}>
-                      <span style={statusStyle}>{vip.status}</span>
-                    </td>
+                    <td style={styles.td}><span style={statusStyle}>{vip.status}</span></td>
 
                     <td style={styles.actionCol}>
                       <button style={styles.editBtn} onClick={() => handleEdit(vip)}>
@@ -164,156 +157,108 @@ export default function VipDetails() {
             </tbody>
           </table>
         )}
-      </div>
 
+        {/* PAGINATION */}
+        {totalPages > 1 && (
+          <div style={styles.paginationContainer}>
+            <button
+              disabled={currentPage === 1}
+              style={styles.pageBtn}
+              onClick={() => goToPage(currentPage - 1)}
+            >
+              Prev
+            </button>
+
+            {[...Array(totalPages)].map((_, i) => (
+              <button
+                key={i}
+                style={{
+                  ...styles.pageBtn,
+                  ...(currentPage === i + 1 ? styles.activePage : {}),
+                }}
+                onClick={() => goToPage(i + 1)}
+              >
+                {i + 1}
+              </button>
+            ))}
+
+            <button
+              disabled={currentPage === totalPages}
+              style={styles.pageBtn}
+              onClick={() => goToPage(currentPage + 1)}
+            >
+              Next
+            </button>
+
+            <select
+              value={rowsPerPage}
+              style={styles.rowsSelect}
+              onChange={(e) => {
+                setRowsPerPage(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+            >
+              <option value={30}>30 / Page</option>
+              <option value={20}>20 / Page</option>
+              <option value={10}>10 / Page</option>
+            </select>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
 
-/* ------------------ STYLES ------------------ */
-
+/* ---- STYLES ---- */
 const styles = {
-  /* FULL WIDTH, NO LEFT/RIGHT SPACING */
-  page: {
-    width: "100%",
-    padding: "0px",
-    margin: 0,
-    background: "#fff",
-  },
+  page: { width: "100%", padding: "0px", margin: 0, background: "#fff" },
+  headerRow: { width: "100%", display: "flex", justifyContent: "space-between", padding: "10px 20px" },
+  title: { fontSize: 28, fontWeight: 800, color: "#1967d2" },
+  totalBox: { display: "flex", alignItems: "center", gap: 10, background: "#e8f1ff", padding: "12px 18px", borderRadius: 12 },
+  totalNumber: { fontSize: 26, fontWeight: 800, color: "#1967d2" },
+  totalLabel: { fontSize: 15, fontWeight: 600, color: "#1967d2" },
 
-  headerRow: {
-    width: "100%",
-    display: "flex",
-    justifyContent: "space-between",
-    padding: "10px 20px",
-  },
-
-  title: {
-    fontSize: 28,
-    fontWeight: "800",
-    color: "#1967d2",
-  },
-
-  totalBox: {
-    display: "flex",
-    alignItems: "center",
-    gap: 10,
-    background: "#e8f1ff",
-    padding: "12px 18px",
-    borderRadius: 12,
-  },
-
-  totalNumber: { fontSize: 26, fontWeight: "800", color: "#1967d2" },
-  totalLabel: { fontSize: 15, fontWeight: "600", color: "#1967d2" },
-
-  /* FILTERS SIDE BY SIDE */
-  filterRow: {
-    display: "flex",
-    gap: 20,
-    width: "100%",
-    padding: "0px 20px",
-    marginBottom: 20,
-  },
-
+  filterRow: { display: "flex", gap: 20, width: "100%", padding: "0px 20px", marginBottom: 20 },
   filterCard: {
-    flex: 1,
-    background: "#fff",
-    padding: 15,
-    borderRadius: 12,
+    flex: 1, background: "#fff", padding: 15, borderRadius: 12,
     boxShadow: "0 4px 15px rgba(0,0,0,0.08)",
   },
-
-  filterLabel: {
-    fontWeight: 600,
-    marginBottom: 6,
-    fontSize: 15,
-  },
-
-  select: {
-    width: "100%",
-    padding: 12,
-    borderRadius: 10,
-    border: "1.5px solid #1a73e8",
-    fontSize: 15,
-  },
+  filterLabel: { fontWeight: 600, marginBottom: 6, fontSize: 15 },
+  select: { width: "100%", padding: 12, borderRadius: 10, border: "1.5px solid #1a73e8", fontSize: 15 },
 
   tableCard: {
-    width: "100%",
-    background: "#fff",
-    padding: "10px 20px",
-    borderRadius: 12,
+    width: "100%", background: "#fff", padding: "10px 20px", borderRadius: 12,
     boxShadow: "0 6px 25px rgba(0,0,0,0.1)",
   },
 
   table: { width: "100%", borderCollapse: "collapse" },
-
-  th: {
-    background: "#f4f4f6",
-    padding: "14px 10px",
-    textAlign: "left",
-    fontWeight: 700,
-  },
-
+  th: { background: "#f4f4f6", padding: "14px 10px", textAlign: "left", fontWeight: 700 },
   td: { padding: "12px 10px", borderBottom: "1px solid #eee" },
-
   row: { height: 50, transition: "0.25s" },
 
-  badge: {
-    background: "#d7ecff",
-    padding: "6px 12px",
-    borderRadius: 8,
-    color: "#005bb7",
-    fontWeight: 600,
-  },
-
+  badge: { background: "#d7ecff", padding: "6px 12px", borderRadius: 8, color: "#005bb7", fontWeight: 600 },
   actionCol: { display: "flex", gap: 10 },
 
-  editBtn: {
-    background: "#28a745",
-    marginTop:"7px",
-    padding: "7px 12px",
-    borderRadius: 6,
-    color: "#fff",
-    border: 0,
-  },
+  editBtn: { background: "#28a745", padding: "7px 12px", borderRadius: 6, color: "#fff", border: 0, marginTop: 7 },
+  deleteBtn: { background: "#d32f2f", padding: "7px 12px", borderRadius: 6, color: "#fff", border: 0, marginTop: 7 },
 
-  deleteBtn: {
-    background: "#d32f2f",
-    marginTop:"7px",
-    padding: "7px 12px",
-    borderRadius: 6,
-    color: "#fff",
-    border: 0,
-  },
+  statusActive: { background: "#e6ffe6", padding: "5px 12px", borderRadius: 20, color: "#2e7d32", fontWeight: 600 },
+  statusInactive: { background: "#ffe6e6", padding: "5px 12px", borderRadius: 20, color: "#d32f2f", fontWeight: 600 },
 
-  statusActive: {
-    background: "#e6ffe6",
-    padding: "5px 12px",
-    borderRadius: 20,
-    color: "#2e7d32",
-    fontWeight: 600,
-  },
+  noData: { textAlign: "center", padding: 40, fontSize: 18, color: "#777" },
 
-  statusInactive: {
-    background: "#ffe6e6",
-    padding: "5px 12px",
-    borderRadius: 20,
-    color: "#d32f2f",
-    fontWeight: 600,
+  paginationContainer: {
+    display: "flex", justifyContent: "center", alignItems: "center",
+    padding: 15, gap: 10
   },
-
-  statusOther: {
-    background: "#fff8e1",
-    padding: "5px 12px",
-    borderRadius: 20,
-    color: "#ff9800",
-    fontWeight: 600,
+  pageBtn: {
+    padding: "6px 14px", borderRadius: 6, border: "1px solid #1967d2",
+    background: "white", cursor: "pointer"
   },
-
-  noData: {
-    textAlign: "center",
-    padding: 40,
-    fontSize: 18,
-    color: "#777",
+  activePage: {
+    background: "#1967d2", color: "white", fontWeight: 700
+  },
+  rowsSelect: {
+    padding: "6px 14px", borderRadius: 6, border: "1px solid #1967d2"
   }
 };

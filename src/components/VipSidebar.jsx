@@ -1,7 +1,14 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink,useNavigate } from "react-router-dom";
 
 export default function VipSidebar() {
+  const navigate = useNavigate();
+  //  Handle Logout
+  const handleLogout = () => {
+    localStorage.removeItem("vipToken");
+    localStorage.removeItem("role");
+    navigate("/login");
+  };
   return (
     <div style={styles.sidebarContainer} className="sidebar">
 
@@ -56,6 +63,15 @@ export default function VipSidebar() {
               <i className="fas fa-bell" style={styles.icon}></i>
               <span>Guard Notifications</span>
             </NavLink>
+          </li>
+
+          
+          <li>
+            <button to="/login" className="menu-link" style={styles.menuLink} onClick={handleLogout}>
+              <i className="fas fa-sign-out-alt" style={styles.icon}></i>
+              <span>Logout</span>
+            </button>
+
           </li>
 
         </ul>

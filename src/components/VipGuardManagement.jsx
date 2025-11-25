@@ -17,13 +17,17 @@ export default function VipGuardManagement() {
   const [vipList, setVipList] = useState([]);
 
   const [selectedDesignation, setSelectedDesignation] = useState("");
-  const [selectedStatus, setSelectedStatus] = useState(""); // ADDED STATUS FILTER ✔
+  const [selectedStatus, setSelectedStatus] = useState("");
 
   const [popupData, setPopupData] = useState(null);
   const [popupPos, setPopupPos] = useState({ top: 0, left: 0 });
 
   const navigate = useNavigate();
   const rowRefs = useRef({});
+
+  /* PAGINATION */
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(30); // default 30
 
   /* ---------------- FETCH VIP LIST ---------------- */
   useEffect(() => {
@@ -56,12 +60,23 @@ export default function VipGuardManagement() {
   /* ---------------- FILTER ---------------- */
   const designations = [...new Set(vipList.map((v) => v.designation))];
 
-  const filtered =
-    vipList.filter((v) => {
-      const desMatch = selectedDesignation ? v.designation === selectedDesignation : true;
-      const statusMatch = selectedStatus ? v.status === selectedStatus : true;
-      return desMatch && statusMatch;
-    });
+  const filtered = vipList.filter((v) => {
+    const desMatch = selectedDesignation ? v.designation === selectedDesignation : true;
+    const statusMatch = selectedStatus ? v.status === selectedStatus : true;
+    return desMatch && statusMatch;
+  });
+
+  /* PAGINATION LOGIC */
+  const totalPages = Math.ceil(filtered.length / rowsPerPage);
+
+  const currentData = filtered.slice(
+    (currentPage - 1) * rowsPerPage,
+    currentPage * rowsPerPage
+  );
+
+  const goToPage = (page) => {
+    if (page >= 1 && page <= totalPages) setCurrentPage(page);
+  };
 
   /* ---------------- POPUP ---------------- */
   const openPopup = (e, vip, id) => {
@@ -87,14 +102,16 @@ export default function VipGuardManagement() {
     <div style={styles.container}>
       <h2 style={styles.title}>VIP Guard Assignment</h2>
 
-      {/* ---------------- FILTERS IN ONE ROW ---------------- */}
+      {/* ---------------- FILTERS ---------------- */}
       <div style={styles.filterRow}>
-        {/* DESIGNATION FILTER */}
         <div style={styles.filterCard}>
           <label style={styles.filterLabel}>Designation</label>
           <select
             value={selectedDesignation}
-            onChange={(e) => setSelectedDesignation(e.target.value)}
+            onChange={(e) => {
+              setSelectedDesignation(e.target.value);
+              setCurrentPage(1);
+            }}
             style={styles.select}
           >
             <option value="">All</option>
@@ -104,25 +121,26 @@ export default function VipGuardManagement() {
           </select>
         </div>
 
-        {/* STATUS FILTER — NEW ✔*/}
         <div style={styles.filterCard}>
           <label style={styles.filterLabel}>Status</label>
           <select
             value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
+            onChange={(e) => {
+              setSelectedStatus(e.target.value);
+              setCurrentPage(1);
+            }}
             style={styles.select}
           >
             <option value="">All</option>
             <option>Active</option>
             <option>Inactive</option>
-            {/* <option>Other</option> */}
           </select>
         </div>
       </div>
 
       {/* VIP TABLE */}
       <div style={styles.card}>
-        {filtered.length === 0 ? (
+        {currentData.length === 0 ? (
           <div style={styles.noData}>No VIP Records Found</div>
         ) : (
           <table style={styles.table}>
@@ -139,35 +157,13 @@ export default function VipGuardManagement() {
             </thead>
 
             <tbody>
-              {filtered.map((vip, index) => {
-                /* ----------- STATUS BADGE COLORS ----------- */
+              {currentData.map((vip, index) => {
                 const statusStyle =
                   vip.status === "Active"
-                    ? {
-                        background: "#e6ffe6",
-                        padding: "6px 12px",
-                        borderRadius: 20,
-                        color: "#2e7d32",
-                        fontWeight: 600,
-                        fontSize: 13,
-                      }
+                    ? styles.statusActive
                     : vip.status === "Inactive"
-                    ? {
-                        background: "#ffe6e6",
-                        padding: "6px 12px",
-                        borderRadius: 20,
-                        color: "#d32f2f",
-                        fontWeight: 600,
-                        fontSize: 13,
-                      }
-                    : {
-                        background: "#fff8e1",
-                        padding: "6px 12px",
-                        borderRadius: 20,
-                        color: "#ff9800",
-                        fontWeight: 600,
-                        fontSize: 13,
-                      };
+                    ? styles.statusInactive
+                    : styles.statusOther;
 
                 return (
                   <tr
@@ -178,25 +174,15 @@ export default function VipGuardManagement() {
                       navigate(`/vip-auto-assign`, { state: { vip } })
                     }
                   >
-                    <td style={styles.td}>{index + 1}</td>
+                    <td style={styles.td}>{index + 1 + (currentPage - 1) * rowsPerPage}</td>
                     <td style={styles.td}>{vip.name}</td>
                     <td style={styles.td}>{vip.email}</td>
-
-                    <td style={styles.td}>
-                      <span style={styles.badge}>{vip.designation}</span>
-                    </td>
-
+                    <td style={styles.td}><span style={styles.badge}>{vip.designation}</span></td>
                     <td style={styles.td}>{vip.contactno}</td>
-
-                    <td style={styles.td}>
-                      <span style={statusStyle}>{vip.status}</span>
-                    </td>
+                    <td style={styles.td}><span style={statusStyle}>{vip.status}</span></td>
 
                     <td style={styles.actionCol}>
-                      <button
-                        style={styles.infoBtn}
-                        onClick={(e) => openPopup(e, vip, vip.id)}
-                      >
+                      <button style={styles.infoBtn} onClick={(e) => openPopup(e, vip, vip.id)}>
                         <i className="fa fa-eye"></i>
                       </button>
                     </td>
@@ -206,14 +192,58 @@ export default function VipGuardManagement() {
             </tbody>
           </table>
         )}
+
+        {/* PAGINATION UI */}
+        {totalPages > 1 && (
+          <div style={styles.paginationContainer}>
+            <button
+              disabled={currentPage === 1}
+              style={styles.pageBtn}
+              onClick={() => goToPage(currentPage - 1)}
+            >
+              Prev
+            </button>
+
+            {[...Array(totalPages)].map((_, i) => (
+              <button
+                key={i}
+                style={{
+                  ...styles.pageBtn,
+                  ...(currentPage === i + 1 ? styles.activePage : {}),
+                }}
+                onClick={() => goToPage(i + 1)}
+              >
+                {i + 1}
+              </button>
+            ))}
+
+            <button
+              disabled={currentPage === totalPages}
+              style={styles.pageBtn}
+              onClick={() => goToPage(currentPage + 1)}
+            >
+              Next
+            </button>
+
+            <select
+              value={rowsPerPage}
+              style={styles.rowsSelect}
+              onChange={(e) => {
+                setRowsPerPage(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+            >
+              <option value={30}>30 / Page</option>
+              <option value={20}>20 / Page</option>
+              <option value={10}>10 / Page</option>
+            </select>
+          </div>
+        )}
       </div>
 
-      {/* ---------------- POPUP ---------------- */}
+      {/* POPUP */}
       {popupData && (
-        <div
-          style={{ ...styles.popup, top: popupPos.top, left: popupPos.left }}
-          onMouseLeave={() => setPopupData(null)}
-        >
+        <div style={{ ...styles.popup, top: popupPos.top, left: popupPos.left }} onMouseLeave={() => setPopupData(null)}>
           <div style={styles.arrow}></div>
 
           <h3 style={styles.popupTitle}>{popupData.name}</h3>
@@ -221,26 +251,10 @@ export default function VipGuardManagement() {
           <p style={styles.popText}>🎖 {popupData.designation}</p>
           <p style={styles.popText}>📞 {popupData.contactno}</p>
 
-          {popupData.status?.toLowerCase() === "active" ? (
-            <p style={styles.popText}>
-              <span className="badge bg-success" style={{ padding: "7px 10px" }}>
-                ✔ Active
-              </span>
-            </p>
-          ) : (
-            <p style={styles.popText}>
-              <span className="badge bg-danger" style={{ padding: "7px 10px" }}>
-                ✘ Inactive
-              </span>
-            </p>
-          )}
-
           <h4 style={{ fontWeight: 700, marginTop: 10 }}>Required Guards:</h4>
 
           {(guardDistribution[popupData.designation] || []).map((item, i) => (
-            <p key={i} style={styles.popText}>
-              {item}
-            </p>
+            <p key={i} style={styles.popText}>{item}</p>
           ))}
         </div>
       )}
@@ -249,24 +263,11 @@ export default function VipGuardManagement() {
 }
 
 /* ------------------------------ STYLES ----------------------------- */
-
 const styles = {
   container: { padding: 30, background: "#fff" },
+  title: { fontSize: 30, fontWeight: 800, marginBottom: 25, color: "#1967d2" },
 
-  title: {
-    fontSize: 30,
-    fontWeight: 800,
-    marginBottom: 25,
-    color: "#1967d2",
-  },
-
-  /* NEW: FILTERS SIDE BY SIDE */
-  filterRow: {
-    display: "flex",
-    gap: 20,
-    marginBottom: 25,
-  },
-
+  filterRow: { display: "flex", gap: 20, marginBottom: 25 },
   filterCard: {
     flex: 1,
     padding: 18,
@@ -274,9 +275,7 @@ const styles = {
     background: "#fff",
     boxShadow: "0 3px 12px rgba(0,0,0,0.08)",
   },
-
   filterLabel: { fontSize: 15, fontWeight: 600, marginBottom: 6 },
-
   select: {
     width: "100%",
     padding: "12px",
@@ -285,77 +284,42 @@ const styles = {
     fontSize: 15,
   },
 
-  card: {
-    background: "#fff",
-    padding: 10,
-    borderRadius: 15,
-    boxShadow: "0 6px 25px rgba(0,0,0,0.1)",
-    marginBottom: 150,
-  },
-
+  card: { background: "#fff", padding: 10, borderRadius: 15, boxShadow: "0 6px 25px rgba(0,0,0,0.1)" },
   table: { width: "100%", borderCollapse: "collapse" },
+  th: { background: "#f4f4f6", padding: "16px 10px", textAlign: "left", borderBottom: "2px solid #ddd", fontWeight: 700 },
+  row: { height: 62, transition: "0.25s", cursor: "pointer" },
+  td: { padding: "14px 10px", borderBottom: "1px solid #eee" },
 
-  th: {
-    background: "#f4f4f6",
-    padding: "16px 10px",
-    textAlign: "left",
-    borderBottom: "2px solid #ddd",
-    fontSize: 15,
-    fontWeight: 700,
-  },
+  badge: { background: "#d7ecff", padding: "6px 12px", borderRadius: 8, color: "#005bb7", fontWeight: 600 },
 
-  row: {
-    height: "62px",
-    transition: "0.25s",
+  infoBtn: { background: "#1976d2", padding: "7px 12px", border: 0, color: "#fff", borderRadius: 8 },
+
+  statusActive: { background: "#e6ffe6", padding: "6px 12px", borderRadius: 20, color: "#2e7d32", fontWeight: 600 },
+  statusInactive: { background: "#ffe6e6", padding: "6px 12px", borderRadius: 20, color: "#d32f2f", fontWeight: 600 },
+  statusOther: { background: "#fff8e1", padding: "6px 12px", borderRadius: 20, color: "#ff9800", fontWeight: 600 },
+
+  noData: { textAlign: "center", padding: 40, fontSize: 18, color: "#777" },
+
+  paginationContainer: { display: "flex", justifyContent: "center", gap: 10, padding: 15 },
+  pageBtn: {
+    padding: "6px 14px",
+    borderRadius: 6,
+    border: "1px solid #1967d2",
+    background: "white",
     cursor: "pointer",
   },
-
-  td: {
-    padding: "14px 10px",
-    borderBottom: "1px solid #eee",
-    fontSize: 15,
-  },
-
-  badge: {
-    background: "#d7ecff",
-    padding: "6px 12px",
-    borderRadius: 8,
-    color: "#005bb7",
-    fontWeight: "600",
-    fontSize: 13,
-  },
-
-  actionCol: {
-    display: "flex",
-    gap: 12,
-    paddingTop: "12px",
-  },
-
-  infoBtn: {
-    background: "#1976d2",
-    padding: "7px 12px",
-    border: "none",
-    color: "#fff",
-    borderRadius: 8,
-  },
-
-  noData: {
-    textAlign: "center",
-    padding: 40,
-    fontSize: 18,
-    color: "#777",
-  },
+  activePage: { background: "#1967d2", color: "#fff", fontWeight: 700 },
+  rowsSelect: { padding: "6px 14px", borderRadius: 6, border: "1px solid #1967d2" },
 
   popup: {
     position: "absolute",
     background: "#ffffff",
     padding: 18,
-    width: "260px",
-    borderRadius: "12px",
+    width: 260,
+    borderRadius: 12,
     boxShadow: "0 8px 25px rgba(0,0,0,0.25)",
     zIndex: 5000,
   },
-
   arrow: {
     position: "absolute",
     bottom: "-10px",
@@ -367,15 +331,6 @@ const styles = {
     borderRight: "10px solid transparent",
     borderTop: "10px solid white",
   },
-
   popupTitle: { fontSize: 18, fontWeight: 700, marginBottom: 10 },
-
   popText: { margin: "6px 0", fontSize: 14, color: "#333" },
 };
-
-/* Hover row */
-const styleEl = document.createElement("style");
-styleEl.innerHTML = `
-  table tbody tr:hover { background-color: #e9f3ff !important; }
-`;
-document.head.appendChild(styleEl);

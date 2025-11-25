@@ -11,7 +11,7 @@ export default function AdminLayout({ children }) {
       <Sidebar />
       <div className="main-panel">
         {/* <SideLogoHeader /> */}
-        <Navbar />
+        {/* <Navbar /> */}
         <div className="content">{children}</div>
         <Footer />
       </div>

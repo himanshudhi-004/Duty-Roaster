@@ -12,7 +12,7 @@ export default function Guardlayout({ children }) {
       <GuardSidebar />
       <div className="main-panel">
         {/* <SideLogoHeader /> */}
-        <GuardNavbar />
+        {/* <GuardNavbar /> */}
         <div className="content">{children}</div>
         <Footer />
       </div>

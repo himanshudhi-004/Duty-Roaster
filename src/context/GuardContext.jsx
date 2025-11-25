@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState } from "react";
 
 const GuardContext = createContext();
@@ -22,6 +23,7 @@ export const GuardProvider = ({ children }) => {
         refreshTrigger,
         handleEdit,
         handleBack,
+        setSelectedGuard,
       }}
     >
       {children}
@@ -30,4 +32,3 @@ export const GuardProvider = ({ children }) => {
 };
 
 export const useGuardStore = () => useContext(GuardContext);
- 
