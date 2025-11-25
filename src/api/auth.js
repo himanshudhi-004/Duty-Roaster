@@ -2,13 +2,30 @@ import axios from "axios";
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 
-export const loginUser = async (data, role) => {
+// export const loginUser = async (data, role) => {
+//   try {
+//     const res = await axios.post(`${BASE_URL}/auth/login`, data);
+
+//     if (res.data.data) {
+//       if (role) {
+//         localStorage.setItem(`${role}Token`, res.data.data);
+//         localStorage.setItem(`${role}LastActive`, Date.now());
+//       }
+//       return { success: true, res };
+//     } else {
+//       return { success: false, message: "No token received" };
+//     }
+
+//   } catch (err) {
+//     return { success: false, message: err.message };
+//   }
+// };
+
+export const loginUser = async (data) => {
   try {
     const res = await axios.post(`${BASE_URL}/auth/login`, data);
 
     if (res.data.data) {
-      localStorage.setItem(`${role}Token`, res.data.data);
-      localStorage.setItem(`${role}LastActive`, Date.now());
       return { success: true, res };
     } else {
       return { success: false, message: "No token received" };

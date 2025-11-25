@@ -76,7 +76,7 @@ export default function GuardDashboard() {
   ----------------------------------------- */
   const handleLogout = () => {
     localStorage.removeItem("guardToken");
-    navigate("/guardlogin");
+    navigate("/login");
   };
 
   const totalUsers = vipList.length + guardList.length;

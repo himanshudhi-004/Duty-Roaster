@@ -136,18 +136,18 @@ function App() {
                  <Route
                 path="/vipdashboard"
                 element={
-                    <PrivateRoute role="vip">
+                     <PrivateRoute role="vip">
                       <VipLayout><VipDashboard /></VipLayout>
-                    </PrivateRoute>  
+                     </PrivateRoute>  
                 }
               />
 
               <Route
                 path="/vipform"
                 element={
-                  // <PrivateRoute>
+                  <PrivateRoute>
                     <VIPForm />
-                  // </PrivateRoute>
+                  </PrivateRoute>
                 }
               />
 
@@ -191,9 +191,9 @@ function App() {
               <Route
                 path="/guardform"
                 element={
-                  <PrivateRoute>
+                   <PrivateRoute>
                     <GuardForm />
-                  </PrivateRoute>
+                   </PrivateRoute>
                 }
               />
 

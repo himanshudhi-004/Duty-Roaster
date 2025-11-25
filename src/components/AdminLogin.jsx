@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-import { loginUser } from "../api/auth"; // <-- single function
+import { loginUser } from "../api/auth"; 
 import { toast } from "react-toastify";
 import { FaUserShield } from "react-icons/fa";
 
@@ -14,7 +14,6 @@ export default function AdminLogin() {
   const [loginData, setLoginData] = useState({
     username: "",
     password: "",
-    role: "admin", // default role lowercase for API path
   });
 
   const handleChange = (e) => {
@@ -29,21 +28,28 @@ export default function AdminLogin() {
     setLoading(true);
 
     try {
-      const response = await loginUser(loginData, loginData.role);
+      const response = await loginUser(loginData);
 
       if (response?.success) {
         toast.success("Login successful!");
 
-        // Check backend role here (if returned)
-        const backendRole = response?.res?.data?.role?.toLowerCase() || loginData.role;
+        // Fetch backend role
+        const backendRole = response?.res?.data?.role?.toLowerCase();
+        console.log("Role from API:", backendRole);
 
-        console.log("Logged in as:", backendRole);
+        // Save token with role key
+        if (backendRole) {
+          localStorage.setItem("role", backendRole);
+          localStorage.setItem(`${backendRole}Token`, response?.res?.data?.data);
+          localStorage.setItem(`${backendRole}LastActive`, Date.now());
 
+        }
+
+        // Redirect using backend role
         if (backendRole === "admin") navigate("/admindashboard");
         else if (backendRole === "vip") navigate("/vipdashboard");
         else if (backendRole === "guard") navigate("/guarddashboard");
         else toast.error("Unauthorized role!");
-
       } else {
         toast.error("Invalid username or password!");
       }
@@ -102,23 +108,6 @@ export default function AdminLogin() {
         </div>
 
         <form onSubmit={handleLogin} style={{ padding: "30px 30px" }}>
-
-          <select
-            name="role"
-            value={loginData.role}
-            onChange={handleChange}
-            style={{
-              width: "100%",
-              padding: "12px",
-              borderRadius: "8px",
-              border: "1px solid #ccc",
-              marginBottom: "18px",
-            }}
-          >
-            <option value="admin">Admin</option>
-            <option value="vip">VIP</option>
-            <option value="guard">Guard</option>
-          </select>
 
           <input
             type="text"

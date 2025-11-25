@@ -38,6 +38,7 @@ export default function VipDashboard() {
   const loadVip = async () => {
     try {
       const data = await getAllVip();
+      console.log("VIP DATA:", data);
       if (Array.isArray(data)) setVipList(data);
       else if (Array.isArray(data?.data)) setVipList(data.data);
       else setVipList([]);
@@ -76,7 +77,7 @@ export default function VipDashboard() {
   ----------------------------------------- */
   const handleLogout = () => {
     localStorage.removeItem("vipToken");
-    navigate("/viplogin");
+    navigate("/login");
   };
 
   const totalUsers = vipList.length + guardList.length;

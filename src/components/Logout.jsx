@@ -13,10 +13,10 @@ export default function Logout() {
       logoutUser("admin");
       navigate("/login");
     } else if (localStorage.getItem("vipToken")) {
-      logoutUser("vip");
+      logoutUser("admin");
       navigate("/login");
     } else if (localStorage.getItem("guardToken")) {
-      logoutUser("guard");
+      logoutUser("admin");
       navigate("/login");
     } else {
       navigate("/login");

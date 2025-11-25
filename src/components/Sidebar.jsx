@@ -126,7 +126,7 @@ export default function Sidebar() {
               <span>Vip-Guard-Management</span>
             </NavLink>
           </li>
-          <li style={styles.sectionTitle}>Notifications</li>
+          {/* <li style={styles.sectionTitle}>Notifications</li>
 
           <li style={styles.menuItem}>
             <NavLink
@@ -148,7 +148,7 @@ export default function Sidebar() {
               <i className="fas fa-bell" style={styles.icon}></i>
               <span>Guard Notifications</span>
             </NavLink>
-          </li>
+          </li> */}
            <li style={styles.menuItem}>
             <NavLink
               to="/adminprofile"

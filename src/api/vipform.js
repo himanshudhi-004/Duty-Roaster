@@ -10,11 +10,21 @@ const api = axios.create({
 });
 
 // Attach token if available
+// api.interceptors.request.use((config) => {
+//   const token = localStorage.getItem("adminToken");
+//   if (token) config.headers.Authorization = `Bearer ${token}`;
+//   return config;
+// });
+
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("adminToken");
+  const role = localStorage.getItem("role"); // admin or vip
+  const token = localStorage.getItem(`${role}Token`);
+
   if (token) config.headers.Authorization = `Bearer ${token}`;
+
   return config;
 });
+
 
 // ====================== ADMIN SECTION ======================
 
