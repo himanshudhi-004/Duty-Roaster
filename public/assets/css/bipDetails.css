@@ -1,0 +1,58 @@
+/* 🌈 Custom Dropdown Styling */
+.dropdown-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+  }
+  
+  .custom-select-animated {
+    width: 100%;
+    padding: 12px 45px 12px 16px;
+    border: 2px solid #007bff;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #f0f8ff, #e6f0ff);
+    font-weight: 500;
+    transition: all 0.3s ease;
+    appearance: none;
+    cursor: pointer;
+  }
+  
+  .custom-select-animated:hover {
+    background: linear-gradient(135deg, #e2ecff, #d6e4ff);
+    box-shadow: 0 3px 8px rgba(0, 123, 255, 0.2);
+  }
+  
+  .custom-select-animated:focus {
+    outline: none;
+    border-color: #0056b3;
+    box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.25);
+  }
+  
+  /* Dropdown arrow icon */
+  .dropdown-icon {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #007bff;
+    font-size: 16px;
+    pointer-events: none;
+    transition: transform 0.3s ease;
+  }
+  
+  .custom-select-animated:focus + .dropdown-icon {
+    transform: translateY(-50%) rotate(180deg);
+  }
+  
+  /* Dropdown card style */
+  .dropdown-card {
+    border-radius: 16px;
+    background: #ffffff;
+    transition: all 0.3s ease;
+  }
+  
+  .dropdown-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+  }
+  
