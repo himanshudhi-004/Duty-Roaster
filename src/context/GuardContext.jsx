@@ -1,11 +1,22 @@
-
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 
 const GuardContext = createContext();
 
 export const GuardProvider = ({ children }) => {
-  const [selectedGuard, setSelectedGuard] = useState(null);
+  // ✅ Load from localStorage on first load
+  const [selectedGuard, setSelectedGuard] = useState(() => {
+    const stored = localStorage.getItem("selectedGuard");
+    return stored ? JSON.parse(stored) : null;
+  });
+
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  // ✅ Auto-sync to localStorage
+  useEffect(() => {
+    if (selectedGuard) {
+      localStorage.setItem("selectedGuard", JSON.stringify(selectedGuard));
+    }
+  }, [selectedGuard]);
 
   const handleEdit = (guard) => {
     setSelectedGuard(guard);
@@ -13,6 +24,7 @@ export const GuardProvider = ({ children }) => {
 
   const handleBack = () => {
     setSelectedGuard(null);
+    localStorage.removeItem("selectedGuard"); // ✅ clear on exit
     setRefreshTrigger((prev) => prev + 1);
   };
 

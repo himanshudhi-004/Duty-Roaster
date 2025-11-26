@@ -52,6 +52,7 @@ import AdminUserWrapper from "./components/AdminUserWrapper";
 /* ---------------- TOAST ---------------- */
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import GuardEditPage from "./pages/GuardEditPage";
 
 function App() {
 
@@ -271,6 +272,14 @@ function App() {
                   element={
                     <PrivateRoute roles={["guard"]}>
                       <Guardlayout><GuardProfile /></Guardlayout>
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/guardedit"
+                  element={
+                    <PrivateRoute roles={["guard"]}>
+                      <Guardlayout><GuardEditPage /></Guardlayout>
                     </PrivateRoute>
                   }
                 />

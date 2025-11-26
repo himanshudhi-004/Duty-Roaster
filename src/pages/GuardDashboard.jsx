@@ -88,9 +88,11 @@ export default function GuardDashboard() {
             STATS ARRAY
   ----------------------------------------- */
   const stats = [
-    { title: "Total VIPs", value: vipList.length, icon: "fas fa-user", color: "#1e73be" },
-    { title: "Total Officers", value: guardList.length, icon: "fas fa-user-shield", color: "#3cb371" },
-    { title: "Total Users", value: totalUsers, icon: "fas fa-users", color: "#ffa500" },
+    // { title: "Total VIPs", value: vipList.length, icon: "fas fa-user", color: "#1e73be" },
+    // { title: "Total Users", value: totalUsers, icon: "fas fa-users", color: "#1e73be" },
+    { title: "Total Officers", value: guardList.length, icon: "fas fa-user-shield", color: "#1e73be" },
+    { title: "Total Assignments", value: totalUsers, icon: "fas fa-tasks", color: "#3cb371" },
+    { title: "Total Incidents", value: totalUsers, icon: "fas fa-exclamation-triangle", color: "#ffa500" },
   ];
 
   /* ---------------------------------------
