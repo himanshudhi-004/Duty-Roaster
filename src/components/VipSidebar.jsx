@@ -1,5 +1,5 @@
 import React from "react";
-import { NavLink,useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 export default function VipSidebar() {
   const navigate = useNavigate();
@@ -56,22 +56,19 @@ export default function VipSidebar() {
 
           <li style={styles.menuItem}>
             <NavLink
-              to="/guardlist"
+              to="/vipprofile"
               style={styles.menuLink}
               className="menu-link"
             >
-              <i className="fas fa-bell" style={styles.icon}></i>
-              <span>Guard Notifications</span>
+              <i className="fas fa-user" style={styles.icon}></i>
+              <span>My Profile</span>
             </NavLink>
           </li>
-
-          
           <li>
             <button to="/login" className="menu-link" style={styles.menuLink} onClick={handleLogout}>
               <i className="fas fa-sign-out-alt" style={styles.icon}></i>
               <span>Logout</span>
             </button>
-
           </li>
 
         </ul>

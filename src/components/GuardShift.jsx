@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { useGuardStore } from "../context/GuardContext";
 
@@ -7,21 +7,25 @@ const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 export default function GuardShift() {
   const navigate = useNavigate();
-  const { selectedGuard } = useGuardStore();
+  const { guardId } = useParams(); // ✅ from URL
+  const { selectedGuard } = useGuardStore(); // ✅ from context
+
+  const finalGuardId = guardId || selectedGuard?.id; // ✅ universal support
+
   const [vip, setVip] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!selectedGuard?.id) {
-      console.warn("Guard missing — redirecting");
-      navigate("/guarddashboard");
+    if (!finalGuardId) {
+      console.warn("Guard ID missing — redirecting");
+      navigate("/guardshift");
       return;
     }
 
     async function fetchVip() {
       try {
         const res = await axios.get(
-          `${BASE_URL}/api/assignments/getvip/${selectedGuard.id}`
+          `${BASE_URL}/api/assignments/getvip/${finalGuardId}`
         );
 
         const extracted =
@@ -30,13 +34,14 @@ export default function GuardShift() {
         setVip(extracted);
       } catch (error) {
         console.error("VIP Fetch Error:", error);
+        setVip(null);
       } finally {
         setLoading(false);
       }
     }
 
     fetchVip();
-  }, [selectedGuard, navigate]);
+  }, [finalGuardId, navigate]);
 
   /* ------------------ LOADING UI ------------------ */
   if (loading) {
@@ -52,8 +57,8 @@ export default function GuardShift() {
   if (!vip) {
     return (
       <div style={styles.emptyBox}>
-        <h2>No VIP Data Found</h2>
-        <button style={styles.backBtn} onClick={() => navigate("/guarddashboard")}>
+        <h2>No VIP Assignment Found</h2>
+        <button style={styles.backBtn} onClick={() => navigate("/guardshift")}>
           Go Back
         </button>
       </div>
@@ -75,55 +80,44 @@ export default function GuardShift() {
 
       {/* SHIFT CARD */}
       <div style={styles.card}>
-        <div style={styles.cardBody}>
-          <div style={styles.profileRow}>
-            {/* LEFT VIP INFO */}
-            <div style={styles.leftBox}>
-              <h4 style={styles.name}>{vip.name}</h4>
-              <p style={styles.role}>{vip.designation}</p>
-            </div>
+        <div style={styles.profileRow}>
+          {/* LEFT VIP INFO */}
+          <div style={styles.leftBox}>
+            <h4 style={styles.name}>{vip.name || "N/A"}</h4>
+            <p style={styles.role}>{vip.designation || "N/A"}</p>
+          </div>
 
-            {/* RIGHT DETAILS */}
-            <div style={styles.rightBox}>
-              {[
-                ["VIP Name", vip.name],
-                ["Designation", vip.designation],
-                [
-                  "Start Time",
-                  <span style={styles.timeBadge}>{vip.startAt}</span>,
-                ],
-                [
-                  "End Time",
-                  <span style={styles.timeBadge}>{vip.endAt}</span>,
-                ],
-                [
-                  "Status",
-                  <span
-                    style={{
-                      ...styles.statusBadge,
-                      background:
-                        vip.status === "Active" ?  "#dc3545" : "#28a745",
-                    }}
-                  >
-                    {vip.status || "Assigned"}
-                  </span>,
-                ],
-              ].map(([label, value], i) => (
-                <div style={styles.detailRow} key={i}>
-                  <div style={styles.detailLabel}>{label}:</div>
-                  <div style={styles.detailValue}>{value}</div>
-                </div>
-              ))}
-
-              {/* ACTION */}
-              <div style={{ marginTop: "20px" }}>
-                <button
-                  style={styles.backBtn}
-                  onClick={() => navigate(-1)}
+          {/* RIGHT DETAILS */}
+          <div style={styles.rightBox}>
+            {[
+              ["VIP Name", vip.name],
+              ["Designation", vip.designation],
+              ["Start Time", <span style={styles.timeBadge}>{vip.startAt || "N/A"}</span>],
+              ["End Time", <span style={styles.timeBadge}>{vip.endAt || "N/A"}</span>],
+              [
+                "Status",
+                <span
+                  style={{
+                    ...styles.statusBadge,
+                    background:
+                      vip.status === "Active" ?  "#dc3545" : "#28a745" ,
+                  }}
                 >
-                  ← Back
-                </button>
+                  {vip.status || "Assigned"}
+                </span>,
+              ],
+            ].map(([label, value], i) => (
+              <div style={styles.detailRow} key={i}>
+                <div style={styles.detailLabel}>{label}:</div>
+                <div style={styles.detailValue}>{value}</div>
               </div>
+            ))}
+
+            {/* ACTION */}
+            <div style={{ marginTop: "20px" }}>
+              <button style={styles.backBtn} onClick={() => navigate(-1)}>
+                ← Back
+              </button>
             </div>
           </div>
         </div>
@@ -132,7 +126,7 @@ export default function GuardShift() {
   );
 }
 
-/* ================== FULL PAGE UI THEME ================== */
+/* ================== UI STYLES ================== */
 
 const styles = {
   pageContainer: {
@@ -141,94 +135,40 @@ const styles = {
     background: "rgba(255,255,255,0.15)",
     backdropFilter: "blur(6px)",
   },
-
   header: {
     marginBottom: "25px",
     padding: "20px",
     background: "linear-gradient(135deg, #4e54c8, #8f94fb)",
     borderRadius: "14px",
     color: "white",
-    boxShadow: "0 6px 18px rgba(0,0,0,0.15)",
   },
-
-  headerTitle: {
-    margin: 0,
-    fontSize: "26px",
-    fontWeight: "700",
-  },
-
-  headerSubtitle: {
-    marginTop: "5px",
-    opacity: 0.9,
-  },
-
+  headerTitle: { margin: 0, fontSize: "26px", fontWeight: "700" },
+  headerSubtitle: { marginTop: "5px", opacity: 0.9 },
   card: {
-    background: "rgba(255,255,255,0.55)",
+    background: "#fff",
     borderRadius: "18px",
-    padding: "25px",
-    backdropFilter: "blur(8px)",
-    boxShadow: "0 8px 20px rgba(0,0,0,0.15)",
+    padding: "31px",
   },
-
-  profileRow: {
-    display: "flex",
-    gap: "40px",
-    flexWrap: "wrap",
-    alignItems: "center",
-  },
-
-  leftBox: {
-    flex: "1",
-    textAlign: "center",
-  },
-
-  name: {
-    fontSize: "22px",
-    fontWeight: "700",
-    marginTop: "10px",
-  },
-
-  role: {
-    fontSize: "15px",
-    color: "#777",
-  },
-
-  rightBox: {
-    flex: "2",
-  },
-
-  detailRow: {
-    display: "flex",
-    marginBottom: "12px",
-  },
-
-  detailLabel: {
-    width: "150px",
-    fontWeight: "600",
-    color: "#333",
-  },
-
-  detailValue: {
-    flex: 1,
-    fontWeight: "500",
-    color: "#444",
-  },
-
+  profileRow: { display: "flex", gap: "40px", flexWrap: "wrap" },
+  leftBox: { flex: "1", textAlign: "center" },
+  name: { fontSize: "22px", fontWeight: "700", marginTop: "50px" },
+  role: { fontSize: "15px", color: "#777" },
+  rightBox: { flex: "2" },
+  detailRow: { display: "flex", marginBottom: "12px" },
+  detailLabel: { width: "150px", fontWeight: "600" },
+  detailValue: { flex: 1 },
   statusBadge: {
     padding: "6px 12px",
     borderRadius: "20px",
     color: "white",
     fontWeight: "600",
   },
-
   timeBadge: {
     padding: "6px 12px",
     borderRadius: "20px",
     background: "#1e73be",
     color: "white",
-    fontWeight: "600",
   },
-
   backBtn: {
     background: "#1e73be",
     color: "white",
@@ -236,11 +176,6 @@ const styles = {
     borderRadius: "10px",
     border: "none",
     cursor: "pointer",
-    fontWeight: "600",
   },
-
-  emptyBox: {
-    padding: "50px",
-    textAlign: "center",
-  },
+  emptyBox: { padding: "50px", textAlign: "center" },
 };

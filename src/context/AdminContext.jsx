@@ -1,47 +1,21 @@
-// import React, { createContext, useContext, useState } from "react";
-
-// const AdminContext = createContext();
-
-// export const AdminProvider = ({ children }) => {
-//   const [selectedAdmin, setSelectedAdmin] = useState(null);
-//   const [refreshTrigger, setRefreshTrigger] = useState(0);
-
-//   const handleEdit = (admin) => {
-//     setSelectedAdmin(admin);
-//   };
-
-//   const handleBack = () => {
-//     setSelectedAdmin(null);
-//     setRefreshTrigger((prev) => prev + 1);
-//   };
-
-//   return (
-//     <AdminContext.Provider
-//       value={{
-//         selectedAdmin,
-//         refreshTrigger,
-//         handleEdit,
-//         handleBack,
-//         setSelectedAdmin,       // <-- ADD THIS
-//       }}
-//     >
-//       {children}
-//     </AdminContext.Provider>
-//   );
-// };
-
-// export const useAdminStore = () => useContext(AdminContext);
-
-
-// src/context/AdminContext.jsx
-
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 
 const AdminContext = createContext();
 
 export const AdminProvider = ({ children }) => {
-  const [selectedAdmin, setSelectedAdmin] = useState(null);
+  const [selectedAdmin, setSelectedAdmin] = useState(() => {
+    const stored = localStorage.getItem("selectedAdmin");
+    return stored ? JSON.parse(stored) : null;
+  });
+
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  // ✅ Auto sync to localStorage
+  useEffect(() => {
+    if (selectedAdmin) {
+      localStorage.setItem("selectedAdmin", JSON.stringify(selectedAdmin));
+    }
+  }, [selectedAdmin]);
 
   const handleEdit = (admin) => {
     setSelectedAdmin(admin);
@@ -49,6 +23,7 @@ export const AdminProvider = ({ children }) => {
 
   const handleBack = () => {
     setSelectedAdmin(null);
+    localStorage.removeItem("selectedAdmin");
     setRefreshTrigger((prev) => prev + 1);
   };
 

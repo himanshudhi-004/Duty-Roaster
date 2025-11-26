@@ -2,12 +2,16 @@ import React, { useEffect, useState } from "react";
 import { getAllVip, deleteVip } from "../api/vipform";
 import { useVipStore } from "../context/VipContext";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+
 
 export default function VipDetails() {
-  const { handleEdit, refreshTrigger } = useVipStore();
+  const {handleEdit, refreshTrigger } = useVipStore();
   const [vipList, setVipList] = useState([]);
   const [selectedDesignation, setSelectedDesignation] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
+  const navigate = useNavigate();
+
 
   /* PAGINATION STATES */
   const [currentPage, setCurrentPage] = useState(1);
@@ -144,7 +148,10 @@ export default function VipDetails() {
                     <td style={styles.td}><span style={statusStyle}>{vip.status}</span></td>
 
                     <td style={styles.actionCol}>
-                      <button style={styles.editBtn} onClick={() => handleEdit(vip)}>
+                      <button style={styles.editBtn} onClick={() => {handleEdit(vip)
+                        console.log("Editing VIP:", vip);
+                      }}>
+
                         <i className="fa fa-edit"></i>
                       </button>
                       {/* <button style={styles.deleteBtn} onClick={() => handleDelete(vip.id)}>

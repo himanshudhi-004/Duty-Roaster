@@ -1,27 +1,37 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 
 const VipContext = createContext();
 
 export const VipProvider = ({ children }) => {
-  const [selectedVIP, setSelectedVIP] = useState(null);
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [selectedVip, setSelectedVip] = useState(() => {
+    const stored = localStorage.getItem("selectedVip");
+    return stored ? JSON.parse(stored) : null;
+  });
+
+  useEffect(() => {
+    if (selectedVip) {
+      localStorage.setItem("selectedVip", JSON.stringify(selectedVip));
+    }
+  }, [selectedVip]);
+
 
   const handleEdit = (vip) => {
-    setSelectedVIP(vip);
+    setSelectedVip(vip);
+    console.log("Selected VIP set in context:", vip);
   };
 
   const handleBack = () => {
-    setSelectedVIP(null);
-    setRefreshTrigger((prev) => prev + 1);
+    setSelectedVip(null);
+    localStorage.removeItem("selectedVip");
   };
 
   return (
     <VipContext.Provider
       value={{
-        selectedVIP,
-        refreshTrigger,
+        selectedVip,
         handleEdit,
         handleBack,
+        setSelectedVip,
       }}
     >
       {children}

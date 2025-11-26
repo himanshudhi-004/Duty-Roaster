@@ -1,129 +1,128 @@
 import React, { useEffect, useState } from "react";
+import { useVipStore } from "../context/VipContext";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 export default function VipProfile() {
+  const navigate = useNavigate();
+  const { handleEdit, setSelectedVip } = useVipStore();
+
   const [userDetails, setUserDetails] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // ------------------- FETCH VIP PROFILE -------------------
-  const fetchVipProfile = async () => {
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
+  const fetchProfile = async () => {
     try {
       const token = localStorage.getItem("vipToken");
-      if (!token) return setLoading(false);
+      if (!token) return;
 
-      const res = await axios.get(`${BASE_URL}/vip/profile`, {
+      const decoded = jwtDecode(token);
+      const username = decoded.username || decoded.sub || decoded.email;
+
+      const res = await axios.get(`${BASE_URL}/api/categories/profile`, {
+        params: { username },
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      // If API returns array, pick 1st row
       const profile = Array.isArray(res.data) ? res.data[0] : res.data;
+      // console.log("VIP PROFILE DATA:", profile);
 
       setUserDetails(profile);
+      setSelectedVip(profile); // ✅ STORE IN CONTEXT
     } catch (err) {
-      console.error("VIP Profile Fetch Error:", err);
+      console.log("Profile Fetch Error:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchVipProfile();
-  }, []);
-
-  // ------------------- LOADING -------------------
   if (loading) {
     return (
       <div className="text-center py-5">
         <i className="fa fa-spinner fa-spin fa-2x text-primary mb-3"></i>
-        <h5>Loading VIP profile...</h5>
+        <h5>Loading profile...</h5>
       </div>
     );
   }
 
-  // ------------------- FAIL STATE -------------------
   if (!userDetails) {
     return (
       <div className="text-center py-5 text-danger">
-        <h4>Unable to load VIP profile.</h4>
+        <h4>Unable to load profile.</h4>
       </div>
     );
   }
-
-  // ------------------- RENDER UI -------------------
+// console.log("USER DETAILS:", userDetails);
   return (
     <div style={styles.pageContainer}>
-
-      {/* HEADER */}
       <div style={styles.header}>
         <h2 style={styles.headerTitle}>
-          <i className="fa fa-user-circle me-2"></i> VIP Profile
+          <i className="fa fa-user-circle me-2"></i> Vip Profile
         </h2>
-        <p style={styles.headerSubtitle}>Preview of VIP account information</p>
+        <p style={styles.headerSubtitle}>Overview of Vip account details</p>
       </div>
 
-      {/* PROFILE CARD */}
       <div style={styles.card}>
         <div style={styles.cardBody}>
           <div style={styles.profileRow}>
-
-            {/* LEFT SIDE */}
             <div style={styles.leftBox}>
-              <h4 style={styles.name}>{userDetails.vip_name}</h4>
-              <p style={styles.role}>VIP</p>
+              <h4 style={styles.name}>{userDetails.name}</h4>
+              <p style={styles.role}>Vip Detail</p>
             </div>
 
-            {/* RIGHT SIDE */}
             <div style={styles.rightBox}>
               {[
-                ["Vip ID", userDetails.vip_id],
-                ["Username", userDetails.vip_username],
-                ["Email", userDetails.vip_email],
-                ["Contact No", userDetails.contact_no],
+                ["Vip ID", userDetails.id],
+                ["Username", userDetails.username],
+                ["Email", userDetails.email],
+                ["Contact No", userDetails.contactno],
                 [
                   "Status",
                   <span
                     style={{
                       ...styles.statusBadge,
                       background:
-                        userDetails.vip_status === "Active"
+                        userDetails.status === "Active"
                           ? "#28a745"
                           : "#dc3545",
                     }}
                   >
-                    {userDetails.vip_status}
+                    {userDetails.status}
                   </span>,
                 ],
-              ].map(([label, value], index) => (
-                <div style={styles.detailRow} key={index}>
+              ].map(([label, value], i) => (
+                <div style={styles.detailRow} key={i}>
                   <div style={styles.detailLabel}>{label}:</div>
                   <div style={styles.detailValue}>{value}</div>
                 </div>
               ))}
 
-              {/* BUTTONS */}
               <div style={{ marginTop: "20px" }}>
-                <button style={styles.editBtn}>
+                <button
+                  style={styles.editBtn}
+                  onClick={() => {
+                    handleEdit(userDetails);
+                    navigate("/vipedit");
+                  }}
+                >
                   <i className="fa fa-edit me-1"></i> Edit Profile
                 </button>
-
-                <button style={styles.passBtn}>
-                  <i className="fa fa-key me-1"></i> Change Password
-                </button>
               </div>
-
             </div>
           </div>
         </div>
       </div>
-
     </div>
   );
 }
 
-/* ---------------- UI THEME (SAME AS ADMIN) ---------------- */
-
+/* ------------------ UI THEME STYLES ------------------ */
 const styles = {
   pageContainer: {
     padding: "30px",
@@ -131,7 +130,6 @@ const styles = {
     background: "rgba(255,255,255,0.15)",
     backdropFilter: "blur(6px)",
   },
-
   header: {
     marginBottom: "25px",
     padding: "20px",
@@ -140,18 +138,8 @@ const styles = {
     color: "white",
     boxShadow: "0 6px 18px rgba(0,0,0,0.15)",
   },
-
-  headerTitle: {
-    margin: 0,
-    fontSize: "26px",
-    fontWeight: "700",
-  },
-
-  headerSubtitle: {
-    marginTop: "5px",
-    opacity: 0.9,
-  },
-
+  headerTitle: { margin: 0, fontSize: "26px", fontWeight: "700" },
+  headerSubtitle: { marginTop: "5px", opacity: 0.9 },
   card: {
     background: "rgba(255,255,255,0.55)",
     borderRadius: "18px",
@@ -159,71 +147,27 @@ const styles = {
     backdropFilter: "blur(8px)",
     boxShadow: "0 8px 20px rgba(0,0,0,0.15)",
   },
-
   profileRow: {
     display: "flex",
     gap: "40px",
     flexWrap: "wrap",
     alignItems: "center",
   },
-
-  leftBox: {
-    flex: "1",
-    textAlign: "center",
-  },
-
-  name: {
-    fontSize: "22px",
-    fontWeight: "700",
-    marginTop: "10px",
-  },
-
-  role: {
-    fontSize: "15px",
-    color: "#777",
-  },
-
-  rightBox: {
-    flex: "2",
-  },
-
-  detailRow: {
-    display: "flex",
-    marginBottom: "12px",
-  },
-
-  detailLabel: {
-    width: "150px",
-    fontWeight: "600",
-    color: "#333",
-  },
-
-  detailValue: {
-    flex: 1,
-    fontWeight: "500",
-    color: "#444",
-  },
-
+  leftBox: { flex: "1", textAlign: "center" },
+  name: { fontSize: "22px", fontWeight: "700", marginTop: "10px" },
+  role: { fontSize: "15px", color: "#777" },
+  rightBox: { flex: "2" },
+  detailRow: { display: "flex", marginBottom: "12px" },
+  detailLabel: { width: "150px", fontWeight: "600", color: "#333" },
+  detailValue: { flex: 1, fontWeight: "500", color: "#444" },
   statusBadge: {
     padding: "6px 12px",
     borderRadius: "20px",
     color: "white",
     fontWeight: "600",
   },
-
   editBtn: {
     background: "#1e73be",
-    color: "white",
-    padding: "10px 18px",
-    borderRadius: "10px",
-    border: "none",
-    marginRight: "10px",
-    cursor: "pointer",
-    fontWeight: "600",
-  },
-
-  passBtn: {
-    background: "#6c757d",
     color: "white",
     padding: "10px 18px",
     borderRadius: "10px",

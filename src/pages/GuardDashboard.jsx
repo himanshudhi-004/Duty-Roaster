@@ -1,36 +1,71 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { getAllVip, getAllGuard } from "../api/vipform";
+import { useGuardStore } from "../context/GuardContext";
 import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 export default function GuardDashboard() {
   const navigate = useNavigate();
+  const { selectedGuard, setSelectedGuard } = useGuardStore();
 
+  const [guardName, setGuardName] = useState("GUARD");
   const [vipList, setVipList] = useState([]);
   const [guardList, setGuardList] = useState([]);
-  const [guardName, setGuardName] = useState("");
 
-  /* ---------------------------------------
-      FETCH Vip PROFILE (get name)
-  ----------------------------------------- */
-  const loadGuardProfile = async () => {
-    try {
-      const token = localStorage.getItem("guardToken");
-      if (!token) return;
-
-      const res = await axios.get(`${BASE_URL}/guardauth/profile`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      const profile = Array.isArray(res.data) ? res.data[0] : res.data;
-
-      setGuardName(profile.name || "GUARD");
-    } catch (error) {
-      console.log("PROFILE FETCH ERROR:", error);
+  /* ------------------------------------------------
+      ✅ 1️⃣ INSTANT SYNC FROM CONTEXT (NO DELAY)
+  -------------------------------------------------- */
+  useEffect(() => {
+    if (selectedGuard?.name) {
+      setGuardName(selectedGuard.name);
     }
-  };
+  }, [selectedGuard]);
+
+  /* ------------------------------------------------
+      ✅ 2️⃣ FALLBACK SYNC (REFRESH / DIRECT URL)
+  -------------------------------------------------- */
+  useEffect(() => {
+    const syncGuardProfile = async () => {
+      try {
+        // ✅ Already available → no need to fetch
+        if (selectedGuard?.name) return;
+
+        // ✅ Try localStorage
+        const stored = localStorage.getItem("selectedGuard");
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          setSelectedGuard(parsed);
+          setGuardName(parsed.name);
+          return;
+        }
+
+        // ✅ Last Fallback → Token + API
+        const token = localStorage.getItem("guardToken");
+        if (!token) return;
+
+        const decoded = jwtDecode(token);
+        const username = decoded.username || decoded.sub || decoded.email;
+
+        const res = await axios.get(`${BASE_URL}/api/officer/profile`, {
+          params: { username },
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const profile = Array.isArray(res.data) ? res.data[0] : res.data;
+
+        setSelectedGuard(profile);
+        setGuardName(profile.name);
+        localStorage.setItem("selectedGuard", JSON.stringify(profile));
+      } catch (err) {
+        console.log("Guard Sync Error:", err);
+      }
+    };
+
+    syncGuardProfile();
+  }, []); // ✅ Run once only on mount
 
   /* ---------------------------------------
         LOAD VIP LIST
@@ -38,11 +73,8 @@ export default function GuardDashboard() {
   const loadVip = async () => {
     try {
       const data = await getAllVip();
-      if (Array.isArray(data)) setVipList(data);
-      else if (Array.isArray(data?.data)) setVipList(data.data);
-      else setVipList([]);
-    } catch (error) {
-      console.log("VIP API ERROR:", error);
+      setVipList(Array.isArray(data) ? data : data?.data || []);
+    } catch {
       setVipList([]);
     }
   };
@@ -53,50 +85,52 @@ export default function GuardDashboard() {
   const loadGuards = async () => {
     try {
       const data = await getAllGuard();
-      if (Array.isArray(data)) setGuardList(data);
-      else if (Array.isArray(data?.data)) setGuardList(data.data);
-      else setGuardList([]);
-    } catch (err) {
-      console.log("GUARD API ERROR:", err);
+      setGuardList(Array.isArray(data) ? data : data?.data || []);
+    } catch {
       setGuardList([]);
     }
   };
 
-  /* ---------------------------------------
-            USE EFFECT
-  ----------------------------------------- */
   useEffect(() => {
     loadVip();
     loadGuards();
-    loadGuardProfile();   // <-- FETCH Vip NAME HERE
   }, []);
 
   /* ---------------------------------------
             LOGOUT
   ----------------------------------------- */
   const handleLogout = () => {
-
     localStorage.removeItem("guardToken");
     localStorage.removeItem("role");
-    console.log("Logged out successfully");
     navigate("/login");
   };
 
-  const totalUsers = vipList.length + guardList.length;
-
   /* ---------------------------------------
-            STATS ARRAY
+            STATS
   ----------------------------------------- */
   const stats = [
-    // { title: "Total VIPs", value: vipList.length, icon: "fas fa-user", color: "#1e73be" },
-    // { title: "Total Users", value: totalUsers, icon: "fas fa-users", color: "#1e73be" },
-    { title: "Total Officers", value: guardList.length, icon: "fas fa-user-shield", color: "#1e73be" },
-    { title: "Total Assignments", value: totalUsers, icon: "fas fa-tasks", color: "#3cb371" },
-    { title: "Total Incidents", value: totalUsers, icon: "fas fa-exclamation-triangle", color: "#ffa500" },
+    {
+      title: "Total Officers",
+      value: guardList.length,
+      icon: "fas fa-user-shield",
+      color: "#1e73be",
+    },
+    {
+      title: "Total Assignments",
+      value: vipList.length + guardList.length,
+      icon: "fas fa-tasks",
+      color: "#3cb371",
+    },
+    {
+      title: "Total Incidents",
+      value: vipList.length + guardList.length,
+      icon: "fas fa-exclamation-triangle",
+      color: "#ffa500",
+    },
   ];
 
   /* ---------------------------------------
-              MAIN UI
+              UI (UNCHANGED)
   ----------------------------------------- */
   return (
     <div style={styles.page}>
@@ -107,20 +141,18 @@ export default function GuardDashboard() {
         </div>
 
         <button style={styles.logoutBtn} onClick={handleLogout}>
-          <i className="fas fa-sign-out-alt" style={{ marginRight: 8 }}></i> Logout
+          <i className="fas fa-sign-out-alt" style={{ marginRight: 8 }}></i>
+          Logout
         </button>
       </div>
 
-      {/* Main Content */}
       <div style={styles.mainContent}>
-        {/* Welcome Section */}
         <div style={styles.welcomeBox}>
           <h2 style={styles.welcomeText}>
             Welcome {guardName} 👋
           </h2>
         </div>
 
-        {/* Stats Grid */}
         <div style={styles.statsGrid}>
           {stats.map((stat, index) => (
             <div key={index} style={styles.statCard}>
@@ -133,7 +165,6 @@ export default function GuardDashboard() {
           ))}
         </div>
 
-        {/* Activity Section */}
         <div style={styles.activityBox}>
           <h3 style={styles.activityTitle}>Recent Activity</h3>
           <ul style={styles.activityList}>
@@ -148,7 +179,7 @@ export default function GuardDashboard() {
 }
 
 /* ---------------------------------------
-              STYLES
+              STYLES (UNCHANGED)
 ----------------------------------------- */
 const styles = {
   page: { padding: 25 },
@@ -185,26 +216,11 @@ const styles = {
 
   welcomeBox: { marginBottom: 25 },
 
-  welcomeText: { fontSize: 26, fontWeight: 700, color: "#1e73be", marginBottom: 20 },
-
-  buttonRow: { display: "flex", gap: 15, flexWrap: "wrap" },
-
-  actionBtnBlue: {
-    background: "#1e73be",
-    padding: "10px 20px",
-    borderRadius: 8,
-    color: "white",
-    textDecoration: "none",
-    fontWeight: 600,
-  },
-
-  actionBtnGreen: {
-    background: "#3cb371",
-    padding: "10px 20px",
-    borderRadius: 8,
-    color: "white",
-    textDecoration: "none",
-    fontWeight: 600,
+  welcomeText: {
+    fontSize: 26,
+    fontWeight: 700,
+    color: "#1e73be",
+    marginBottom: 20,
   },
 
   statsGrid: {
@@ -246,7 +262,11 @@ const styles = {
     border: "1px solid #e5e9f0",
   },
 
-  activityTitle: { fontSize: 20, color: "#1e73be", marginBottom: 10 },
+  activityTitle: {
+    fontSize: 20,
+    color: "#1e73be",
+    marginBottom: 10,
+  },
 
   activityList: { lineHeight: 2, paddingLeft: 10 },
 };

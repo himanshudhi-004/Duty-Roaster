@@ -53,6 +53,8 @@ import AdminUserWrapper from "./components/AdminUserWrapper";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import GuardEditPage from "./pages/GuardEditPage";
+// import VIPEditForm from "./components/VipDetailEditPage";
+import VipEditPage from "./pages/VipEditPage";
 
 function App() {
 
@@ -244,6 +246,14 @@ function App() {
                   element={
                     <PrivateRoute roles={["vip"]}>
                       <VipLayout><VipProfile /></VipLayout>
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/vipedit"
+                  element={
+                    <PrivateRoute roles={["vip"]}>
+                      <VipLayout><VipEditPage /></VipLayout>
                     </PrivateRoute>
                   }
                 />

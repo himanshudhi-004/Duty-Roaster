@@ -8,16 +8,11 @@ const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 export default function GuardProfile() {
   const navigate = useNavigate();
-  
   const { handleEdit, setSelectedGuard } = useGuardStore();
 
-  console.log("GuardProfile Component Rendered");
-
-  /* ------------------ STATE ------------------ */
   const [userDetails, setUserDetails] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  /* ------------------ FETCH PROFILE ------------------ */
   useEffect(() => {
     fetchProfile();
   }, []);
@@ -28,24 +23,17 @@ export default function GuardProfile() {
       if (!token) return;
 
       const decoded = jwtDecode(token);
-
-      // ✅ Get username directly from token safely
       const username = decoded.username || decoded.sub || decoded.email;
-
-      console.log("Decoded Token:", decoded);
-      console.log("Username from Token:", username);
 
       const res = await axios.get(`${BASE_URL}/api/officer/profile`, {
         params: { username },
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       const profile = Array.isArray(res.data) ? res.data[0] : res.data;
 
       setUserDetails(profile);
-      setSelectedGuard(profile); // ✅ Store in context
+      setSelectedGuard(profile); // ✅ STORE IN CONTEXT
     } catch (err) {
       console.log("Profile Fetch Error:", err);
     } finally {
@@ -53,7 +41,6 @@ export default function GuardProfile() {
     }
   };
 
-  /* ------------------ LOADING UI ------------------ */
   if (loading) {
     return (
       <div className="text-center py-5">
@@ -63,7 +50,6 @@ export default function GuardProfile() {
     );
   }
 
-  /* ------------------ NO PROFILE ------------------ */
   if (!userDetails) {
     return (
       <div className="text-center py-5 text-danger">
@@ -72,10 +58,8 @@ export default function GuardProfile() {
     );
   }
 
-  /* ------------------ MAIN UI ------------------ */
   return (
     <div style={styles.pageContainer}>
-      {/* HEADER */}
       <div style={styles.header}>
         <h2 style={styles.headerTitle}>
           <i className="fa fa-user-circle me-2"></i> Guard Profile
@@ -83,17 +67,14 @@ export default function GuardProfile() {
         <p style={styles.headerSubtitle}>Overview of Guard account details</p>
       </div>
 
-      {/* PROFILE CARD */}
       <div style={styles.card}>
         <div style={styles.cardBody}>
           <div style={styles.profileRow}>
-            {/* LEFT SECTION */}
             <div style={styles.leftBox}>
               <h4 style={styles.name}>{userDetails.name}</h4>
               <p style={styles.role}>Guard Detail</p>
             </div>
 
-            {/* RIGHT DETAILS */}
             <div style={styles.rightBox}>
               {[
                 ["Guard ID", userDetails.id],
@@ -121,13 +102,12 @@ export default function GuardProfile() {
                 </div>
               ))}
 
-              {/* ACTION */}
               <div style={{ marginTop: "20px" }}>
                 <button
                   style={styles.editBtn}
                   onClick={() => {
-                    handleEdit(userDetails); // ✅ save in context
-                    navigate("/guardedit");  // ✅ go to edit page
+                    handleEdit(userDetails);
+                    navigate("/guardedit");
                   }}
                 >
                   <i className="fa fa-edit me-1"></i> Edit Profile
@@ -149,7 +129,6 @@ const styles = {
     background: "rgba(255,255,255,0.15)",
     backdropFilter: "blur(6px)",
   },
-
   header: {
     marginBottom: "25px",
     padding: "20px",
@@ -158,18 +137,8 @@ const styles = {
     color: "white",
     boxShadow: "0 6px 18px rgba(0,0,0,0.15)",
   },
-
-  headerTitle: {
-    margin: 0,
-    fontSize: "26px",
-    fontWeight: "700",
-  },
-
-  headerSubtitle: {
-    marginTop: "5px",
-    opacity: 0.9,
-  },
-
+  headerTitle: { margin: 0, fontSize: "26px", fontWeight: "700" },
+  headerSubtitle: { marginTop: "5px", opacity: 0.9 },
   card: {
     background: "rgba(255,255,255,0.55)",
     borderRadius: "18px",
@@ -177,58 +146,25 @@ const styles = {
     backdropFilter: "blur(8px)",
     boxShadow: "0 8px 20px rgba(0,0,0,0.15)",
   },
-
   profileRow: {
     display: "flex",
     gap: "40px",
     flexWrap: "wrap",
     alignItems: "center",
   },
-
-  leftBox: {
-    flex: "1",
-    textAlign: "center",
-  },
-
-  name: {
-    fontSize: "22px",
-    fontWeight: "700",
-    marginTop: "10px",
-  },
-
-  role: {
-    fontSize: "15px",
-    color: "#777",
-  },
-
-  rightBox: {
-    flex: "2",
-  },
-
-  detailRow: {
-    display: "flex",
-    marginBottom: "12px",
-  },
-
-  detailLabel: {
-    width: "150px",
-    fontWeight: "600",
-    color: "#333",
-  },
-
-  detailValue: {
-    flex: 1,
-    fontWeight: "500",
-    color: "#444",
-  },
-
+  leftBox: { flex: "1", textAlign: "center" },
+  name: { fontSize: "22px", fontWeight: "700", marginTop: "10px" },
+  role: { fontSize: "15px", color: "#777" },
+  rightBox: { flex: "2" },
+  detailRow: { display: "flex", marginBottom: "12px" },
+  detailLabel: { width: "150px", fontWeight: "600", color: "#333" },
+  detailValue: { flex: 1, fontWeight: "500", color: "#444" },
   statusBadge: {
     padding: "6px 12px",
     borderRadius: "20px",
     color: "white",
     fontWeight: "600",
   },
-
   editBtn: {
     background: "#1e73be",
     color: "white",
