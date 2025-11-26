@@ -8,15 +8,23 @@ const api = axios.create({
   baseURL: process.env.REACT_APP_BASE_URL,
 });
 
-// Attach token automatically
 api.interceptors.request.use((config) => {
-  const role = localStorage.getItem("role"); // admin or vip
+  const role = localStorage.getItem("role");
   const token = localStorage.getItem(`${role}Token`);
-
   if (token) config.headers.Authorization = `Bearer ${token}`;
-
   return config;
 });
+
+/* ------------------- DEFAULT TIME LOGIC ------------------- */
+const now = new Date();
+const plus8Hours = new Date(now.getTime() + 8 * 60 * 60 * 1000);
+
+const formatDateTimeLocal = (date) => {
+  const pad = (n) => n.toString().padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(
+    date.getDate()
+  )}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+};
 
 /* STATIC GUARD DISTRIBUTION */
 const guardDistribution = {
@@ -38,19 +46,22 @@ export default function VipAutoAssign() {
   const [alreadyAssigned, setAlreadyAssigned] = useState(false);
 
   const [showTimeModal, setShowTimeModal] = useState(false);
-  const [startAt, setStartAt] = useState("");
-  const [endAt, setEndAt] = useState("");
+
+  const [startAt, setStartAt] = useState(formatDateTimeLocal(now));
+  const [endAt, setEndAt] = useState(formatDateTimeLocal(plus8Hours));
+
+  /* ✅ STATUS STATE */
+  const [vipStatus, setVipStatus] = useState(vip?.status?.toLowerCase());
 
   useEffect(() => {
     if (!vip) return navigate("/vip-management");
+    setVipStatus(vip?.status?.toLowerCase());
     fetchAssignedGuards();
-  }, []);
+  }, [vip]);
 
-  /* CHECK ALREADY ASSIGNED */
   const fetchAssignedGuards = async () => {
     try {
       const res = await api.get(`/api/assignments/${id}`);
-
       if (res.data?.details?.length > 0) {
         setResult(res.data);
         setAlreadyAssigned(true);
@@ -60,10 +71,8 @@ export default function VipAutoAssign() {
     }
   };
 
-  /* STEP 1 OPEN MODAL */
   const openTimePopup = () => setShowTimeModal(true);
 
-  /* STEP 2 AUTO ASSIGN */
   const handleAutoAssign = async () => {
     if (!startAt || !endAt) return toast.error("Please select both start and end time!");
 
@@ -87,8 +96,13 @@ export default function VipAutoAssign() {
 
     try {
       const response = await api.post(`/api/assignments/auto`, payload);
+
       setResult(response.data);
       setAlreadyAssigned(true);
+
+      /* ✅ INSTANTLY SET ACTIVE */
+      setVipStatus("active");
+
       toast.success("Guards Assigned Successfully!");
     } catch (err) {
       toast.error("Assignment Failed!");
@@ -108,13 +122,13 @@ export default function VipAutoAssign() {
         <p>🎖 {vip?.designation}</p>
         <p>📞 {vip?.contactno}</p>
 
-        {vip?.status?.toLowerCase() === "active" ? (
+        {vipStatus === "active" ? (
           <span className="badge bg-success" style={{ padding: "8px 12px" }}>
-            <i className="bi bi-check-circle"></i> &nbsp; Active
+            Active
           </span>
         ) : (
           <span className="badge bg-danger" style={{ padding: "8px 12px" }}>
-            <i className="bi bi-x-circle"></i> &nbsp; Inactive
+            Inactive
           </span>
         )}
       </div>
@@ -125,7 +139,6 @@ export default function VipAutoAssign() {
         </button>
       )}
 
-      {/* Time Popup */}
       {showTimeModal && (
         <div style={styles.modalOverlay}>
           <div style={styles.modalBox}>
@@ -149,7 +162,10 @@ export default function VipAutoAssign() {
 
             <div style={{ marginTop: 20, display: "flex", gap: 10 }}>
               <button style={styles.btn} onClick={handleAutoAssign}>Continue</button>
-              <button style={{ ...styles.btn, background: "#888" }} onClick={() => setShowTimeModal(false)}>
+              <button
+                style={{ ...styles.btn, background: "#888" }}
+                onClick={() => setShowTimeModal(false)}
+              >
                 Cancel
               </button>
             </div>
@@ -157,7 +173,6 @@ export default function VipAutoAssign() {
         </div>
       )}
 
-      {/* RESULT DISPLAY */}
       {result && (
         <div style={styles.responseBox}>
           <h3>Assigned Guard Summary</h3>
@@ -166,25 +181,25 @@ export default function VipAutoAssign() {
             <thead>
               <tr>
                 <th style={styles.tableHeader}>Level</th>
-                <th style={styles.tableHeader}>Requested</th>
-                <th style={styles.tableHeader}>Assigned</th>
+                {/* <th style={styles.tableHeader}>Requested</th>
+                <th style={styles.tableHeader}>Assigned</th> */}
                 <th style={styles.tableHeader}>Missing</th>
               </tr>
             </thead>
-
             <tbody>
               {result.summary?.map((row, i) => (
-                <tr key={i} style={styles.row}>
+                <tr key={i}>
                   <td style={styles.tableCell}>{row.level}</td>
-                  <td style={styles.tableCell}>{row.requested}</td>
+                  {/* <td style={styles.tableCell}>{row.requested}</td> */}
                   <td style={styles.tableCell}>{row.assigned}</td>
-                  <td style={styles.tableCell}>{row.missing}</td>
+                  {/* <td style={styles.tableCell}>{row.missing}</td> */}
                 </tr>
               ))}
             </tbody>
           </table>
 
           <h3 style={{ marginTop: 30 }}>Assigned Guard Details</h3>
+
           <table style={styles.table}>
             <thead>
               <tr>
@@ -197,14 +212,13 @@ export default function VipAutoAssign() {
                 <th style={styles.tableHeader}>Assigned Till</th>
               </tr>
             </thead>
-
             <tbody>
               {result.details?.map((d) => (
-                <tr key={d.id} style={styles.row}>
-                  <td style={styles.tableCell}>{d.officer.name}</td>
-                  <td style={styles.tableCell}>{d.officer.email}</td>
-                  <td style={styles.tableCell}>{d.officer.rank}</td>
-                  <td style={styles.tableCell}>{d.officer.experience} yrs</td>
+                <tr key={d.id}>
+                  <td style={styles.tableCell}>{d.officer?.name}</td>
+                  <td style={styles.tableCell}>{d.officer?.email}</td>
+                  <td style={styles.tableCell}>{d.officer?.rank}</td>
+                  <td style={styles.tableCell}>{d.officer?.experience} yrs</td>
                   <td style={styles.tableCell}>{d.status}</td>
                   <td style={styles.tableCell}>{new Date(d.startAt).toLocaleString()}</td>
                   <td style={styles.tableCell}>{new Date(d.endAt).toLocaleString()}</td>
@@ -245,44 +259,18 @@ const styles = {
     padding: 25,
     boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
   },
-  table: {
-    width: "100%",
-    borderCollapse: "separate",
-    marginTop: 15,
-  },
-  tableHeader: {
-    background: "linear-gradient(90deg, #1967d2, #4285f4)",
-    color: "#fff",
-    padding: "14px 16px",
-  },
-  tableCell: {
-    padding: "14px 16px",
-    borderBottom: "1px solid rgba(0,0,0,0.05)",
-  },
-  row: { transition: "0.25s ease" },
+  table: { width: "100%", marginTop: 15 },
+  tableHeader: { background: "#1967d2", color: "#fff", padding: 10 },
+  tableCell: { padding: 10, borderBottom: "1px solid #ddd" },
   modalOverlay: {
-    position: "fixed",
-    top: 0, left: 0,
-    width: "100vw",
-    height: "100vh",
+    position: "fixed", top: 0, left: 0,
+    width: "100vw", height: "100vh",
     background: "rgba(0,0,0,0.6)",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    zIndex: 999,
+    display: "flex", justifyContent: "center", alignItems: "center", zIndex: 999,
   },
-  modalBox: {
-    background: "#fff",
-    padding: 25,
-    borderRadius: 12,
-    width: "400px",
-  },
+  modalBox: { background: "#fff", padding: 25, borderRadius: 12, width: "400px" },
   input: {
-    width: "100%",
-    padding: "10px",
-    borderRadius: 8,
-    border: "1px solid #ccc",
-    marginTop: 5,
-    marginBottom: 15,
+    width: "100%", padding: "10px", borderRadius: 8,
+    border: "1px solid #ccc", marginTop: 5, marginBottom: 15,
   },
 };

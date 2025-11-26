@@ -93,6 +93,74 @@ export const deleteAdmin = async (id) => {
   }
 };
 
+
+// ====================== User SECTION ======================
+
+// Register new user
+export const submitUserFormData = async (userformData) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/usr/reg`, userformData);
+    return response.data;
+  } catch (error) {
+    console.error("Error while sending User form data:", error.message);
+    throw error;
+  }
+};
+
+// Get all admins (✔ Correct API)
+export const getAllUser = async () => {
+  try {
+    const response = await api.get(`/api/auth`);
+    const res = response.data;
+
+    console.log("User API:", res);
+
+    // Parse all possible backend formats
+    if (Array.isArray(res)) return res;
+    if (Array.isArray(res?.data)) return res.data;
+    if (Array.isArray(res?.users)) return res.users;
+    if (Array.isArray(res?.data?.users)) return res.data.users;
+
+    return [];
+  } catch (error) {
+    console.error("Error fetching User data:", error.message);
+    return [];
+  }
+};
+
+// Get single admin by ID
+export const getUserById = async (id) => {
+  try {
+    const response = await api.get(`/api/auth/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching admin by ID:", error.message);
+    throw error;
+  }
+};
+
+// Update admin
+export const updateUser = async (id, userformData) => {
+  try {
+    const response = await api.post(`/auth/update/${id}`, userformData);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating User data:", error.message);
+    throw error;
+  }
+};
+
+// Delete admin
+export const deleteUser = async (id) => {
+  try {
+    const response = await api.delete(`/api/usr/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting User:", error.message);
+    throw error;
+  }
+};
+
 // ====================== VIP SECTION ======================
 
 // Add VIP

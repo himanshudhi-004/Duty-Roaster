@@ -3,11 +3,11 @@ import { NavLink } from "react-router-dom";
 import {useNavigate } from "react-router-dom";
 import { logoutUser } from "../api/auth";
 
-export default function Sidebar() {
+export default function UserSidebar() {
   const navigate = useNavigate();
   //  Handle Logout
   const handleLogout = () => {
-    localStorage.removeItem("adminToken");
+    localStorage.removeItem("userToken");
     localStorage.removeItem("role");
     navigate("/login");
   };
@@ -17,8 +17,8 @@ export default function Sidebar() {
 
       {/* LOGO SECTION */}
       <div style={styles.logoBox}>
-        <NavLink to="/admindashboard" style={styles.logoLink}>
-          <span style={styles.logoText}>Admin Panel</span>
+        <NavLink to="/userdashboard" style={styles.logoLink}>
+          <span style={styles.logoText}>User Panel</span>
         </NavLink>
       </div>
 
@@ -29,7 +29,7 @@ export default function Sidebar() {
           {/* Dashboard */}
           <li style={styles.menuItem}>
             <NavLink
-              to="/admindashboard"
+              to="/userdashboard"
               style={styles.menuLink}
               className={({ isActive }) =>
                 `menu-link ${isActive ? "active-menu" : ""}`
@@ -39,66 +39,6 @@ export default function Sidebar() {
               <span>Dashboard</span>
             </NavLink>
           </li>
-
-          {/* <li style={styles.menuItem}>
-            <NavLink
-              to="/vipdashboard"
-              style={styles.menuLink}
-              className="menu-link"
-            >
-              <i className="fas fa-home" style={styles.icon}></i>
-              <span>Vip Dashboard</span>
-            </NavLink>
-          </li>
-
-          <li style={styles.menuItem}>
-            <NavLink
-              to="/guarddashboard"
-              style={styles.menuLink}
-              className="menu-link"
-            >
-              <i className="fas fa-home" style={styles.icon}></i>
-              <span>Guard Dashboard</span>
-            </NavLink>
-          </li>  */}
-
-          {/* Section */}
-          <li style={styles.sectionTitle}>Manage Forms</li>
-
-          <li style={styles.menuItem}>
-            <NavLink
-              to="/userform"
-              style={styles.menuLink}
-              className="menu-link"
-            >
-              <i className="fas fa-pen-square" style={styles.icon}></i>
-              <span>User Registration Form</span>
-            </NavLink>
-          </li>
-
-          <li style={styles.menuItem}>
-            <NavLink
-              to="/vipform"
-              style={styles.menuLink}
-              className="menu-link"
-            >
-              <i className="fas fa-pen-square" style={styles.icon}></i>
-              <span>VIP Registration Form</span>
-            </NavLink>
-          </li>
-
-          <li style={styles.menuItem}>
-            <NavLink
-              to="/guardform"
-              style={styles.menuLink}
-              className="menu-link"
-            >
-              <i className="fas fa-pen-square" style={styles.icon}></i>
-              <span>Guard Registration Form</span>
-            </NavLink>
-          </li>
-
-
 
           {/* Table Section */}
           <li style={styles.sectionTitle}>Tables</li>
@@ -161,7 +101,7 @@ export default function Sidebar() {
           </li> */}
           <li style={styles.menuItem}>
             <NavLink
-              to="/adminprofile"
+              to="/userprofile"
               style={styles.menuLink}
               className="menu-link"
             >

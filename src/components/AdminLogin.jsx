@@ -49,6 +49,7 @@ export default function AdminLogin() {
         if (backendRole === "admin") navigate("/admindashboard");
         else if (backendRole === "vip") navigate("/vipdashboard");
         else if (backendRole === "guard") navigate("/guarddashboard");
+        else if (backendRole === "user") navigate("/userdashboard");
         else toast.error("Unauthorized role!");
       } else {
         toast.error("Invalid username or password!");

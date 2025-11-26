@@ -1,25 +1,26 @@
-// src/App.jsx
 import React, { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-// CONTEXT
+/* ---------------- CONTEXT ---------------- */
 import { VipProvider } from "./context/VipContext";
 import { GuardProvider } from "./context/GuardContext";
 import { AdminProvider } from "./context/AdminContext";
+import { UserProvider } from "./context/UserContext";
 
-// AUTH
+/* ---------------- AUTH ---------------- */
 import AdminLogin from "./components/AdminLogin";
 import Logout from "./components/Logout";
 import PrivateRoute from "./components/PrivateRoute";
 
-// ADMIN
+/* ---------------- ADMIN ---------------- */
 import AdminForm from "./components/AdminForm";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminListPage from "./pages/AdminListPage";
 import AdminProfile from "./components/AdminProfile";
 import AdminEditPage from "./pages/AdminEditPage";
+import VipAutoAssign from "./pages/VipAutoAssign";
 
-// VIP
+/* ---------------- VIP ---------------- */
 import VIPForm from "./components/VIPForm";
 import VipListPage from "./pages/VipListPage";
 import VipGuardManagement from "./components/VipGuardManagement";
@@ -27,26 +28,33 @@ import VipDashboard from "./pages/VipDashboard";
 import VipLayout from "./layouts/Viplayout";
 import VipProfile from "./components/VipProfile";
 
-// GUARD
+/* ---------------- GUARD ---------------- */
 import GuardForm from "./components/GuardForm";
 import GuardListPage from "./pages/GuardListPage";
 import GuardDashboard from "./pages/GuardDashboard";
 import GuardProfile from "./components/GuardProfile";
 import Guardlayout from "./layouts/Guardlayout";
-
-// LAYOUTS
-import Adminlayout from "./layouts/Adminlayout";
-
-// AUTO ASSIGN
-import VipAutoAssign from "./pages/VipAutoAssign";
-
-// TOAST
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import GuardShift from "./components/GuardShift";
 
+/* ---------------- USER ---------------- */
+import UserLayout from "./layouts/UserLayout";
+import UserDashboard from "./pages/UserDashboard";
+import UserProfile from "./components/UserProfile";
+import UserDetailEditPage from "./components/UserDetailEditPage";
+import UserForm from "./components/UserForm";
+
+/* ---------------- LAYOUT ---------------- */
+import Adminlayout from "./layouts/Adminlayout";
+
+/* ---------------- WRAPPER ---------------- */
+import AdminUserWrapper from "./components/AdminUserWrapper";
+
+/* ---------------- TOAST ---------------- */
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 function App() {
-  // Auto logout activity timer
+
   useEffect(() => {
     const resetActivityTimer = () => {
       localStorage.setItem("lastActiveTime", Date.now());
@@ -64,157 +72,214 @@ function App() {
   return (
     <Router>
       <AdminProvider>
-        <VipProvider>
-          <GuardProvider>
-            <ToastContainer position="top-right" autoClose={2000} pauseOnHover draggable theme="colored" />
+        <UserProvider>
+          <VipProvider>
+            <GuardProvider>
 
-            <Routes>
-              {/* AUTH ROUTES */}
-              <Route path="/" element={<AdminLogin />} />
-              <Route path="/login" element={<AdminLogin />} />
-              <Route path="/logout" element={<Logout />} />
-
-              {/* ADMIN ROUTES */}
-              <Route path="/register" element={<AdminForm />} />
-
-              <Route
-                path="/admindashboard"
-                element={
-                  <PrivateRoute role="admin">
-                    <Adminlayout><AdminDashboard /></Adminlayout>
-                  </PrivateRoute>
-                }
+              <ToastContainer
+                position="top-right"
+                autoClose={2000}
+                pauseOnHover
+                draggable
+                theme="colored"
               />
 
-              <Route
-                path="/adminlist"
-                element={
-                  <PrivateRoute role="admin">
-                    <Adminlayout><AdminListPage /></Adminlayout>
-                  </PrivateRoute>
-                }
-              />
+              <Routes>
 
-              <Route
-                path="/adminprofile"
-                element={
-                  <PrivateRoute role="admin">
-                    <Adminlayout><AdminProfile /></Adminlayout>
-                  </PrivateRoute>
-                }
-              />
+                {/* ---------------- AUTH ---------------- */}
+                <Route path="/" element={<AdminLogin />} />
+                <Route path="/login" element={<AdminLogin />} />
+                <Route path="/logout" element={<Logout />} />
 
-              <Route
-                path="/adminedit"
-                element={
-                  <PrivateRoute role="admin">
-                    <Adminlayout><AdminEditPage /></Adminlayout>
-                  </PrivateRoute>
-                }
-              />
+                {/* ---------------- ADMIN ---------------- */}
+                <Route path="/register" element={<AdminForm />} />
 
-              <Route
-                path="/vip-auto-assign"
-                element={
-                  <PrivateRoute role="admin">
-                    <Adminlayout><VipAutoAssign /></Adminlayout>
-                  </PrivateRoute>
-                }
-              />
+                <Route
+                  path="/admindashboard"
+                  element={
+                    <PrivateRoute roles={["admin"]}>
+                      <Adminlayout><AdminDashboard /></Adminlayout>
+                    </PrivateRoute>
+                  }
+                />
 
-              {/* VIP ROUTES */}
-              <Route
-                path="/vipdashboard"
-                element={
-                  <PrivateRoute role="vip">
-                    <VipLayout><VipDashboard /></VipLayout>
-                  </PrivateRoute>
-                }
-              />
+                <Route
+                  path="/adminlist"
+                  element={
+                    <PrivateRoute roles={["admin"]}>
+                      <Adminlayout><AdminListPage /></Adminlayout>
+                    </PrivateRoute>
+                  }
+                />
 
-              <Route
-                path="/vipform"
-                element={
-                  <PrivateRoute role="admin">
-                    <Adminlayout><VIPForm /></Adminlayout>
-                  </PrivateRoute>
-                }
-              />
+                <Route
+                  path="/adminprofile"
+                  element={
+                    <PrivateRoute roles={["admin"]}>
+                      <Adminlayout><AdminProfile /></Adminlayout>
+                    </PrivateRoute>
+                  }
+                />
 
-              <Route
-                path="/viplist"
-                element={
-                  <PrivateRoute role="admin">
-                    <Adminlayout><VipListPage /></Adminlayout>
-                  </PrivateRoute>
-                }
-              />
+                <Route
+                  path="/adminedit"
+                  element={
+                    <PrivateRoute roles={["admin"]}>
+                      <Adminlayout><AdminEditPage /></Adminlayout>
+                    </PrivateRoute>
+                  }
+                />
 
-              <Route
-                path="/vgmang"
-                element={
-                  <PrivateRoute role="admin">
-                    <Adminlayout><VipGuardManagement /></Adminlayout>
-                  </PrivateRoute>
-                }
-              />
 
-              <Route
-                path="/vipprofile"
-                element={
-                  <PrivateRoute role="vip">
-                    <VipLayout><VipProfile /></VipLayout>
-                  </PrivateRoute>
-                }
-              />
+                <Route
+                  path="/userform"
+                  element={
+                    <PrivateRoute roles={["admin"]}>
+                      <Adminlayout><UserForm /></Adminlayout>
+                    </PrivateRoute>
+                  }
+                />
 
-              {/* GUARD ROUTES */}
-              <Route
-                path="/guarddashboard"
-                element={
-                  <PrivateRoute role="guard">
-                    <Guardlayout><GuardDashboard /></Guardlayout>
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/guardshift"
-                element={
-                  <PrivateRoute role="guard">
-                    <Guardlayout><GuardShift /></Guardlayout>
-                  </PrivateRoute>
-                }
-              />
+                <Route
+                  path="/vipform"
+                  element={
+                    <PrivateRoute roles={["admin"]}>
+                      <Adminlayout><VIPForm /></Adminlayout>
+                    </PrivateRoute>
+                  }
+                />
 
-              <Route
-                path="/guardform"
-                element={
-                  <PrivateRoute role="admin">
-                    <Adminlayout><GuardForm /></Adminlayout>
-                  </PrivateRoute>
-                }
-              />
+                <Route
+                  path="/guardform"
+                  element={
+                    <PrivateRoute roles={["admin"]}>
+                      <Adminlayout><GuardForm /></Adminlayout>
+                    </PrivateRoute>
+                  }
+                />
 
-              <Route
-                path="/guardlist"
-                element={
-                  <PrivateRoute role="admin">
-                    <Adminlayout><GuardListPage /></Adminlayout>
-                  </PrivateRoute>
-                }
-              />
+                {/* ---------------- SHARED ADMIN + USER ---------------- */}
+                <Route
+                  path="/vip-auto-assign"
+                  element={
+                    <PrivateRoute roles={["user"]}>
+                      <UserLayout><VipAutoAssign /></UserLayout>
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/viplist"
+                  element={
+                    <PrivateRoute roles={["admin", "user"]}>
+                      <AdminUserWrapper>
+                        <VipListPage />
+                      </AdminUserWrapper>
+                    </PrivateRoute>
+                  }
+                />
 
-              <Route
-                path="/guardprofile"
-                element={
-                  <PrivateRoute role="guard">
-                    <Guardlayout><GuardProfile /></Guardlayout>
-                  </PrivateRoute>
-                }
-              />
-            </Routes>
-          </GuardProvider>
-        </VipProvider>
+                <Route
+                  path="/guardlist"
+                  element={
+                    <PrivateRoute roles={["admin", "user"]}>
+                      <AdminUserWrapper>
+                        <GuardListPage />
+                      </AdminUserWrapper>
+                    </PrivateRoute>
+                  }
+                />
+
+                <Route
+                  path="/vgmang"
+                  element={
+                    <PrivateRoute roles={["admin", "user"]}>
+                      <AdminUserWrapper>
+                        <VipGuardManagement />
+                      </AdminUserWrapper>
+                    </PrivateRoute>
+                  }
+                />
+
+                {/* ---------------- USER ---------------- */}
+                <Route
+                  path="/userdashboard"
+                  element={
+                    <PrivateRoute roles={["user"]}>
+                      <UserLayout><UserDashboard /></UserLayout>
+                    </PrivateRoute>
+                  }
+                />
+
+                <Route
+                  path="/useredit"
+                  element={
+                    <PrivateRoute roles={["user"]}>
+                      <UserLayout><UserDetailEditPage /></UserLayout>
+                    </PrivateRoute>
+                  }
+                />
+
+                <Route
+                  path="/userprofile"
+                  element={
+                    <PrivateRoute roles={["user"]}>
+                      <UserLayout><UserProfile /></UserLayout>
+                    </PrivateRoute>
+                  }
+                />
+
+                {/* ---------------- VIP ---------------- */}
+                <Route
+                  path="/vipdashboard"
+                  element={
+                    <PrivateRoute roles={["vip"]}>
+                      <VipLayout><VipDashboard /></VipLayout>
+                    </PrivateRoute>
+                  }
+                />
+
+                <Route
+                  path="/vipprofile"
+                  element={
+                    <PrivateRoute roles={["vip"]}>
+                      <VipLayout><VipProfile /></VipLayout>
+                    </PrivateRoute>
+                  }
+                />
+
+                {/* ---------------- GUARD ---------------- */}
+                <Route
+                  path="/guarddashboard"
+                  element={
+                    <PrivateRoute roles={["guard"]}>
+                      <Guardlayout><GuardDashboard /></Guardlayout>
+                    </PrivateRoute>
+                  }
+                />
+
+                <Route
+                  path="/guardshift"
+                  element={
+                    <PrivateRoute roles={["guard"]}>
+                      <Guardlayout><GuardShift /></Guardlayout>
+                    </PrivateRoute>
+                  }
+                />
+
+                <Route
+                  path="/guardprofile"
+                  element={
+                    <PrivateRoute roles={["guard"]}>
+                      <Guardlayout><GuardProfile /></Guardlayout>
+                    </PrivateRoute>
+                  }
+                />
+
+              </Routes>
+
+            </GuardProvider>
+          </VipProvider>
+        </UserProvider>
       </AdminProvider>
     </Router>
   );

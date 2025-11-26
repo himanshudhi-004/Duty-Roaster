@@ -22,12 +22,14 @@ export default function VipGuardManagement() {
   const [popupData, setPopupData] = useState(null);
   const [popupPos, setPopupPos] = useState({ top: 0, left: 0 });
 
+  const role = localStorage.getItem("role"); // ✅ admin / user
+
   const navigate = useNavigate();
   const rowRefs = useRef({});
 
   /* PAGINATION */
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(30); // default 30
+  const [rowsPerPage, setRowsPerPage] = useState(30);
 
   /* ---------------- FETCH VIP LIST ---------------- */
   useEffect(() => {
@@ -42,20 +44,6 @@ export default function VipGuardManagement() {
     }
     load();
   }, [refreshTrigger]);
-
-  /* ---------------- DELETE VIP ---------------- */
-  const handleDelete = async (id) => {
-    if (toast.success("Delete this VIP?")) {
-      try {
-        await deleteVip(id);
-        const updated = await getAllVip();
-        setVipList(Array.isArray(updated) ? updated : []);
-        toast.success("VIP Deleted Successfully!");
-      } catch (err) {
-        console.error("Delete Error:", err);
-      }
-    }
-  };
 
   /* ---------------- FILTER ---------------- */
   const designations = [...new Set(vipList.map((v) => v.designation))];
@@ -152,7 +140,9 @@ export default function VipGuardManagement() {
                 <th style={styles.th}>Designation</th>
                 <th style={styles.th}>Contact</th>
                 <th style={styles.th}>Status</th>
-                <th style={styles.th}>Actions</th>
+
+                {/* ✅ WORKED HERE — Actions Head shown only when role is user */}
+                {role === "user" && <th style={styles.th}>Actions</th>}
               </tr>
             </thead>
 
@@ -169,23 +159,39 @@ export default function VipGuardManagement() {
                   <tr
                     key={vip.id}
                     ref={(el) => (rowRefs.current[vip.id] = el)}
-                    style={styles.row}
-                    onClick={() =>
-                      navigate(`/vip-auto-assign`, { state: { vip } })
-                    }
+                    style={{
+                      ...styles.row,
+                      cursor: role === "user" ? "pointer" : "not-allowed",
+                      opacity: role === "admin" ? 0.7 : 1,
+                    }}
+                    onClick={() => {
+                      if (role === "user") {
+                        navigate(`/vip-auto-assign`, { state: { vip } });
+                      }
+                    }}
                   >
                     <td style={styles.td}>{index + 1 + (currentPage - 1) * rowsPerPage}</td>
                     <td style={styles.td}>{vip.name}</td>
                     <td style={styles.td}>{vip.email}</td>
-                    <td style={styles.td}><span style={styles.badge}>{vip.designation}</span></td>
-                    <td style={styles.td}>{vip.contactno}</td>
-                    <td style={styles.td}><span style={statusStyle}>{vip.status}</span></td>
-
-                    <td style={styles.actionCol}>
-                      <button style={styles.infoBtn} onClick={(e) => openPopup(e, vip, vip.id)}>
-                        <i className="fa fa-eye"></i>
-                      </button>
+                    <td style={styles.td}>
+                      <span style={styles.badge}>{vip.designation}</span>
                     </td>
+                    <td style={styles.td}>{vip.contactno}</td>
+                    <td style={styles.td}>
+                      <span style={statusStyle}>{vip.status}</span>
+                    </td>
+
+                    {/* ✅ WORKED HERE — Actions column shown only for user */}
+                    {role === "user" && (
+                      <td style={styles.actionCol}>
+                        <button
+                          style={styles.infoBtn}
+                          onClick={(e) => openPopup(e, vip, vip.id)}
+                        >
+                          <i className="fa fa-eye"></i>
+                        </button>
+                      </td>
+                    )}
                   </tr>
                 );
               })}
@@ -243,7 +249,10 @@ export default function VipGuardManagement() {
 
       {/* POPUP */}
       {popupData && (
-        <div style={{ ...styles.popup, top: popupPos.top, left: popupPos.left }} onMouseLeave={() => setPopupData(null)}>
+        <div
+          style={{ ...styles.popup, top: popupPos.top, left: popupPos.left }}
+          onMouseLeave={() => setPopupData(null)}
+        >
           <div style={styles.arrow}></div>
 
           <h3 style={styles.popupTitle}>{popupData.name}</h3>
@@ -254,7 +263,9 @@ export default function VipGuardManagement() {
           <h4 style={{ fontWeight: 700, marginTop: 10 }}>Required Guards:</h4>
 
           {(guardDistribution[popupData.designation] || []).map((item, i) => (
-            <p key={i} style={styles.popText}>{item}</p>
+            <p key={i} style={styles.popText}>
+              {item}
+            </p>
           ))}
         </div>
       )}
