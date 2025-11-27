@@ -1,134 +1,299 @@
-import React, { useState, useEffect } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
-import { adminLogout } from "../api/auth";
+import React, { useState, useEffect, useRef } from "react";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
+import { logoutUser } from "../api/auth";
+import { useGuardStore } from "../context/GuardContext";
 
 export default function GuardNavbar() {
   const navigate = useNavigate();
-  const [isNavOpen, setIsNavOpen] = useState(false);
-  const [isVisible, setIsVisible] = useState(true);
+  const location = useLocation();
+  const { selectedGuard } = useGuardStore();
 
-  //  Hide navbar only if screen < 345px
+  const [showNavbar, setShowNavbar] = useState(
+    typeof window !== "undefined" ? window.innerWidth <= 851 : false
+  );
+  const [leftMenuOpen, setLeftMenuOpen] = useState(false);
+  const [userDropOpen, setUserDropOpen] = useState(false);
+
+  const leftMenuRef = useRef(null);
+  const userRef = useRef(null);
+
+  const guardName = selectedGuard?.name || "Guard";
+  const guardEmail = selectedGuard?.email || "guard@gmail.com";
+
+  /* ✅ RESPONSIVE WIDTH CONTROL */
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth < 345) {
-        setIsVisible(false);
-      } else {
-        setIsVisible(true);
+      const isMobile = window.innerWidth <= 851;
+      setShowNavbar(isMobile);
+
+      if (!isMobile) {
+        setLeftMenuOpen(false);
+        setUserDropOpen(false);
       }
     };
 
-    handleResize(); // run once at load
+    handleResize();
     window.addEventListener("resize", handleResize);
+    window.addEventListener("orientationchange", handleResize);
 
-    return () => window.removeEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("orientationchange", handleResize);
+    };
   }, []);
 
-  //  Handle Logout
-  const handleLogout = (e) => {
-    e.preventDefault();
-    const result = guardLogout(); // remove token
-    if (result.success) {
-      navigate("/login");
-    } else {
-      console.error("Logout failed:", result.message);
-    }
+  /* ✅ CLOSE DROPDOWNS ON ROUTE CHANGE */
+  useEffect(() => {
+    setLeftMenuOpen(false);
+    setUserDropOpen(false);
+  }, [location.pathname]);
+
+  /* ✅ OUTSIDE CLICK CLOSE */
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (leftMenuRef.current && !leftMenuRef.current.contains(e.target)) {
+        setLeftMenuOpen(false);
+      }
+      if (userRef.current && !userRef.current.contains(e.target)) {
+        setUserDropOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, []);
+
+  /* ✅ LOGOUT */
+  const handleLogout = () => {
+    logoutUser();
+    localStorage.removeItem("guardToken");
+    localStorage.removeItem("selectedGuard");
+    localStorage.removeItem("role");
+    navigate("/login");
   };
 
-  if (!isVisible) return null; // hide navbar below 345px
+  /* ✅ HIDE ON DESKTOP */
+  if (!showNavbar) return null;
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-white border-bottom shadow-sm">
-      <div className="container-fluid">
-        {/* 🧭 Brand / Logo */}
-        <NavLink className="navbar-brand fw-bold text-black" to="/guarddashboard">
-          <img
-            src="/"
-            alt=""
-            height="25"
-            className="me-2"
-          />
-          {/* Admin Panel */}
-        </NavLink>
-
-        {/*  Toggle Button for Mobile */}
+    <nav style={styles.navbar}>
+      {/* ✅ LEFT SIDE : MENU + BRAND */}
+      <div style={styles.leftBox} ref={leftMenuRef}>
         <button
-          className="navbar-toggler"
-          type="button"
-          onClick={() => setIsNavOpen(!isNavOpen)}
-          aria-controls="navbarNav"
-          aria-expanded={isNavOpen ? "true" : "false"}
-          aria-label="Toggle navigation"
+          style={styles.menuBtn}
+          aria-label="Open menu"
+          onClick={() => {
+            setLeftMenuOpen((p) => !p);
+            setUserDropOpen(false);
+          }}
         >
-          <span className="navbar-toggler-icon"></span>
+          ---
         </button>
 
-        {/*  Navbar Items */}
-        <div
-          className={`collapse navbar-collapse ${isNavOpen ? "show" : ""}`}
-          id="navbarNav"
-        >
-          <ul className="navbar-nav ms-auto align-items-center">
-            <li className="nav-item dropdown">
-              <NavLink
-                className="nav-link dropdown-toggle d-flex align-items-center"
-                to="/guardprofile"
-                id="userDropdown"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                <img
-                  src="assets/img/avtar.jpg"
-                  alt="Profile"
-                  className="rounded-circle me-2"
-                  width="35"
-                  height="35"
-                />
-                <span className="d-none d-sm-inline text-black">
-                  Hi, <strong>Guard</strong>
-                </span>
-              </NavLink>
+        <span style={styles.brand}>Guard Panel</span>
 
-              <ul
-                className="dropdown-menu dropdown-menu-end shadow animated fadeIn"
-                aria-labelledby="userDropdown"
-              >
-                <li className="dropdown-item-text text-center">
-                  <img
-                    src="assets/img/avtar.jpg"
-                    alt="Profile"
-                    className="rounded-circle mb-2"
-                    width="60"
-                    height="60"
-                  />
-                  <h6 className="mb-0">Guard</h6>
-                  <small className="text-muted">guard@gmail.com</small>
-                </li>
-                <li>
-                  <div className="dropdown-divider"></div>
-                </li>
-                <li>
-                  <NavLink className="dropdown-item" to="/guardprofile">
-                    My Profile
-                  </NavLink>
-                </li>
-                <li>
-                  <div className="dropdown-divider"></div>
-                </li>
-                <li>
-                  <button
-                    className="dropdown-item text-danger"
-                    onClick={handleLogout}
-                    style={{ border: "none", background: "none" }}
-                  >
-                    Logout
-                  </button>
-                </li>
-              </ul>
-            </li>
-          </ul>
-        </div>
+        {leftMenuOpen && (
+          <div style={styles.leftDropdown}>
+            <NavLink to="/guarddashboard" style={styles.menuItem}>
+              Dashboard
+            </NavLink>
+
+            <NavLink to="/guardsrequest" style={styles.menuItem}>
+              Leave Request
+            </NavLink>
+
+            <NavLink to="/guardshift" style={styles.menuItem}>
+              My Shift
+            </NavLink>
+
+            <NavLink to="/guardprofile" style={styles.menuItem}>
+              My Profile
+            </NavLink>
+          </div>
+        )}
+      </div>
+
+      {/* ✅ RIGHT SIDE : PROFILE ICON */}
+      <div style={styles.userBox} ref={userRef}>
+        <button
+          style={styles.profileIconBtn}
+          aria-label="Open profile"
+          onClick={() => {
+            setUserDropOpen((p) => !p);
+            setLeftMenuOpen(false);
+          }}
+        >
+          <img
+            src="/assets/img/avtar.jpg"
+            alt="Guard"
+            style={styles.avatar}
+          />
+        </button>
+
+        {userDropOpen && (
+          <div style={styles.userDropdown}>
+            <div style={styles.userHeader}>
+              <img
+                src="/assets/img/avtar.jpg"
+                alt="Guard"
+                style={styles.userBigAvatar}
+              />
+              <div>
+                <strong>{guardName}</strong>
+                <br />
+                <small>{guardEmail}</small>
+              </div>
+            </div>
+
+            <NavLink to="/guardprofile" style={styles.userItem}>
+              My Profile
+            </NavLink>
+
+            <button onClick={handleLogout} style={styles.logoutBtn}>
+              Logout
+            </button>
+          </div>
+        )}
       </div>
     </nav>
   );
 }
+
+/* ===============================
+   ✅ GUARD NAVBAR STYLES
+================================ */
+
+const styles = {
+  navbar: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: "10px 14px",
+    background: "#ffffff",
+    borderBottom: "1px solid #ddd",
+    position: "sticky",
+    top: 0,
+    zIndex: 1000,
+    width: "100%",
+  },
+
+  /* LEFT */
+  leftBox: {
+    display: "flex",
+    alignItems: "center",
+    gap: 10,
+    position: "relative",
+  },
+
+  menuBtn: {
+    fontSize: 20,
+    fontWeight: "900",
+    background: "none",
+    border: "2px solid #4e54c8",
+    borderRadius: 6,
+    padding: "2px 8px",
+    cursor: "pointer",
+    color: "#4e54c8",
+  },
+
+  brand: {
+    fontSize: 17,
+    fontWeight: "700",
+    color: "#4e54c8",
+    whiteSpace: "nowrap",
+  },
+
+  leftDropdown: {
+    position: "absolute",
+    top: 38,
+    left: 0,
+    width: 240,
+    background: "#fff",
+    borderRadius: 12,
+    boxShadow: "0 6px 20px rgba(0,0,0,0.2)",
+    overflow: "hidden",
+    zIndex: 1000,
+  },
+
+  menuItem: {
+    display: "block",
+    padding: "12px 14px",
+    textDecoration: "none",
+    color: "#333",
+    borderBottom: "1px solid #eee",
+    fontWeight: 600,
+    fontSize: 14,
+  },
+
+  /* RIGHT */
+  userBox: {
+    position: "relative",
+  },
+
+  profileIconBtn: {
+    background: "none",
+    border: "none",
+    padding: 0,
+    cursor: "pointer",
+  },
+
+  avatar: {
+    width: 34,
+    height: 34,
+    borderRadius: "50%",
+    border: "2px solid #4e54c8",
+  },
+
+  userDropdown: {
+    position: "absolute",
+    right: 0,
+    top: 42,
+    width: 220,
+    maxWidth: "90vw",
+    background: "#fff",
+    borderRadius: 12,
+    boxShadow: "0 8px 20px rgba(0,0,0,0.2)",
+    overflow: "hidden",
+    zIndex: 1000,
+  },
+
+  userHeader: {
+    display: "flex",
+    gap: 10,
+    padding: 12,
+    background: "#f8f9fa",
+    borderBottom: "1px solid #eee",
+    alignItems: "center",
+  },
+
+  userBigAvatar: {
+    width: 38,
+    height: 38,
+    borderRadius: "50%",
+  },
+
+  userItem: {
+    display: "block",
+    padding: "10px 14px",
+    textDecoration: "none",
+    color: "#333",
+    fontWeight: 600,
+    fontSize: 14,
+  },
+
+  logoutBtn: {
+    width: "100%",
+    border: "none",
+    background: "#dc3545",
+    color: "#fff",
+    padding: 12,
+    fontWeight: 700,
+    cursor: "pointer",
+    fontSize: 14,
+  },
+};

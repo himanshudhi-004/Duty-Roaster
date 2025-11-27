@@ -12,7 +12,7 @@ export default function VipLayout({ children }) {
       <VipSidebar />
       <div className="main-panel">
         {/* <SideLogoHeader /> */}
-        {/* <VipNavbar /> */}
+        <VipNavbar />
         <div className="content">{children}</div>
         <Footer />
       </div>

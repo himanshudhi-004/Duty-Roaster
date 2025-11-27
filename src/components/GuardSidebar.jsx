@@ -58,6 +58,17 @@ export default function GuardSidebar() {
 
           <li style={styles.menuItem}>
             <NavLink
+              to="/guardsrequest"
+              style={styles.menuLink}
+              className="menu-link"
+            >
+              <i className="fas fa-file-alt" style={styles.icon}></i>
+              <span>Leave Request</span>
+            </NavLink>
+          </li>
+
+          <li style={styles.menuItem}>
+            <NavLink
               to="/guardshift"
               style={styles.menuLink}
               className="menu-link"

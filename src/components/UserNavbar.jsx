@@ -1,34 +1,26 @@
 import React, { useState, useEffect, useRef } from "react";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { logoutUser } from "../api/auth";
-import { useAdminStore } from "../context/AdminContext";
+import { useUserStore } from "../context/UserContext";
 
-export default function Navbar() {
+export default function UserNavbar() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { selectedAdmin } = useAdminStore();
+  const { selectedUser } = useUserStore();
 
-  const [leftMenuOpen, setLeftMenuOpen] = useState(false);
-  const [userDropOpen, setUserDropOpen] = useState(false);
   const [showNavbar, setShowNavbar] = useState(
     typeof window !== "undefined" ? window.innerWidth <= 851 : false
   );
+  const [leftMenuOpen, setLeftMenuOpen] = useState(false);
+  const [userDropOpen, setUserDropOpen] = useState(false);
 
   const leftMenuRef = useRef(null);
   const userRef = useRef(null);
 
-  const adminName = selectedAdmin?.adminName || "Admin";
-  const adminEmail = selectedAdmin?.adminEmail || "admin@gmail.com";
+  const userName = selectedUser?.name || "User";
+  const userEmail = selectedUser?.email || "user@gmail.com";
 
-  const handleLogout = () => {
-    logoutUser();
-    localStorage.removeItem("selectedAdmin");
-    localStorage.removeItem("adminToken");
-    localStorage.removeItem("role");
-    navigate("/login");
-  };
-
-  /* ✅ RESPONSIVE WIDTH + ORIENTATION */
+  /* ✅ RESPONSIVE WIDTH CONTROL */
   useEffect(() => {
     const handleResize = () => {
       const isMobile = window.innerWidth <= 851;
@@ -40,7 +32,7 @@ export default function Navbar() {
       }
     };
 
-    handleResize(); // initial check
+    handleResize();
     window.addEventListener("resize", handleResize);
     window.addEventListener("orientationchange", handleResize);
 
@@ -76,51 +68,73 @@ export default function Navbar() {
     };
   }, []);
 
-  /* ✅ AUTO HIDE ON DESKTOP */
+  /* ✅ LOGOUT */
+  const handleLogout = () => {
+    logoutUser();
+    localStorage.removeItem("userToken");
+    localStorage.removeItem("selectedUser");
+    localStorage.removeItem("role");
+    navigate("/login");
+  };
+
+  /* ✅ HIDE ON DESKTOP */
   if (!showNavbar) return null;
 
   return (
     <nav style={styles.navbar}>
-      {/* ✅ LEFT SIDE */}
+      {/* ✅ LEFT SIDE : MENU + BRAND */}
       <div style={styles.leftBox} ref={leftMenuRef}>
         <button
-          style={styles.dashBtn}
+          style={styles.menuBtn}
           aria-label="Open menu"
           onClick={() => {
-            setLeftMenuOpen((prev) => !prev);
+            setLeftMenuOpen((p) => !p);
             setUserDropOpen(false);
           }}
         >
           ---
         </button>
 
-        <span style={styles.brand}>Admin Panel</span>
+        <span style={styles.brand}>User Panel</span>
 
         {leftMenuOpen && (
           <div style={styles.leftDropdown}>
-            <NavLink to="/admindashboard" style={styles.menuItem}>Dashboard</NavLink>
-            <NavLink to="/vipform" style={styles.menuItem}>VIP Form</NavLink>
-            <NavLink to="/guardform" style={styles.menuItem}>Guard Form</NavLink>
-            <NavLink to="/viplist" style={styles.menuItem}>VIP Table</NavLink>
-            <NavLink to="/guardlist" style={styles.menuItem}>Guard Table</NavLink>
-            <NavLink to="/vgmang" style={styles.menuItem}>VIP–Guard Management</NavLink>
+            <NavLink to="/userdashboard" style={styles.menuItem}>
+              Dashboard
+            </NavLink>
+
+            <NavLink to="/viplist" style={styles.menuItem}>
+              VIP Table
+            </NavLink>
+
+            <NavLink to="/guardlist" style={styles.menuItem}>
+              Guard Table
+            </NavLink>
+
+            <NavLink to="/vgmang" style={styles.menuItem}>
+              VIP–Guard Management
+            </NavLink>
+
+            <NavLink to="/userprofile" style={styles.menuItem}>
+              My Profile
+            </NavLink>
           </div>
         )}
       </div>
 
-      {/* ✅ RIGHT SIDE */}
-      <div style={styles.userDropdownBox} ref={userRef}>
+      {/* ✅ RIGHT SIDE : PROFILE ICON */}
+      <div style={styles.userBox} ref={userRef}>
         <button
           style={styles.profileIconBtn}
-          aria-label="Open profile menu"
+          aria-label="Open profile"
           onClick={() => {
-            setUserDropOpen((prev) => !prev);
+            setUserDropOpen((p) => !p);
             setLeftMenuOpen(false);
           }}
         >
           <img
             src="/assets/img/avtar.jpg"
-            alt="profile"
+            alt="User"
             style={styles.avatar}
           />
         </button>
@@ -130,17 +144,17 @@ export default function Navbar() {
             <div style={styles.userHeader}>
               <img
                 src="/assets/img/avtar.jpg"
-                alt="profile"
+                alt="User"
                 style={styles.userBigAvatar}
               />
               <div>
-                <strong>{adminName}</strong>
+                <strong>{userName}</strong>
                 <br />
-                <small>{adminEmail}</small>
+                <small>{userEmail}</small>
               </div>
             </div>
 
-            <NavLink to="/adminprofile" style={styles.userItem}>
+            <NavLink to="/userprofile" style={styles.userItem}>
               My Profile
             </NavLink>
 
@@ -155,7 +169,7 @@ export default function Navbar() {
 }
 
 /* ===============================
-   ✅ PERFECT RESPONSIVE STYLES
+   ✅ USER NAVBAR STYLES
 ================================ */
 
 const styles = {
@@ -172,15 +186,15 @@ const styles = {
     width: "100%",
   },
 
+  /* LEFT */
   leftBox: {
     display: "flex",
     alignItems: "center",
     gap: 10,
     position: "relative",
-    maxWidth: "70%",
   },
 
-  dashBtn: {
+  menuBtn: {
     fontSize: 20,
     fontWeight: "900",
     background: "none",
@@ -189,12 +203,10 @@ const styles = {
     padding: "2px 8px",
     cursor: "pointer",
     color: "#4e54c8",
-    minWidth: 36,
-    minHeight: 32,
   },
 
   brand: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: "700",
     color: "#4e54c8",
     whiteSpace: "nowrap",
@@ -202,14 +214,13 @@ const styles = {
 
   leftDropdown: {
     position: "absolute",
-    top: "38px",
+    top: 38,
     left: 0,
-    width: "240px",
-    maxHeight: "70vh",
-    overflowY: "auto",
+    width: 240,
     background: "#fff",
     borderRadius: 12,
     boxShadow: "0 6px 20px rgba(0,0,0,0.2)",
+    overflow: "hidden",
     zIndex: 1000,
   },
 
@@ -223,7 +234,8 @@ const styles = {
     fontSize: 14,
   },
 
-  userDropdownBox: {
+  /* RIGHT */
+  userBox: {
     position: "relative",
   },
 
@@ -235,18 +247,17 @@ const styles = {
   },
 
   avatar: {
-    width: 32,
-    height: 32,
+    width: 34,
+    height: 34,
     borderRadius: "50%",
     border: "2px solid #4e54c8",
-    objectFit: "cover",
   },
 
   userDropdown: {
     position: "absolute",
     right: 0,
-    top: "40px",
-    width: "220px",
+    top: 42,
+    width: 220,
     maxWidth: "90vw",
     background: "#fff",
     borderRadius: 12,

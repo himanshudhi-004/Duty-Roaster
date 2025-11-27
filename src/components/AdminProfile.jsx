@@ -122,6 +122,7 @@ export default function AdminProfile() {
   );
 }
 
+
 /* ------------------ STYLES (UNCHANGED) ------------------ */
 const styles = {
   pageContainer: {

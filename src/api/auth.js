@@ -49,7 +49,7 @@ export const checkToken = (role) => {
   if (!token) return false;
 
   const now = Date.now();
-  const limit = 5 * 60 * 1000;
+  const limit = 10 * 60 * 1000;
 
   if (lastActive && now - lastActive > limit) {
     logoutUser(role);

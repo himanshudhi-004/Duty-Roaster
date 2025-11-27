@@ -1,10 +1,7 @@
 // src/layouts/UserLayout.jsx
 import React from "react";
-import VipSidebar from "../components/VipSidebar";
-
-import SideLogoHeader from "../components/SideLogoHeader";
 import Footer from "../components/Footer";
-import VipNavbar from "../components/VipNavbar";
+import UserNavbar from "../components/UserNavbar";
 import UserSidebar from "../components/UserSidebar";
 
 export default function UserLayout({ children }) {
@@ -13,7 +10,7 @@ export default function UserLayout({ children }) {
       <UserSidebar />
       <div className="main-panel">
         {/* <SideLogoHeader /> */}
-        {/* <VipNavbar /> */}
+        <UserNavbar />
         <div className="content">{children}</div>
         <Footer />
       </div>

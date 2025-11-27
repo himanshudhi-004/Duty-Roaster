@@ -34,7 +34,7 @@ export const AdminProvider = ({ children }) => {
         refreshTrigger,
         handleEdit,
         handleBack,
-        setSelectedAdmin,
+        setSelectedAdmin, // ✅ REQUIRED FOR PROFILE & NAVBAR
       }}
     >
       {children}
