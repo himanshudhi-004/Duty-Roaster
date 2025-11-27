@@ -5,17 +5,31 @@ import { updateGuard } from "../api/vipform";
 import { toast } from "react-toastify";
 
 export default function GuardEditForm({ guardData, onBack }) {
-  const [guardformData, setGuardFormData] = useState(guardData);
-
+  // -------- INITIAL STATE --------
+    const [guardformData, setGuardFormData] = useState({
+      ...guardData,
+      password: "",       // always start empty
+    });
+  
+// -------- INPUT CHANGE HANDLER --------
   const handle_gd_change = (e) => {
     const { name, value } = e.target;
     setGuardFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // -------- SUBMIT --------
   const handle_gd_submit = async (e) => {
     e.preventDefault();
+
+ // Remove password if empty
+    const payload = { ...guardformData };
+    if (!payload.password) {
+      delete payload.password;
+    }
+
+
     try {
-      await updateGuard(guardformData.id, guardformData);
+      await updateGuard(guardformData.id, payload);
       toast.success("Guard updated successfully!");
       onBack();
     } catch (error) {
@@ -52,9 +66,9 @@ export default function GuardEditForm({ guardData, onBack }) {
       {/* PASSWORD FIELD (EMPTY ALWAYS ON LOAD) */}
       <FormInput
         label="Password"
-        name="Password"
+        name="password"
         type="text"
-        value={guardformData.Password}   // empty initially, updates normally
+        value={guardformData.password}   // empty initially, updates normally
         onChange={handle_gd_change}
       />
 

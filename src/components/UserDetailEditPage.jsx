@@ -28,8 +28,8 @@ export default function UserDetailEditPage({ userData, onBack }) {
 
     // Remove password if empty
     const payload = { ...userformData };
-    if (!payload.Password) {
-      delete payload.Password;
+    if (!payload.password) {
+      delete payload.password;
     }
 
     try {

@@ -152,7 +152,7 @@ export default function VIPForm() {
             <FormInput
               label="Password"
               name="password"
-              type="password"
+              type="text"
               value={formData.password}
               onChange={handleChange}
             />

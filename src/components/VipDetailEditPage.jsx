@@ -5,8 +5,13 @@ import { updateVip } from "../api/vipform";
 import { toast } from "react-toastify";
 
 export default function VipEditForm({ vipData, onBack }) {
-  const [vipformData, setVipformData] = useState(vipData);
-
+   // -------- INITIAL STATE --------
+   const [vipformData, setVipformData] = useState({
+     ...vipData,
+     password: "",       // always start empty
+   });
+ 
+// -------- INPUT CHANGE HANDLER --------
   const handlechange = (e) => {
     const { name, value } = e.target;
     setVipformData((prev) => ({ ...prev, [name]: value }));
@@ -14,8 +19,15 @@ export default function VipEditForm({ vipData, onBack }) {
 
   const handlesubmit = async (e) => {
     e.preventDefault();
+
+    // Remove password if empty
+    const payload = { ...vipformData };
+    if (!payload.password) {
+      delete payload.password;
+    }
+
     try {
-      await updateVip(vipformData.id, vipformData);
+      await updateVip(vipformData.id, payload);
       toast.success("Vip updated successfully!");
       onBack();
     } catch (error) {
@@ -52,9 +64,9 @@ export default function VipEditForm({ vipData, onBack }) {
       {/* PASSWORD FIELD (EMPTY ALWAYS ON LOAD) */}
       <FormInput
         label="Password"
-        name="Password"
+        name="password"
         type="text"
-        value={vipformData.Password}   // empty initially, updates normally
+        value={vipformData.password}   // empty initially, updates normally
         onChange={handlechange}
       />
 

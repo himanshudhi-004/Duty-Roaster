@@ -110,7 +110,7 @@ export const submitUserFormData = async (userformData) => {
 // Get all admins (✔ Correct API)
 export const getAllUser = async () => {
   try {
-    const response = await api.get(`/api/auth`);
+    const response = await api.get(`/api/usr`);
     const res = response.data;
 
     console.log("User API:", res);
@@ -131,7 +131,7 @@ export const getAllUser = async () => {
 // Get single admin by ID
 export const getUserById = async (id) => {
   try {
-    const response = await api.get(`/api/auth/${id}`);
+    const response = await api.get(`/api/usr/${id}`);
     return response.data;
   } catch (error) {
     console.error("Error fetching admin by ID:", error.message);
@@ -142,7 +142,7 @@ export const getUserById = async (id) => {
 // Update admin
 export const updateUser = async (id, userformData) => {
   try {
-    const response = await api.post(`/auth/update/${id}`, userformData);
+    const response = await api.post(`/auth/usr/${id}`, userformData);
     return response.data;
   } catch (error) {
     console.error("Error updating User data:", error.message);
