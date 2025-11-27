@@ -89,8 +89,8 @@ export default function VipProfile() {
                       ...styles.statusBadge,
                       background:
                         userDetails.status === "Active"
-                          ?  "#dc3545"
-                          : "#28a745 "
+                          ?  "#28a745"
+                          : "#dc3545 "
                     }}
                   >
                     {userDetails.status}

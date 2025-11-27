@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-/* ------------------- AXIOS INSTANCE + INTERCEPTOR ------------------- */
+/* ------------------- AXIOS INSTANCE ------------------- */
 const api = axios.create({
   baseURL: process.env.REACT_APP_BASE_URL,
 });
@@ -15,7 +15,7 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-/* ------------------- DEFAULT TIME LOGIC ------------------- */
+/* ------------------- DEFAULT TIME ------------------- */
 const now = new Date();
 const plus8Hours = new Date(now.getTime() + 8 * 60 * 60 * 1000);
 
@@ -26,7 +26,7 @@ const formatDateTimeLocal = (date) => {
   )}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
 };
 
-/* STATIC GUARD DISTRIBUTION */
+/* ------------------- GUARD DISTRIBUTION ------------------- */
 const guardDistribution = {
   "Bollywood Actor": ["Grade A - 1", "Grade B - 1", "Grade C - 2", "Grade E - 10"],
   Cricketers: ["Grade B - 1", "Grade C - 1", "Grade D - 5", "Grade E - 10"],
@@ -44,37 +44,52 @@ export default function VipAutoAssign() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [alreadyAssigned, setAlreadyAssigned] = useState(false);
-
   const [showTimeModal, setShowTimeModal] = useState(false);
 
   const [startAt, setStartAt] = useState(formatDateTimeLocal(now));
   const [endAt, setEndAt] = useState(formatDateTimeLocal(plus8Hours));
 
-  /* ✅ STATUS STATE */
-  const [vipStatus, setVipStatus] = useState(vip?.status?.toLowerCase());
+  /* ✅ VIP STATUS LOGIC (SOURCE OF TRUTH IS ASSIGNMENT API) */
+  const [vipStatus, setVipStatus] = useState("inactive");
 
-  useEffect(() => {
-    if (!vip) return navigate("/vip-management");
-    setVipStatus(vip?.status?.toLowerCase());
-    fetchAssignedGuards();
-  }, [vip]);
-
+  /* ------------------- FETCH ASSIGNMENTS ------------------- */
   const fetchAssignedGuards = async () => {
     try {
       const res = await api.get(`/api/assignments/${id}`);
+
       if (res.data?.details?.length > 0) {
-        setResult(res.data);
+        const uniqueGuards = Array.from(
+          new Map(res.data.details.map((g) => [g.officer?.id, g])).values()
+        );
+
+        setResult({
+          ...res.data,
+          details: uniqueGuards,
+        });
+
         setAlreadyAssigned(true);
+        setVipStatus("active"); // ✅ STATUS SET ONLY FROM ASSIGNMENTS
+      } else {
+        setVipStatus("inactive");
       }
     } catch (err) {
-      console.error("Check assigned error:", err);
+      console.error("Assignment Check Error:", err);
+      setVipStatus("inactive");
     }
   };
 
-  const openTimePopup = () => setShowTimeModal(true);
+  useEffect(() => {
+    if (!vip) {
+      navigate("/vip-management");
+      return;
+    }
+    fetchAssignedGuards();
+  }, [vip]);
 
+  /* ------------------- AUTO ASSIGN ------------------- */
   const handleAutoAssign = async () => {
-    if (!startAt || !endAt) return toast.error("Please select both start and end time!");
+    if (!startAt || !endAt)
+      return toast.error("Select start & end time");
 
     setShowTimeModal(false);
     setLoading(true);
@@ -83,8 +98,10 @@ export default function VipAutoAssign() {
 
     const levelsArray = dataList.map((item) => {
       const [grade, count] = item.split(" - ");
-      const formatted = grade.replace("Grade ", "") + " Grade";
-      return { guardLevel: formatted, numberOfGuards: Number(count) };
+      return {
+        guardLevel: grade.replace("Grade ", "") + " Grade",
+        numberOfGuards: Number(count),
+      };
     });
 
     const payload = {
@@ -97,21 +114,27 @@ export default function VipAutoAssign() {
     try {
       const response = await api.post(`/api/assignments/auto`, payload);
 
-      setResult(response.data);
-      setAlreadyAssigned(true);
+      const uniqueGuards = Array.from(
+        new Map(response.data.details.map((g) => [g.officer?.id, g])).values()
+      );
 
-      /* ✅ INSTANTLY SET ACTIVE */
+      setResult({
+        ...response.data,
+        details: uniqueGuards,
+      });
+
+      setAlreadyAssigned(true);
       setVipStatus("active");
 
       toast.success("Guards Assigned Successfully!");
     } catch (err) {
       toast.error("Assignment Failed!");
-      setResult({ error: err.message });
     }
 
     setLoading(false);
   };
 
+  /* ------------------- UI ------------------- */
   return (
     <div style={styles.container}>
       <h2 style={styles.title}>VIP Guard Assignment</h2>
@@ -122,19 +145,22 @@ export default function VipAutoAssign() {
         <p>🎖 {vip?.designation}</p>
         <p>📞 {vip?.contactno}</p>
 
-        {vipStatus === "active" ? (
-          <span className="badge bg-success" style={{ padding: "8px 12px" }}>
-            Active
-          </span>
-        ) : (
-          <span className="badge bg-danger" style={{ padding: "8px 12px" }}>
-            Inactive
-          </span>
-        )}
+        <span
+          className={`badge ${
+            vipStatus === "active" ? "bg-success" : "bg-danger"
+          }`}
+          style={{ padding: "8px 12px" }}
+        >
+          {vipStatus === "active" ? "Active" : "Inactive"}
+        </span>
       </div>
 
       {!alreadyAssigned && (
-        <button style={styles.btn} onClick={openTimePopup} disabled={loading}>
+        <button
+          style={styles.btn}
+          onClick={() => setShowTimeModal(true)}
+          disabled={loading}
+        >
           {loading ? "Assigning..." : "Auto Assign Guards"}
         </button>
       )}
@@ -161,7 +187,9 @@ export default function VipAutoAssign() {
             />
 
             <div style={{ marginTop: 20, display: "flex", gap: 10 }}>
-              <button style={styles.btn} onClick={handleAutoAssign}>Continue</button>
+              <button style={styles.btn} onClick={handleAutoAssign}>
+                Continue
+              </button>
               <button
                 style={{ ...styles.btn, background: "#888" }}
                 onClick={() => setShowTimeModal(false)}
@@ -175,30 +203,7 @@ export default function VipAutoAssign() {
 
       {result && (
         <div style={styles.responseBox}>
-          <h3>Assigned Guard Summary</h3>
-
-          <table style={styles.table}>
-            <thead>
-              <tr>
-                <th style={styles.tableHeader}>Level</th>
-                {/* <th style={styles.tableHeader}>Requested</th>
-                <th style={styles.tableHeader}>Assigned</th> */}
-                <th style={styles.tableHeader}>Missing</th>
-              </tr>
-            </thead>
-            <tbody>
-              {result.summary?.map((row, i) => (
-                <tr key={i}>
-                  <td style={styles.tableCell}>{row.level}</td>
-                  {/* <td style={styles.tableCell}>{row.requested}</td> */}
-                  <td style={styles.tableCell}>{row.assigned}</td>
-                  {/* <td style={styles.tableCell}>{row.missing}</td> */}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          <h3 style={{ marginTop: 30 }}>Assigned Guard Details</h3>
+          <h3>Assigned Guard Details</h3>
 
           <table style={styles.table}>
             <thead>
@@ -208,8 +213,8 @@ export default function VipAutoAssign() {
                 <th style={styles.tableHeader}>Rank</th>
                 <th style={styles.tableHeader}>Experience</th>
                 <th style={styles.tableHeader}>Status</th>
-                <th style={styles.tableHeader}>Assigned At</th>
-                <th style={styles.tableHeader}>Assigned Till</th>
+                <th style={styles.tableHeader}>From</th>
+                <th style={styles.tableHeader}>Till</th>
               </tr>
             </thead>
             <tbody>
@@ -220,8 +225,12 @@ export default function VipAutoAssign() {
                   <td style={styles.tableCell}>{d.officer?.rank}</td>
                   <td style={styles.tableCell}>{d.officer?.experience} yrs</td>
                   <td style={styles.tableCell}>{d.status}</td>
-                  <td style={styles.tableCell}>{new Date(d.startAt).toLocaleString()}</td>
-                  <td style={styles.tableCell}>{new Date(d.endAt).toLocaleString()}</td>
+                  <td style={styles.tableCell}>
+                    {new Date(d.startAt).toLocaleString()}
+                  </td>
+                  <td style={styles.tableCell}>
+                    {new Date(d.endAt).toLocaleString()}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -263,14 +272,24 @@ const styles = {
   tableHeader: { background: "#1967d2", color: "#fff", padding: 10 },
   tableCell: { padding: 10, borderBottom: "1px solid #ddd" },
   modalOverlay: {
-    position: "fixed", top: 0, left: 0,
-    width: "100vw", height: "100vh",
+    position: "fixed",
+    top: 0,
+    left: 0,
+    width: "100vw",
+    height: "100vh",
     background: "rgba(0,0,0,0.6)",
-    display: "flex", justifyContent: "center", alignItems: "center", zIndex: 999,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 999,
   },
   modalBox: { background: "#fff", padding: 25, borderRadius: 12, width: "400px" },
   input: {
-    width: "100%", padding: "10px", borderRadius: 8,
-    border: "1px solid #ccc", marginTop: 5, marginBottom: 15,
+    width: "100%",
+    padding: "10px",
+    borderRadius: 8,
+    border: "1px solid #ccc",
+    marginTop: 5,
+    marginBottom: 15,
   },
 };

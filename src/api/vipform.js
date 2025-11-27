@@ -245,9 +245,9 @@ export const getAllGuard = async () => {
 };
 
 // Update guard
-export const updateGuard = async (guard_id, guardformData) => {
+export const updateGuard = async (id, guardformData) => {
   try {
-    const response = await api.put(`/api/officer/${guard_id}`, guardformData);
+    const response = await api.put(`/api/officer/${id}`, guardformData);
     return response.data;
   } catch (error) {
     console.error("Error updating Guard data:", error.message);
