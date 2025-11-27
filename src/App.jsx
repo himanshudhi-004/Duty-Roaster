@@ -40,7 +40,7 @@ import GuardShift from "./components/GuardShift";
 import UserLayout from "./layouts/UserLayout";
 import UserDashboard from "./pages/UserDashboard";
 import UserProfile from "./components/UserProfile";
-import UserDetailEditPage from "./components/UserDetailEditPage";
+// import UserDetailEditPage from "./components/UserDetailEditPage";
 import UserForm from "./components/UserForm";
 
 /* ---------------- LAYOUT ---------------- */
@@ -55,6 +55,7 @@ import "react-toastify/dist/ReactToastify.css";
 import GuardEditPage from "./pages/GuardEditPage";
 // import VIPEditForm from "./components/VipDetailEditPage";
 import VipEditPage from "./pages/VipEditPage";
+import UserEditPage from "./pages/UserEditPage";
 
 function App() {
 
@@ -96,6 +97,7 @@ function App() {
 
                 {/* ---------------- ADMIN ---------------- */}
                 <Route path="/register" element={<AdminForm />} />
+                <Route path="/userform" element={<UserForm />} />
 
                 <Route
                   path="/admindashboard"
@@ -134,14 +136,14 @@ function App() {
                 />
 
 
-                <Route
+                {/* <Route
                   path="/userform"
                   element={
-                    <PrivateRoute roles={["admin"]}>
+                     <PrivateRoute roles={["admin"]}>
                       <Adminlayout><UserForm /></Adminlayout>
-                    </PrivateRoute>
+                     </PrivateRoute>
                   }
-                />
+                /> */}
 
                 <Route
                   path="/vipform"
@@ -217,7 +219,7 @@ function App() {
                   path="/useredit"
                   element={
                     <PrivateRoute roles={["user"]}>
-                      <UserLayout><UserDetailEditPage /></UserLayout>
+                      <UserLayout><UserEditPage /></UserLayout>
                     </PrivateRoute>
                   }
                 />

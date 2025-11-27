@@ -65,7 +65,7 @@ export default function Sidebar() {
           {/* Section */}
           <li style={styles.sectionTitle}>Manage Forms</li>
 
-          <li style={styles.menuItem}>
+          {/* <li style={styles.menuItem}>
             <NavLink
               to="/userform"
               style={styles.menuLink}
@@ -74,7 +74,7 @@ export default function Sidebar() {
               <i className="fas fa-pen-square" style={styles.icon}></i>
               <span>User Registration Form</span>
             </NavLink>
-          </li>
+          </li> */}
 
           <li style={styles.menuItem}>
             <NavLink
@@ -120,7 +120,7 @@ export default function Sidebar() {
               style={styles.menuLink}
               className="menu-link"
             >
-              <i className="fas fa-users" style={styles.icon}></i>
+              <i className="fas fa-table" style={styles.icon}></i>
               <span>Guard Table</span>
             </NavLink>
           </li>

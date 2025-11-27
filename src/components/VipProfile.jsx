@@ -31,10 +31,10 @@ export default function VipProfile() {
       });
 
       const profile = Array.isArray(res.data) ? res.data[0] : res.data;
-      // console.log("VIP PROFILE DATA:", profile);
 
       setUserDetails(profile);
       setSelectedVip(profile); // ✅ STORE IN CONTEXT
+      localStorage.setItem("selectedVip", JSON.stringify(profile)); // ✅ STORE FOR REFRESH
     } catch (err) {
       console.log("Profile Fetch Error:", err);
     } finally {
@@ -58,7 +58,7 @@ export default function VipProfile() {
       </div>
     );
   }
-// console.log("USER DETAILS:", userDetails);
+
   return (
     <div style={styles.pageContainer}>
       <div style={styles.header}>
@@ -89,8 +89,8 @@ export default function VipProfile() {
                       ...styles.statusBadge,
                       background:
                         userDetails.status === "Active"
-                          ? "#28a745"
-                          : "#dc3545",
+                          ?  "#dc3545"
+                          : "#28a745 "
                     }}
                   >
                     {userDetails.status}
@@ -122,7 +122,7 @@ export default function VipProfile() {
   );
 }
 
-/* ------------------ UI THEME STYLES ------------------ */
+/* ----------- YOUR UI STYLES (UNCHANGED) ----------- */
 const styles = {
   pageContainer: {
     padding: "30px",

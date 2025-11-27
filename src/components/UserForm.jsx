@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 
 export default function UserForm() {
   const [userformData, setuserFormData] = useState({
-      id: '',
+    id: '',
     name: '',
     username: '',
     password: '',
@@ -21,7 +21,7 @@ export default function UserForm() {
 
   const navigate = useNavigate();
 
-  const handleEdit = (user) => {
+  const handle_us_Edit = (user) => {
     setuserFormData(user);
     setIsEditMode(true);
     setSelectedUser(user);
@@ -30,13 +30,13 @@ export default function UserForm() {
 
   const resetForm = () => {
     setuserFormData({
-     id: '',
-    name: '',
-    username: '',
-    password: '',
-    email: '',
-    contactno: '',
-    status: '',
+      id: '',
+      name: '',
+      username: '',
+      password: '',
+      email: '',
+      contactno: '',
+      status: '',
     });
     setIsEditMode(false);
     setSelectedUser(null);
@@ -144,15 +144,15 @@ export default function UserForm() {
 
 // ---------- STYLES ----------
 const styles = {
-//  page: {
-//    width: "100vw",
-//    // background: "#7bd3e2",
-//    display: "flex",
-//    justifyContent: "center",
-//    alignItems: "center",
-   
-//   },
-  
+  //  page: {
+  //    width: "100vw",
+  //    // background: "#7bd3e2",
+  //    display: "flex",
+  //    justifyContent: "center",
+  //    alignItems: "center",
+
+  //   },
+
   container: {
     minHeight: "100vh",
     width: "100%",

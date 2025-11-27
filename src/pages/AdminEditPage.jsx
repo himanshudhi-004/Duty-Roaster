@@ -5,7 +5,7 @@ import { useAdminStore } from "../context/AdminContext";
 import AdminEditForm from "../components/AdminDetailEditPage";
 
 export default function AdminEditPage() {
-  const { selectedAdmin, handleBack } = useAdminStore();
+  const { selectedAdmin, handleBack } = useAdminStore();a
   const navigate = useNavigate();
 
   if (!selectedAdmin) {

@@ -7,12 +7,12 @@ import { toast } from "react-toastify";
 export default function VipEditForm({ vipData, onBack }) {
   const [vipformData, setVipformData] = useState(vipData);
 
-  const handle_vp_change = (e) => {
+  const handlechange = (e) => {
     const { name, value } = e.target;
     setVipformData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handle_vp_submit = async (e) => {
+  const handlesubmit = async (e) => {
     e.preventDefault();
     try {
       await updateVip(vipformData.id, vipformData);
@@ -25,28 +25,28 @@ export default function VipEditForm({ vipData, onBack }) {
   };
 
   return (
-    <form onSubmit={handle_vp_submit}>
+    <form onSubmit={handlesubmit}>
       <h2>Edit VIP</h2>
 
       <FormInput
         label="Full Name"
         name="name"
         value={vipformData.name}
-        onChange={handle_vp_change}
+        onChange={handlechange}
       />
 
       <FormInput
         label="Email"
         name="email"
         value={vipformData.email}
-        onChange={handle_vp_change}
+        onChange={handlechange}
       />
 
       <FormInput
         label="Username"
         name="username"
         value={vipformData.username}
-        onChange={handle_vp_change}
+        onChange={handlechange}
       />
 
       {/* PASSWORD FIELD (EMPTY ALWAYS ON LOAD) */}
@@ -55,7 +55,7 @@ export default function VipEditForm({ vipData, onBack }) {
         name="Password"
         type="text"
         value={vipformData.Password}   // empty initially, updates normally
-        onChange={handle_vp_change}
+        onChange={handlechange}
       />
 
       {/* RANK */}
@@ -81,7 +81,7 @@ export default function VipEditForm({ vipData, onBack }) {
         label="Contact No"
         name="contactno"
         value={vipformData.contactno}
-        onChange={handle_vp_change}
+        onChange={handlechange}
       />
 
       {/* ✅ STATUS FIXED */}
@@ -90,7 +90,7 @@ export default function VipEditForm({ vipData, onBack }) {
         <select
           name="status"
           value={vipformData.status || ""}
-          onChange={handle_vp_change}
+          onChange={handlechange}
           style={selectStyle}
           required
         >

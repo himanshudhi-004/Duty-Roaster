@@ -1,99 +1,95 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { getAllVip, getAllGuard } from "../api/vipform";
+import { useUserStore } from "../context/UserContext";
 import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 export default function UserDashboard() {
   const navigate = useNavigate();
+  const { selectedUser, setSelectedUser } = useUserStore();
 
+  const [UserName, setUserName] = useState("User");
   const [vipList, setVipList] = useState([]);
   const [guardList, setGuardList] = useState([]);
-  const [UserName, setUserName] = useState("");
 
-  /* ---------------------------------------
-      FETCH ADMIN PROFILE (get admin_name)
-  ----------------------------------------- */
-  const loadUserProfile = async () => {
-    try {
-      const token = localStorage.getItem("userToken");
-      if (!token) return;
-
-      const res = await axios.get(`${BASE_URL}/auth/profile`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      const profile = Array.isArray(res.data) ? res.data[0] : res.data;
-
-      setUserName(profile.user_name || "User");
-    } catch (error) {
-      console.log("PROFILE FETCH ERROR:", error);
+  /* ✅ INSTANT SYNC FROM CONTEXT */
+  useEffect(() => {
+    if (selectedUser?.name) {
+      setUserName(selectedUser.name);
     }
-  };
+  }, [selectedUser]);
 
-  /* ---------------------------------------
-        LOAD VIP LIST
-  ----------------------------------------- */
+  /* ✅ FALLBACK FOR REFRESH / DIRECT URL */
+  useEffect(() => {
+    const syncUserProfile = async () => {
+      try {
+        if (selectedUser?.name) return;
+
+        const stored = localStorage.getItem("selectedUser");
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          setSelectedUser(parsed);
+          setUserName(parsed.name);
+          return;
+        }
+
+        const token = localStorage.getItem("userToken");
+        if (!token) return;
+
+        const decoded = jwtDecode(token);
+        const username = decoded.username || decoded.sub || decoded.email;
+
+        const res = await axios.get(`${BASE_URL}/usr/profile`, {
+          params: { username },
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const profile = Array.isArray(res.data) ? res.data[0] : res.data;
+
+        setSelectedUser(profile);
+        setUserName(profile.name);
+        localStorage.setItem("selectedUser", JSON.stringify(profile));
+      } catch (err) {
+        console.log("User Sync Error:", err);
+      }
+    };
+
+    syncUserProfile();
+  }, []);
+
   const loadVip = async () => {
-    try {
-      const data = await getAllVip();
-      if (Array.isArray(data)) setVipList(data);
-      else if (Array.isArray(data?.data)) setVipList(data.data);
-      else setVipList([]);
-    } catch (error) {
-      console.log("VIP API ERROR:", error);
-      setVipList([]);
-    }
+    const data = await getAllVip();
+    setVipList(Array.isArray(data) ? data : data?.data || []);
   };
 
-  /* ---------------------------------------
-        LOAD GUARD LIST
-  ----------------------------------------- */
   const loadGuards = async () => {
-    try {
-      const data = await getAllGuard();
-      if (Array.isArray(data)) setGuardList(data);
-      else if (Array.isArray(data?.data)) setGuardList(data.data);
-      else setGuardList([]);
-    } catch (err) {
-      console.log("GUARD API ERROR:", err);
-      setGuardList([]);
-    }
+    const data = await getAllGuard();
+    setGuardList(Array.isArray(data) ? data : data?.data || []);
   };
 
-  /* ---------------------------------------
-            USE EFFECT
-  ----------------------------------------- */
   useEffect(() => {
     loadVip();
     loadGuards();
-    loadUserProfile();   // <-- FETCH ADMIN NAME HERE
   }, []);
 
-  /* ---------------------------------------
-            LOGOUT
-  ----------------------------------------- */
   const handleLogout = () => {
     localStorage.removeItem("userToken");
+    localStorage.removeItem("selectedUser");
     localStorage.removeItem("role");
     navigate("/login");
   };
 
   const totalUsers = vipList.length + guardList.length;
 
-  /* ---------------------------------------
-            STATS ARRAY
-  ----------------------------------------- */
   const stats = [
     { title: "Total VIPs", value: vipList.length, icon: "fas fa-user", color: "#1e73be" },
     { title: "Total Officers", value: guardList.length, icon: "fas fa-user-shield", color: "#3cb371" },
     { title: "Total Users", value: totalUsers, icon: "fas fa-users", color: "#ffa500" },
   ];
 
-  /* ---------------------------------------
-              MAIN UI
-  ----------------------------------------- */
   return (
     <div style={styles.page}>
       <div style={styles.headerSection}>
@@ -107,22 +103,11 @@ export default function UserDashboard() {
         </button>
       </div>
 
-      {/* Main Content */}
       <div style={styles.mainContent}>
-        {/* Welcome Section */}
         <div style={styles.welcomeBox}>
-          <h2 style={styles.welcomeText}>
-            Welcome {UserName} 👋
-          </h2>
-
-          {/* Buttons */}
-          <div style={styles.buttonRow}>
-            {/* <Link to="/vipform" style={styles.actionBtnBlue}>Add VIPs</Link>
-            <Link to="/guardform" style={styles.actionBtnGreen}>Add Guards</Link> */}
-          </div>
+          <h2 style={styles.welcomeText}>Welcome {UserName} 👋</h2>
         </div>
 
-        {/* Stats Grid */}
         <div style={styles.statsGrid}>
           {stats.map((stat, index) => (
             <div key={index} style={styles.statCard}>
@@ -135,7 +120,6 @@ export default function UserDashboard() {
           ))}
         </div>
 
-        {/* Activity Section */}
         <div style={styles.activityBox}>
           <h3 style={styles.activityTitle}>Recent Activity</h3>
           <ul style={styles.activityList}>
@@ -149,23 +133,17 @@ export default function UserDashboard() {
   );
 }
 
-/* ---------------------------------------
-              STYLES
------------------------------------------ */
+/* ------------------ STYLES (UNCHANGED) ------------------ */
 const styles = {
   page: { padding: 25 },
-
   headerSection: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 20,
   },
-
   pageTitle: { fontSize: 30, fontWeight: 700, color: "#1e73be" },
-
   desc: { fontSize: 15, opacity: 0.6 },
-
   logoutBtn: {
     background: "#888",
     padding: "10px 20px",
@@ -177,45 +155,20 @@ const styles = {
     display: "flex",
     alignItems: "center",
   },
-
   mainContent: {
     background: "#fff",
     padding: 25,
     borderRadius: 12,
     boxShadow: "0 5px 20px rgba(0,0,0,0.1)",
   },
-
   welcomeBox: { marginBottom: 25 },
-
   welcomeText: { fontSize: 26, fontWeight: 700, color: "#1e73be", marginBottom: 20 },
-
-  buttonRow: { display: "flex", gap: 15, flexWrap: "wrap" },
-
-  actionBtnBlue: {
-    background: "#1e73be",
-    padding: "10px 20px",
-    borderRadius: 8,
-    color: "white",
-    textDecoration: "none",
-    fontWeight: 600,
-  },
-
-  actionBtnGreen: {
-    background: "#3cb371",
-    padding: "10px 20px",
-    borderRadius: 8,
-    color: "white",
-    textDecoration: "none",
-    fontWeight: 600,
-  },
-
   statsGrid: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))",
     gap: 25,
     marginTop: 20,
   },
-
   statCard: {
     background: "white",
     borderRadius: 12,
@@ -223,7 +176,6 @@ const styles = {
     textAlign: "center",
     boxShadow: "0 5px 20px rgba(0,0,0,0.08)",
   },
-
   iconCircle: {
     width: 55,
     height: 55,
@@ -233,13 +185,9 @@ const styles = {
     justifyContent: "center",
     margin: "0 auto 15px",
   },
-
   icon: { fontSize: 22, color: "white" },
-
   statValue: { fontSize: 28, fontWeight: 700, color: "#333" },
-
   statTitle: { opacity: 0.6 },
-
   activityBox: {
     marginTop: 35,
     padding: 20,
@@ -247,8 +195,6 @@ const styles = {
     background: "#f8fbff",
     border: "1px solid #e5e9f0",
   },
-
   activityTitle: { fontSize: 20, color: "#1e73be", marginBottom: 10 },
-
   activityList: { lineHeight: 2, paddingLeft: 10 },
 };

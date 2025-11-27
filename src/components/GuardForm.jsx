@@ -26,8 +26,8 @@ export default function GuardForm() {
   useEffect(() => {
     const fetchRanks = async () => {
       try {
+        const data = await getAllCategory();
         if (getAllCategory) {
-          const data = await getAllCategory();
           setRanks(data);
         } else {
           setRanks(["A Grade", "B Grade", "C Grade", "D Grade", "E Grade"]);

@@ -4,12 +4,12 @@ import VipDetails from "../components/VipDetails";
 import VipDetailEditPage from "../components/VipDetailEditPage";
 
 export default function VipListPage() {
-  const { selectedVIP, handleBack } = useVipStore();
+  const { selectedVip, handleBack } = useVipStore();
 
   return (
     <div className="container my-3">
-      {selectedVIP ? (
-        <VipDetailEditPage vipData={selectedVIP} onBack={handleBack} />
+      {selectedVip ? (
+        <VipDetailEditPage vipData={selectedVip} onBack={handleBack} />
       ) : (
         <VipDetails />
       )}

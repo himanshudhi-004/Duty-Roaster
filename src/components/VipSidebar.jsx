@@ -38,20 +38,20 @@ export default function VipSidebar() {
           </li>
 
           {/* Section Title */}
-          <li style={styles.sectionTitle}>Manage Forms</li>
+          <li style={styles.sectionTitle}>Manage</li>
 
           <li style={styles.menuItem}>
             <NavLink
-              to="/vipform"
+              to="/assguards"
               style={styles.menuLink}
               className="menu-link"
             >
               <i className="fas fa-file-alt" style={styles.icon}></i>
-              <span>VIP Registration</span>
+              <span>Assigned Guards</span>
             </NavLink>
           </li>
 
-          <li style={styles.sectionTitle}>Notifications</li>
+          {/* <li style={styles.sectionTitle}>Notifications</li> */}
 
 
           <li style={styles.menuItem}>

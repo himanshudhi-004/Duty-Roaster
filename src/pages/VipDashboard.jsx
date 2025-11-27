@@ -9,30 +9,30 @@ const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 export default function VipDashboard() {
   const navigate = useNavigate();
-  const { selectedVIP, setSelectedVIP } = useVipStore();
+  const { selectedVip, setSelectedVip } = useVipStore();
 
   const [vipName, setVipName] = useState("VIP");
   const [vipList, setVipList] = useState([]);
   const [guardList, setGuardList] = useState([]);
 
-  /* ✅ INSTANT SYNC FROM CONTEXT */
+  /* ✅ INSTANT FROM CONTEXT */
   useEffect(() => {
-    if (selectedVIP?.vip_name) {
-      setVipName(selectedVIP.vip_name);
+    if (selectedVip?.name) {
+      setVipName(selectedVip.name);
     }
-  }, [selectedVIP]);
+  }, [selectedVip]);
 
   /* ✅ FALLBACK FOR REFRESH / DIRECT URL */
   useEffect(() => {
     const syncVipProfile = async () => {
       try {
-        if (selectedVIP?.vip_name) return;
+        if (selectedVip?.name) return;
 
-        const stored = localStorage.getItem("selectedVIP");
+        const stored = localStorage.getItem("selectedVip");
         if (stored) {
           const parsed = JSON.parse(stored);
-          setSelectedVIP(parsed);
-          setVipName(parsed.vip_name);
+          setSelectedVip(parsed);
+          setVipName(parsed.name);
           return;
         }
 
@@ -40,18 +40,18 @@ export default function VipDashboard() {
         if (!token) return;
 
         const decoded = jwtDecode(token);
-        const username = decoded.sub || decoded.username;
+        const username = decoded.username || decoded.sub || decoded.email;
 
-        const res = await axios.get(`${BASE_URL}/vip/profile`, {
+        const res = await axios.get(`${BASE_URL}/api/categories/profile`, {
           params: { username },
           headers: { Authorization: `Bearer ${token}` },
         });
 
         const profile = Array.isArray(res.data) ? res.data[0] : res.data;
 
-        setSelectedVIP(profile);
-        setVipName(profile.vip_name);
-        localStorage.setItem("selectedVIP", JSON.stringify(profile));
+        setSelectedVip(profile);
+        setVipName(profile.name);
+        localStorage.setItem("selectedVip", JSON.stringify(profile));
       } catch (err) {
         console.log("VIP Sync Error:", err);
       }
@@ -77,7 +77,7 @@ export default function VipDashboard() {
 
   const handleLogout = () => {
     localStorage.removeItem("vipToken");
-    localStorage.removeItem("selectedVIP");
+    localStorage.removeItem("selectedVip");
     navigate("/login");
   };
 
@@ -132,7 +132,7 @@ export default function VipDashboard() {
   );
 }
 
-/* ------------------ STYLES (UNCHANGED) ------------------ */
+/* ----------- YOUR UI STYLES (UNCHANGED) ----------- */
 const styles = {
   page: { padding: 25 },
   headerSection: {

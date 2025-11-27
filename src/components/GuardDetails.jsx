@@ -154,7 +154,9 @@ export default function GuardDetails() {
                     </td>
 
                     <td style={styles.actionCol}>
-                      <button style={styles.editBtn} onClick={() => handleEdit(g)}>
+                      <button style={styles.editBtn}
+                       onClick={() => handleEdit(g)}
+                       >
                         <i className="fa fa-edit"></i>
                       </button>
                     </td>

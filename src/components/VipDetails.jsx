@@ -2,15 +2,16 @@ import React, { useEffect, useState } from "react";
 import { getAllVip, deleteVip } from "../api/vipform";
 import { useVipStore } from "../context/VipContext";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+
 
 
 export default function VipDetails() {
   const {handleEdit, refreshTrigger } = useVipStore();
   const [vipList, setVipList] = useState([]);
+
   const [selectedDesignation, setSelectedDesignation] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
-  const navigate = useNavigate();
+  
 
 
   /* PAGINATION STATES */
@@ -22,8 +23,11 @@ export default function VipDetails() {
     async function fetchVips() {
       try {
         const data = await getAllVip();
+
         if (Array.isArray(data)) setVipList(data);
         else if (Array.isArray(data?.data)) setVipList(data.data);
+         else if (Array.isArray(data?.vip)) setGuardList(data.vip);
+        else if (Array.isArray(data?.designation)) setGuardList(data.designation);
       } catch (err) {
         toast.error("Failed to load VIPs!");
       }
@@ -44,7 +48,7 @@ export default function VipDetails() {
   };
 
   /* Unique designations */
-  const designations = [...new Set(vipList.map((v) => v.designation))];
+  const designations = [...new Set(vipList.map((g) => g.designation || "Uncategorized"))];
 
   /* FILTER */
   const filteredVips = vipList.filter((v) => {

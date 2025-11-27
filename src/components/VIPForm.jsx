@@ -27,7 +27,7 @@ export default function VIPForm() {
     const fetchDesignations = async () => {
       try {
         const data = await getAllDesignations();
-        if (data && data.length > 0) {
+        if (getAllDesignations) {
           setDesignations(data);
         } else {
           setDesignations([
