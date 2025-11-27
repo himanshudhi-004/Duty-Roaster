@@ -56,6 +56,7 @@ import GuardEditPage from "./pages/GuardEditPage";
 // import VIPEditForm from "./components/VipDetailEditPage";
 import VipEditPage from "./pages/VipEditPage";
 import UserEditPage from "./pages/UserEditPage";
+import VipAssignedGuards from "./components/VipAssignedGuards";
 
 function App() {
 
@@ -248,6 +249,14 @@ function App() {
                   element={
                     <PrivateRoute roles={["vip"]}>
                       <VipLayout><VipProfile /></VipLayout>
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/assguards"
+                  element={
+                    <PrivateRoute roles={["vip"]}>
+                      <VipLayout><VipAssignedGuards /></VipLayout>
                     </PrivateRoute>
                   }
                 />
