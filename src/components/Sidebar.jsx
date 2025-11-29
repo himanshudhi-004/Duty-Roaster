@@ -161,6 +161,16 @@ export default function Sidebar() {
           </li> */}
           <li style={styles.menuItem}>
             <NavLink
+              to="/adminrequestaccept"
+              style={styles.menuLink}
+              className="menu-link"
+            >
+              <i className="fas fa-user" style={styles.icon}></i>
+              <span>Duty Accept/Reject</span>
+            </NavLink>
+          </li>
+          <li style={styles.menuItem}>
+            <NavLink
               to="/adminprofile"
               style={styles.menuLink}
               className="menu-link"

@@ -7,17 +7,16 @@ const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 export default function GuardShift() {
   const navigate = useNavigate();
-  const { guardId } = useParams(); // ✅ from URL
-  const { selectedGuard } = useGuardStore(); // ✅ from context
+  const { guardId } = useParams();
+  const { selectedGuard } = useGuardStore();
 
-  const finalGuardId = guardId || selectedGuard?.id; // ✅ universal support
+  const finalGuardId = guardId || selectedGuard?.id;
 
   const [vip, setVip] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!finalGuardId) {
-      console.warn("Guard ID missing — redirecting");
       navigate("/guardshift");
       return;
     }
@@ -43,7 +42,6 @@ export default function GuardShift() {
     fetchVip();
   }, [finalGuardId, navigate]);
 
-  /* ------------------ LOADING UI ------------------ */
   if (loading) {
     return (
       <div className="text-center py-5">
@@ -53,7 +51,6 @@ export default function GuardShift() {
     );
   }
 
-  /* ------------------ EMPTY UI ------------------ */
   if (!vip) {
     return (
       <div style={styles.emptyBox}>
@@ -65,10 +62,8 @@ export default function GuardShift() {
     );
   }
 
-  /* ------------------ MAIN UI ------------------ */
   return (
     <div style={styles.pageContainer}>
-      {/* HEADER */}
       <div style={styles.header}>
         <h2 style={styles.headerTitle}>
           <i className="fa fa-shield me-2"></i> Guard Shift Details
@@ -78,34 +73,21 @@ export default function GuardShift() {
         </p>
       </div>
 
-      {/* SHIFT CARD */}
       <div style={styles.card}>
         <div style={styles.profileRow}>
-          {/* LEFT VIP INFO */}
           <div style={styles.leftBox}>
             <h4 style={styles.name}>{vip.name || "N/A"}</h4>
             <p style={styles.role}>{vip.designation || "N/A"}</p>
           </div>
 
-          {/* RIGHT DETAILS */}
           <div style={styles.rightBox}>
             {[
+              ["Guard Assignment ID", vip.id],
               ["VIP Name", vip.name],
               ["Designation", vip.designation],
-              ["Start Time", <span style={styles.timeBadge}>{vip.startAt || "N/A"}</span>],
-              ["End Time", <span style={styles.timeBadge}>{vip.endAt || "N/A"}</span>],
-              [
-                "Status",
-                <span
-                  style={{
-                    ...styles.statusBadge,
-                    background:
-                      vip.status === "Active" ?  "#dc3545" : "#28a745" ,
-                  }}
-                >
-                  {vip.status || "Assigned"}
-                </span>,
-              ],
+              ["Start Time", vip.startAt || "N/A"],
+              ["End Time", vip.endAt || "N/A"],
+              ["Status", vip.status || "Assigned"],
             ].map(([label, value], i) => (
               <div style={styles.detailRow} key={i}>
                 <div style={styles.detailLabel}>{label}:</div>
@@ -113,10 +95,17 @@ export default function GuardShift() {
               </div>
             ))}
 
-            {/* ACTION */}
-            <div style={{ marginTop: "20px" }}>
+            <div style={{ marginTop: "20px", display: "flex", gap: "12px" }}>
               <button style={styles.backBtn} onClick={() => navigate(-1)}>
                 ← Back
+              </button>
+
+              {/*  SEND vip.id TO GuardLeaveRequest */}
+              <button
+                style={{ ...styles.backBtn, background: "#28a745" }}
+                onClick={() => navigate(`/guarddecision/${vip.id}`)}
+              >
+                Duty-Decision ➡
               </button>
             </div>
           </div>
@@ -157,18 +146,6 @@ const styles = {
   detailRow: { display: "flex", marginBottom: "12px" },
   detailLabel: { width: "150px", fontWeight: "600" },
   detailValue: { flex: 1 },
-  statusBadge: {
-    padding: "6px 12px",
-    borderRadius: "20px",
-    color: "white",
-    fontWeight: "600",
-  },
-  timeBadge: {
-    padding: "6px 12px",
-    borderRadius: "20px",
-    background: "#1e73be",
-    color: "white",
-  },
   backBtn: {
     background: "#1e73be",
     color: "white",

@@ -16,7 +16,7 @@ export default function GuardDashboard() {
   const [guardList, setGuardList] = useState([]);
 
   /* ------------------------------------------------
-      ✅ 1️⃣ INSTANT SYNC FROM CONTEXT (NO DELAY)
+       1️⃣ INSTANT SYNC FROM CONTEXT (NO DELAY)
   -------------------------------------------------- */
   useEffect(() => {
     if (selectedGuard?.name) {
@@ -25,15 +25,15 @@ export default function GuardDashboard() {
   }, [selectedGuard]);
 
   /* ------------------------------------------------
-      ✅ 2️⃣ FALLBACK SYNC (REFRESH / DIRECT URL)
+       2️⃣ FALLBACK SYNC (REFRESH / DIRECT URL)
   -------------------------------------------------- */
   useEffect(() => {
     const syncGuardProfile = async () => {
       try {
-        // ✅ Already available → no need to fetch
+        //  Already available → no need to fetch
         if (selectedGuard?.name) return;
 
-        // ✅ Try localStorage
+        //  Try localStorage
         const stored = localStorage.getItem("selectedGuard");
         if (stored) {
           const parsed = JSON.parse(stored);
@@ -42,7 +42,7 @@ export default function GuardDashboard() {
           return;
         }
 
-        // ✅ Last Fallback → Token + API
+        //  Last Fallback → Token + API
         const token = localStorage.getItem("guardToken");
         if (!token) return;
 
@@ -65,7 +65,7 @@ export default function GuardDashboard() {
     };
 
     syncGuardProfile();
-  }, []); // ✅ Run once only on mount
+  }, []); //  Run once only on mount
 
   /* ---------------------------------------
         LOAD VIP LIST
@@ -117,13 +117,13 @@ export default function GuardDashboard() {
     },
     {
       title: "Total Assignments",
-      value: vipList.length + guardList.length,
+      value: "1",
       icon: "fas fa-tasks",
       color: "#3cb371",
     },
     {
       title: "Total Incidents",
-      value: vipList.length + guardList.length,
+      value: "0",
       icon: "fas fa-exclamation-triangle",
       color: "#ffa500",
     },
@@ -255,7 +255,7 @@ const styles = {
   statTitle: { opacity: 0.6 },
 
   activityBox: {
-    marginTop: 35,
+    marginTop: "17%",
     padding: 20,
     borderRadius: 12,
     background: "#f8fbff",

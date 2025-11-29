@@ -65,7 +65,7 @@ export default function VipSidebar() {
             </NavLink>
           </li>
           <li>
-            <button to="/login" className="menu-link" style={styles.menuLink} onClick={handleLogout}>
+            <button to="/login" className="menu-link" style={{ ...styles.menuLink, outline: "none", border: "none" }} onClick={handleLogout}>
               <i className="fas fa-sign-out-alt" style={styles.icon}></i>
               <span>Logout</span>
             </button>
@@ -131,6 +131,8 @@ const styles = {
   menuItem: { marginBottom: "10px" },
 
   menuLink: {
+    width: "100%",
+    background: "transparent",
     display: "flex",
     alignItems: "center",
     gap: "12px",

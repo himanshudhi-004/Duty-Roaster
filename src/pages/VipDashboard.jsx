@@ -15,14 +15,14 @@ export default function VipDashboard() {
   const [vipList, setVipList] = useState([]);
   const [guardList, setGuardList] = useState([]);
 
-  /* ✅ INSTANT FROM CONTEXT */
+  /*  INSTANT FROM CONTEXT */
   useEffect(() => {
     if (selectedVip?.name) {
       setVipName(selectedVip.name);
     }
   }, [selectedVip]);
 
-  /* ✅ FALLBACK FOR REFRESH / DIRECT URL */
+  /*  FALLBACK FOR REFRESH / DIRECT URL */
   useEffect(() => {
     const syncVipProfile = async () => {
       try {
@@ -188,12 +188,12 @@ const styles = {
   statValue: { fontSize: 28, fontWeight: 700, color: "#333" },
   statTitle: { opacity: 0.6 },
   activityBox: {
-    marginTop: 35,
+    marginTop: "17%",
     padding: 20,
     borderRadius: 12,
     background: "#f8fbff",
     border: "1px solid #e5e9f0",
   },
-  activityTitle: { fontSize: 20, color: "#1e73be", marginBottom: 10 },
+  activityTitle: { fontSize: 20, color: "#1e73be", marginBottom: 10, },
   activityList: { lineHeight: 2, paddingLeft: 10 },
 };

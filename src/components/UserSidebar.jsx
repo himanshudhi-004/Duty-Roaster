@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import {useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { logoutUser } from "../api/auth";
 
 export default function UserSidebar() {
@@ -18,7 +18,7 @@ export default function UserSidebar() {
       {/* LOGO SECTION */}
       <div style={styles.logoBox}>
         <NavLink to="/userdashboard" style={styles.logoLink}>
-          <span style={styles.logoText}>User Panel</span>
+          <span style={styles.logoText}>Manager Panel</span>
         </NavLink>
       </div>
 
@@ -76,6 +76,28 @@ export default function UserSidebar() {
               <span>Vip-Guard-Management</span>
             </NavLink>
           </li>
+
+          <li style={styles.menuItem}>
+            <NavLink
+              to="/uglrequest"
+              style={styles.menuLink}
+              className="menu-link"
+            >
+              <i className="fas fa-file" style={styles.icon}></i>
+              <span>Guard Leave Requests</span>
+            </NavLink>
+          </li>
+
+          <li style={styles.menuItem}>
+            <NavLink
+              to="/adminrequestaccept"
+              style={styles.menuLink}
+              className="menu-link"
+            >
+              <i className="fas fa-user" style={styles.icon}></i>
+              <span>Duty Accept/Reject</span>
+            </NavLink>
+          </li>
           {/* <li style={styles.sectionTitle}>Notifications</li>
 
           <li style={styles.menuItem}>
@@ -110,11 +132,11 @@ export default function UserSidebar() {
             </NavLink>
           </li>
           <li>
-            <NavLink to="/login" className="menu-link"  style={styles.menuLink} onClick={handleLogout}>
-             <i className="fas fa-sign-out-alt" style={styles.icon}></i>
+            <NavLink to="/login" className="menu-link" style={styles.menuLink} onClick={handleLogout}>
+              <i className="fas fa-sign-out-alt" style={styles.icon}></i>
               <span>Logout</span>
             </NavLink>
-            
+
           </li>
         </ul>
       </div>

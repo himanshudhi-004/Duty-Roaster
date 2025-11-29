@@ -96,7 +96,7 @@ export default function VipEditForm({ vipData, onBack }) {
         onChange={handlechange}
       />
 
-      {/* ✅ STATUS FIXED */}
+      {/*  STATUS FIXED */}
       <div className="form-group">
         <label>Vip Status</label>
         <select

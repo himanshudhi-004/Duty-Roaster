@@ -15,14 +15,14 @@ export default function AdminDashboard() {
   const [vipList, setVipList] = useState([]);
   const [guardList, setGuardList] = useState([]);
 
-  /* ✅ INSTANT SYNC FROM CONTEXT */
+  /*  INSTANT SYNC FROM CONTEXT */
   useEffect(() => {
     if (selectedAdmin?.adminName) {
       setAdminName(selectedAdmin.adminName);
     }
   }, [selectedAdmin]);
 
-  /* ✅ FALLBACK FOR REFRESH / DIRECT URL */
+  /*  FALLBACK FOR REFRESH / DIRECT URL */
   useEffect(() => {
     const syncAdminProfile = async () => {
       try {
@@ -210,7 +210,7 @@ const styles = {
   statValue: { fontSize: 28, fontWeight: 700, color: "#333" },
   statTitle: { opacity: 0.6 },
   activityBox: {
-    marginTop: 35,
+    marginTop: "13%",
     padding: 20,
     borderRadius: 12,
     background: "#f8fbff",

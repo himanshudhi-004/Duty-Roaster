@@ -10,7 +10,7 @@ export const UserProvider = ({ children }) => {
 
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  // ✅ Sync with localStorage
+  //  Sync with localStorage
   useEffect(() => {
     if (selectedUser) {
       localStorage.setItem("selectedUser", JSON.stringify(selectedUser));
@@ -34,7 +34,7 @@ export const UserProvider = ({ children }) => {
         refreshTrigger,
         handle_us_Edit,
         handleBack,
-        setSelectedUser,   // ✅ REQUIRED
+        setSelectedUser,   //  REQUIRED
       }}
     >
       {children}

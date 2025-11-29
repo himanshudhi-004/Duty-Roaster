@@ -57,7 +57,9 @@ import GuardEditPage from "./pages/GuardEditPage";
 import VipEditPage from "./pages/VipEditPage";
 import UserEditPage from "./pages/UserEditPage";
 import VipAssignedGuards from "./components/VipAssignedGuards";
-import GuardLeaveRequest from "./components/GuardLeaveRequest";
+import UserGuardLeaveRequest from "./components/UserGuardLeaveRequest";
+import AdminRequestAccept from "./components/AdminRequestAccept";
+import GuardDutyDecision from "./components/GuardDutyDecision";
 
 function App() {
 
@@ -165,6 +167,15 @@ function App() {
                   }
                 />
 
+                {/* <Route
+                  path="/adminrequestaccept"
+                  element={
+                    <PrivateRoute roles={["admin"]}>
+                      <Adminlayout><AdminRequestAccept /></Adminlayout>
+                    </PrivateRoute>
+                  }
+                /> */}
+
                 {/* ---------------- SHARED ADMIN + USER ---------------- */}
                 <Route
                   path="/vip-auto-assign"
@@ -206,6 +217,16 @@ function App() {
                     </PrivateRoute>
                   }
                 />
+                <Route
+                  path="/adminrequestaccept"
+                  element={
+                    <PrivateRoute roles={["admin", "user"]}>
+                      <AdminUserWrapper>
+                        <AdminRequestAccept />
+                      </AdminUserWrapper>
+                    </PrivateRoute>
+                  }
+                />
 
                 {/* ---------------- USER ---------------- */}
                 <Route
@@ -231,6 +252,15 @@ function App() {
                   element={
                     <PrivateRoute roles={["user"]}>
                       <UserLayout><UserProfile /></UserLayout>
+                    </PrivateRoute>
+                  }
+                />
+
+                <Route
+                  path="/uglrequest"
+                  element={
+                    <PrivateRoute roles={["user"]}>
+                      <UserLayout><UserGuardLeaveRequest /></UserLayout>
                     </PrivateRoute>
                   }
                 />
@@ -307,10 +337,10 @@ function App() {
                 />
 
                 <Route
-                  path="/guardsrequest"
+                  path="/guarddecision/:assignmentId"
                   element={
                     <PrivateRoute roles={["guard"]}>
-                      <Guardlayout><GuardLeaveRequest /></Guardlayout>
+                      <Guardlayout><GuardDutyDecision /></Guardlayout>
                     </PrivateRoute>
                   }
                 />

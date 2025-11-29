@@ -20,7 +20,7 @@ export default function VipNavbar() {
   const vipName = selectedVip?.name || "Vip";
   const vipEmail = selectedVip?.email || "vip@gmail.com";
 
-  /* ✅ RESPONSIVE WIDTH CONTROL */
+  /*  RESPONSIVE WIDTH CONTROL */
   useEffect(() => {
     const handleResize = () => {
       const isMobile = window.innerWidth <= 851;
@@ -42,13 +42,13 @@ export default function VipNavbar() {
     };
   }, []);
 
-  /* ✅ CLOSE DROPDOWNS ON ROUTE CHANGE */
+  /*  CLOSE DROPDOWNS ON ROUTE CHANGE */
   useEffect(() => {
     setLeftMenuOpen(false);
     setUserDropOpen(false);
   }, [location.pathname]);
 
-  /* ✅ OUTSIDE CLICK CLOSE */
+  /*  OUTSIDE CLICK CLOSE */
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (leftMenuRef.current && !leftMenuRef.current.contains(e.target)) {
@@ -68,7 +68,7 @@ export default function VipNavbar() {
     };
   }, []);
 
-  /* ✅ LOGOUT */
+  /*  LOGOUT */
   const handleLogout = () => {
     logoutUser();
     localStorage.removeItem("vipToken");
@@ -77,12 +77,12 @@ export default function VipNavbar() {
     navigate("/login");
   };
 
-  /* ✅ HIDE ON DESKTOP */
+  /*  HIDE ON DESKTOP */
   if (!showNavbar) return null;
 
   return (
     <nav style={styles.navbar}>
-      {/* ✅ LEFT SIDE : MENU + BRAND */}
+      {/*  LEFT SIDE : MENU + BRAND */}
       <div style={styles.leftBox} ref={leftMenuRef}>
         <button
           style={styles.menuBtn}
@@ -114,7 +114,7 @@ export default function VipNavbar() {
         )}
       </div>
 
-      {/* ✅ RIGHT SIDE : PROFILE ICON */}
+      {/*  RIGHT SIDE : PROFILE ICON */}
       <div style={styles.userBox} ref={userRef}>
         <button
           style={styles.profileIconBtn}
@@ -161,7 +161,7 @@ export default function VipNavbar() {
 }
 
 /* ===============================
-   ✅ VIP NAVBAR STYLES
+    VIP NAVBAR STYLES
 ================================ */
 
 const styles = {

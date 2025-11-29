@@ -55,8 +55,18 @@ export default function GuardSidebar() {
           </li>
              */}
           <li style={styles.sectionTitle}>Manage</li>
-
           <li style={styles.menuItem}>
+            <NavLink
+              to="/guardshift"
+              style={styles.menuLink}
+              className="menu-link"
+            >
+              <i className="fas fa-bell" style={styles.icon}></i>
+              <span>My Shift</span>
+            </NavLink>
+          </li>
+
+          {/* <li style={styles.menuItem}>
             <NavLink
               to="/guardsrequest"
               style={styles.menuLink}
@@ -69,14 +79,26 @@ export default function GuardSidebar() {
 
           <li style={styles.menuItem}>
             <NavLink
-              to="/guardshift"
+              to="/guardshistory"
               style={styles.menuLink}
               className="menu-link"
             >
-              <i className="fas fa-bell" style={styles.icon}></i>
-              <span>My Shift</span>
+              <i className="fas fa-file-alt" style={styles.icon}></i>
+              <span>Duty History</span>
             </NavLink>
           </li>
+
+          <li style={styles.menuItem}>
+            <NavLink
+              to="/guardsinsident"
+              style={styles.menuLink}
+              className="menu-link"
+            >
+              <i className="fas fa-file-alt" style={styles.icon}></i>
+              <span>Incidents</span>
+            </NavLink>
+          </li> */}
+
 
 
 
@@ -91,7 +113,7 @@ export default function GuardSidebar() {
             </NavLink>
           </li>
           <li>
-            <button to="/login" className="menu-link" style={styles.menuLink} onClick={handleLogout}>
+            <button to="/login" className="menu-link" style={{...styles.menuLink, outline: "none",border: "none"}} onClick={handleLogout}>
               <i className="fas fa-sign-out-alt" style={styles.icon}></i>
               <span>Logout</span>
             </button>
@@ -166,6 +188,8 @@ const styles = {
   },
 
   menuLink: {
+    width: "100%",
+    background: "transparent",
     display: "flex",
     alignItems: "center",
     gap: "12px",

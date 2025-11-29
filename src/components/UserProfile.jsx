@@ -63,7 +63,7 @@ export default function UserProfile() {
     <div style={styles.pageContainer}>
       <div style={styles.header}>
         <h2 style={styles.headerTitle}>
-          <i className="fa fa-user-circle me-2"></i> User Profile
+          <i className="fa fa-user-circle me-2"></i> Manager Profile
         </h2>
         <p style={styles.headerSubtitle}>Overview of user account details</p>
       </div>

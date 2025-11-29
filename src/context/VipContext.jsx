@@ -8,7 +8,7 @@ export const VipProvider = ({ children }) => {
     return stored ? JSON.parse(stored) : null;
   });
 
-  // ✅ Sync with localStorage
+  //  Sync with localStorage
   useEffect(() => {
     if (selectedVip) {
       localStorage.setItem("selectedVip", JSON.stringify(selectedVip));
@@ -30,7 +30,7 @@ export const VipProvider = ({ children }) => {
         selectedVip,
         handleEdit,
         handleBack,
-        setSelectedVip, // ✅ REQUIRED
+        setSelectedVip, //  REQUIRED
       }}
     >
       {children}

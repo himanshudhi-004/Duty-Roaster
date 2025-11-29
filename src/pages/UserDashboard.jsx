@@ -15,14 +15,14 @@ export default function UserDashboard() {
   const [vipList, setVipList] = useState([]);
   const [guardList, setGuardList] = useState([]);
 
-  /* ✅ INSTANT SYNC FROM CONTEXT */
+  /*  INSTANT SYNC FROM CONTEXT */
   useEffect(() => {
     if (selectedUser?.name) {
       setUserName(selectedUser.name);
     }
   }, [selectedUser]);
 
-  /* ✅ FALLBACK FOR REFRESH / DIRECT URL */
+  /*  FALLBACK FOR REFRESH / DIRECT URL */
   useEffect(() => {
     const syncUserProfile = async () => {
       try {
@@ -94,7 +94,7 @@ export default function UserDashboard() {
     <div style={styles.page}>
       <div style={styles.headerSection}>
         <div>
-          <h2 style={styles.pageTitle}>USER DASHBOARD</h2>
+          <h2 style={styles.pageTitle}>Manager Dashboard</h2>
           <p style={styles.desc}>Manage VIPs, Guards & Combined User Count.</p>
         </div>
 
@@ -189,7 +189,7 @@ const styles = {
   statValue: { fontSize: 28, fontWeight: 700, color: "#333" },
   statTitle: { opacity: 0.6 },
   activityBox: {
-    marginTop: 35,
+    marginTop: "17%",
     padding: 20,
     borderRadius: 12,
     background: "#f8fbff",

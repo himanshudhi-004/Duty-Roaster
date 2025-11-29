@@ -88,7 +88,7 @@ export default function UserForm() {
         {/* RIGHT WHITE FORM */}
         <div style={styles.formBox}>
           <h2 style={styles.formTitle}>
-            {isEditMode ? "Edit User Details" : "User Registeration Form"}
+            {isEditMode ? "Edit User Details" : "Manager Registeration Form"}
           </h2>
 
           <form className="user-form" onSubmit={handle_us_Submit}>

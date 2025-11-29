@@ -49,7 +49,7 @@ export default function VipAutoAssign() {
   const [startAt, setStartAt] = useState(formatDateTimeLocal(now));
   const [endAt, setEndAt] = useState(formatDateTimeLocal(plus8Hours));
 
-  /* ✅ VIP STATUS LOGIC (SOURCE OF TRUTH IS ASSIGNMENT API) */
+  /*  VIP STATUS LOGIC (SOURCE OF TRUTH IS ASSIGNMENT API) */
   const [vipStatus, setVipStatus] = useState("inactive");
 
   /* ------------------- FETCH ASSIGNMENTS ------------------- */
@@ -68,7 +68,7 @@ export default function VipAutoAssign() {
         });
 
         setAlreadyAssigned(true);
-        setVipStatus("active"); // ✅ STATUS SET ONLY FROM ASSIGNMENTS
+        setVipStatus("active"); //  STATUS SET ONLY FROM ASSIGNMENTS
       } else {
         setVipStatus("inactive");
       }

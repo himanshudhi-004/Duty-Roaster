@@ -64,7 +64,7 @@ export default function VipAssignedGuards() {
     <div style={styles.container}>
       <h2 style={styles.title}>Assigned Guards for {selectedVip?.name}</h2>
 
-      {/* ✅ SUMMARY TABLE */}
+      {/*  SUMMARY TABLE */}
       <div style={styles.card}>
         <h3>Guard Summary</h3>
 
@@ -86,7 +86,7 @@ export default function VipAssignedGuards() {
         </table>
       </div>
 
-      {/* ✅ DETAILS TABLE */}
+      {/*  DETAILS TABLE */}
       <div style={styles.responseBox}>
         <h3>Guard Details</h3>
 

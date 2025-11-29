@@ -20,7 +20,7 @@ export default function GuardNavbar() {
   const guardName = selectedGuard?.name || "Guard";
   const guardEmail = selectedGuard?.email || "guard@gmail.com";
 
-  /* ✅ RESPONSIVE WIDTH CONTROL */
+  /*  RESPONSIVE WIDTH CONTROL */
   useEffect(() => {
     const handleResize = () => {
       const isMobile = window.innerWidth <= 851;
@@ -42,13 +42,13 @@ export default function GuardNavbar() {
     };
   }, []);
 
-  /* ✅ CLOSE DROPDOWNS ON ROUTE CHANGE */
+  /*  CLOSE DROPDOWNS ON ROUTE CHANGE */
   useEffect(() => {
     setLeftMenuOpen(false);
     setUserDropOpen(false);
   }, [location.pathname]);
 
-  /* ✅ OUTSIDE CLICK CLOSE */
+  /*  OUTSIDE CLICK CLOSE */
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (leftMenuRef.current && !leftMenuRef.current.contains(e.target)) {
@@ -68,7 +68,7 @@ export default function GuardNavbar() {
     };
   }, []);
 
-  /* ✅ LOGOUT */
+  /*  LOGOUT */
   const handleLogout = () => {
     logoutUser();
     localStorage.removeItem("guardToken");
@@ -77,12 +77,12 @@ export default function GuardNavbar() {
     navigate("/login");
   };
 
-  /* ✅ HIDE ON DESKTOP */
+  /*  HIDE ON DESKTOP */
   if (!showNavbar) return null;
 
   return (
     <nav style={styles.navbar}>
-      {/* ✅ LEFT SIDE : MENU + BRAND */}
+      {/*  LEFT SIDE : MENU + BRAND */}
       <div style={styles.leftBox} ref={leftMenuRef}>
         <button
           style={styles.menuBtn}
@@ -118,7 +118,7 @@ export default function GuardNavbar() {
         )}
       </div>
 
-      {/* ✅ RIGHT SIDE : PROFILE ICON */}
+      {/*  RIGHT SIDE : PROFILE ICON */}
       <div style={styles.userBox} ref={userRef}>
         <button
           style={styles.profileIconBtn}
@@ -165,7 +165,7 @@ export default function GuardNavbar() {
 }
 
 /* ===============================
-   ✅ GUARD NAVBAR STYLES
+    GUARD NAVBAR STYLES
 ================================ */
 
 const styles = {

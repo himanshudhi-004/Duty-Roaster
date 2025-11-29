@@ -22,7 +22,7 @@ export default function VipGuardManagement() {
   const [popupData, setPopupData] = useState(null);
   const [popupPos, setPopupPos] = useState({ top: 0, left: 0 });
 
-  const role = localStorage.getItem("role"); // ✅ admin / user
+  const role = localStorage.getItem("role"); //  admin / user
 
   const navigate = useNavigate();
   const rowRefs = useRef({});
@@ -141,7 +141,7 @@ export default function VipGuardManagement() {
                 <th style={styles.th}>Contact</th>
                 <th style={styles.th}>Status</th>
 
-                {/* ✅ WORKED HERE — Actions Head shown only when role is user */}
+                {/*  WORKED HERE — Actions Head shown only when role is user */}
                 {role === "user" && <th style={styles.th}>Actions</th>}
               </tr>
             </thead>
@@ -181,7 +181,7 @@ export default function VipGuardManagement() {
                       <span style={statusStyle}>{vip.status}</span>
                     </td>
 
-                    {/* ✅ WORKED HERE — Actions column shown only for user */}
+                    {/*  WORKED HERE — Actions column shown only for user */}
                     {role === "user" && (
                       <td style={styles.actionCol}>
                         <button

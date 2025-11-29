@@ -28,7 +28,7 @@ export default function Navbar() {
     navigate("/login");
   };
 
-  /* ✅ RESPONSIVE WIDTH + ORIENTATION */
+  /*  RESPONSIVE WIDTH + ORIENTATION */
   useEffect(() => {
     const handleResize = () => {
       const isMobile = window.innerWidth <= 851;
@@ -50,13 +50,13 @@ export default function Navbar() {
     };
   }, []);
 
-  /* ✅ CLOSE DROPDOWNS ON ROUTE CHANGE */
+  /*  CLOSE DROPDOWNS ON ROUTE CHANGE */
   useEffect(() => {
     setLeftMenuOpen(false);
     setUserDropOpen(false);
   }, [location.pathname]);
 
-  /* ✅ OUTSIDE CLICK CLOSE */
+  /*  OUTSIDE CLICK CLOSE */
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (leftMenuRef.current && !leftMenuRef.current.contains(e.target)) {
@@ -76,12 +76,12 @@ export default function Navbar() {
     };
   }, []);
 
-  /* ✅ AUTO HIDE ON DESKTOP */
+  /*  AUTO HIDE ON DESKTOP */
   if (!showNavbar) return null;
 
   return (
     <nav style={styles.navbar}>
-      {/* ✅ LEFT SIDE */}
+      {/*  LEFT SIDE */}
       <div style={styles.leftBox} ref={leftMenuRef}>
         <button
           style={styles.dashBtn}
@@ -108,7 +108,7 @@ export default function Navbar() {
         )}
       </div>
 
-      {/* ✅ RIGHT SIDE */}
+      {/*  RIGHT SIDE */}
       <div style={styles.userDropdownBox} ref={userRef}>
         <button
           style={styles.profileIconBtn}
@@ -155,7 +155,7 @@ export default function Navbar() {
 }
 
 /* ===============================
-   ✅ PERFECT RESPONSIVE STYLES
+    PERFECT RESPONSIVE STYLES
 ================================ */
 
 const styles = {

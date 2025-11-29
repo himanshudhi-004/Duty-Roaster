@@ -10,7 +10,7 @@ export const AdminProvider = ({ children }) => {
 
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  // ✅ Auto sync to localStorage
+  //  Auto sync to localStorage
   useEffect(() => {
     if (selectedAdmin) {
       localStorage.setItem("selectedAdmin", JSON.stringify(selectedAdmin));
@@ -34,7 +34,7 @@ export const AdminProvider = ({ children }) => {
         refreshTrigger,
         handleEdit,
         handleBack,
-        setSelectedAdmin, // ✅ REQUIRED FOR PROFILE & NAVBAR
+        setSelectedAdmin, //  REQUIRED FOR PROFILE & NAVBAR
       }}
     >
       {children}
