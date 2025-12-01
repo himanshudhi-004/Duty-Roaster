@@ -117,20 +117,20 @@ export default function VIPForm() {
           </h2>
 
           <form onSubmit={handleSubmit}>
-            <FormInput
+            {/* <FormInput
               label="VIP ID"
               name="id"
               type="text"
               value={formData.id}
-              onChange={handleChange}
-            />
+              onChange={handleChange}  required
+            /> */}
 
             <FormInput
               label="Full Name"
               name="name"
               type="text"
               value={formData.name}
-              onChange={handleChange}
+              onChange={handleChange} required
             />
 
             <FormInput
@@ -138,7 +138,7 @@ export default function VIPForm() {
               name="email"
               type="email"
               value={formData.email}
-              onChange={handleChange}
+              onChange={handleChange} required
             />
 
             <FormInput
@@ -146,7 +146,7 @@ export default function VIPForm() {
               name="username"
               type="text"
               value={formData.username}
-              onChange={handleChange}
+              onChange={handleChange} required
             />
 
             <FormInput
@@ -154,7 +154,7 @@ export default function VIPForm() {
               name="password"
               type="text"
               value={formData.password}
-              onChange={handleChange}
+              onChange={handleChange} required
             />
 
             {/* DESIGNATION DROPDOWN */}
@@ -181,7 +181,7 @@ export default function VIPForm() {
               name="contactno"
               type="text"
               value={formData.contactno}
-              onChange={handleChange}
+              onChange={handleChange} required
             />
             {/* Grade DROPDOWN */}
             <div className="form-group">

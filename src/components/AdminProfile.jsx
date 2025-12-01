@@ -12,6 +12,7 @@ export default function AdminProfile() {
 
   const [userDetails, setUserDetails] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [profileImage, setProfileImage] = useState(null);
 
   useEffect(() => {
     fetchProfile();
@@ -33,12 +34,43 @@ export default function AdminProfile() {
       const profile = Array.isArray(res.data) ? res.data[0] : res.data;
 
       setUserDetails(profile);
-      setSelectedAdmin(profile); // ✅ STORE IN CONTEXT
-      localStorage.setItem("selectedAdmin", JSON.stringify(profile)); // ✅ STORE FOR REFRESH
+      setSelectedAdmin(profile);
+      localStorage.setItem("selectedAdmin", JSON.stringify(profile));
+
+      if (profile?.image) {
+        setProfileImage(`${BASE_URL}/${profile.image}`);
+      }
     } catch (err) {
       console.log("Profile Fetch Error:", err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  /* ---------------- IMAGE UPLOAD ----------------- */
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const token = localStorage.getItem("adminToken");
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      const res = await axios.post(
+        `${BASE_URL}/auth/upload-profile-image/${userDetails.id}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      setProfileImage(`${BASE_URL}/${res.data.image}`);
+    } catch (err) {
+      console.log("Image Upload Error:", err);
     }
   };
 
@@ -71,11 +103,29 @@ export default function AdminProfile() {
       <div style={styles.card}>
         <div style={styles.cardBody}>
           <div style={styles.profileRow}>
+            {/* ----------- IMAGE SECTION (ADDED ONLY) ----------- */}
             <div style={styles.leftBox}>
+              <img
+                src={
+                  profileImage ||
+                  "https://cdn-icons-png.flaticon.com/512/149/149071.png"
+                }
+                alt="Profile"
+                style={styles.profileImage}
+              />
+
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                style={{ marginTop: "10px" }}
+              />
+
               <h4 style={styles.name}>{userDetails.adminName}</h4>
               <p style={styles.role}>Administrator</p>
             </div>
 
+            {/* ----------- DETAILS SECTION (UNCHANGED) ----------- */}
             <div style={styles.rightBox}>
               {[
                 ["Admin ID", userDetails.id],
@@ -122,8 +172,7 @@ export default function AdminProfile() {
   );
 }
 
-
-/* ------------------ STYLES (UNCHANGED) ------------------ */
+/* ------------------ STYLES (UNCHANGED + IMAGE STYLE ADDED) ------------------ */
 const styles = {
   pageContainer: {
     padding: "30px",
@@ -155,6 +204,16 @@ const styles = {
     alignItems: "center",
   },
   leftBox: { flex: "1", textAlign: "center" },
+
+  /* ✅ IMAGE STYLE ADDED */
+  profileImage: {
+    width: "140px",
+    height: "140px",
+    borderRadius: "50%",
+    objectFit: "cover",
+    border: "3px solid #4e54c8",
+  },
+
   name: { fontSize: "22px", fontWeight: "700", marginTop: "10px" },
   role: { fontSize: "15px", color: "#777" },
   rightBox: { flex: "2" },

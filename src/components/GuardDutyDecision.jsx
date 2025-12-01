@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useGuardStore } from "../context/GuardContext";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -8,11 +8,10 @@ const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 export default function GuardDutyDecision() {
   const navigate = useNavigate();
-  const { assignmentId } = useParams();
   const { selectedGuard } = useGuardStore();
 
-  const [guardAssignmentId, setGuardAssignmentId] = useState(null);
-  const [loadingRanks, setLoadingRanks] = useState(true);
+  const [guardId, setGuardId] = useState(null);
+  const [guardData, setGuardData] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
   const [decisionData, setDecisionData] = useState({
@@ -20,31 +19,69 @@ export default function GuardDutyDecision() {
     reason: "",
   });
 
-  /* ================= FETCH ASSIGNMENT ID ================= */
+  const [existingDecision, setExistingDecision] = useState(null);
+  const [checkingDecision, setCheckingDecision] = useState(true);
+
+  /* ================= LOAD GUARD FROM CONTEXT OR LOCALSTORAGE ================= */
   useEffect(() => {
-    if (!assignmentId) {
-      toast.error("Please open Duty page from 'My Shift'");
-      navigate("/guardshift");
-      return;
+    let guard = selectedGuard;
+
+    if (!guard) {
+      const storedGuard = localStorage.getItem("selectedGuard");
+      if (storedGuard) {
+        guard = JSON.parse(storedGuard);
+      }
     }
 
-    if (!selectedGuard) {
+    if (!guard) {
       toast.error("Session expired. Please login again.");
       navigate("/login");
       return;
     }
 
-    const id = Number(assignmentId);
-    setGuardAssignmentId(id);
-    setLoadingRanks(false);
-  }, [assignmentId, selectedGuard, navigate]);
+    setGuardId(guard.id);
+    setGuardData(guard);
+  }, [selectedGuard, navigate]);
+
+  /* ================= FETCH EXISTING DECISION ================= */
+  useEffect(() => {
+    const fetchExistingDecision = async () => {
+      try {
+        const token = localStorage.getItem("guardToken");
+        if (!token) {
+          toast.error("Token expired. Please login again.");
+          navigate("/login");
+          return;
+        }
+
+        const res = await axios.get(`${BASE_URL}/api/duty/${guardId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (res.data && res.data.length > 0) {
+          setExistingDecision(res.data[0]);
+        } else {
+          setExistingDecision(null);
+        }
+      } catch (err) {
+        console.error("Fetch Decision Error:", err);
+        setExistingDecision(null);
+      } finally {
+        setCheckingDecision(false);
+      }
+    };
+
+    if (guardId) fetchExistingDecision();
+  }, [guardId, navigate]);
 
   /* ================= STATUS HANDLER ================= */
   const handleStatusClick = (status) => {
-    setDecisionData((prev) => ({
-      ...prev,
+    setDecisionData({
       status,
-    }));
+      reason: "",
+    });
   };
 
   /* ================= REASON HANDLER ================= */
@@ -66,49 +103,37 @@ export default function GuardDutyDecision() {
     }
 
     if (
-      decisionData.status === "REJECTED" &&
+      decisionData.status === "Guard Rejected" &&
       !decisionData.reason.trim()
     ) {
       toast.error("Reason is required for rejection");
       return;
     }
 
-    //  STATUS → MESSAGE
-    const statusMessageMap = {
-      ACCEPTED: "Guard accepted the assigned duty",
-      REJECTED: "Guard rejected the assigned duty and requested leave",
-    };
-
-    //  EXACT PAYLOAD WITH REASON + FULL OFFICER
     const dutyPayload = {
-      officer: selectedGuard, //  FULL OBJECT
+      officer: guardData,
       status: decisionData.status,
-      reason: decisionData.reason, //  FROM INPUT
-      message: statusMessageMap[decisionData.status],
+      reason: decisionData.reason,
+      message: decisionData.reason,
     };
 
     try {
       setSubmitting(true);
 
-      //  TOKEN ADDED HERE
       const token = localStorage.getItem("guardToken");
-
-      await axios.post(
-        `${BASE_URL}/api/duty/decision`,
-        dutyPayload,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`, //  TOKEN
-          },
-        }
-      );
-
-      if (decisionData.status === "REJECTED") {
-        toast.warning("Duty Rejected Successfully");
-      } else {
-        toast.success("Duty Accepted Successfully");
+      if (!token) {
+        toast.error("Token expired. Please login again.");
+        navigate("/login");
+        return;
       }
 
+      await axios.post(`${BASE_URL}/api/duty/decision`, dutyPayload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      toast.success("Duty decision submitted successfully");
       setDecisionData({ status: "", reason: "" });
       navigate("/guardshift");
     } catch (err) {
@@ -128,106 +153,112 @@ export default function GuardDutyDecision() {
           <h2 style={styles.leftTitle}>DUTY INFORMATION</h2>
           <p style={styles.desc}>Accept or Reject your assigned duty.</p>
 
-          <p>
-            <b>Assignment ID:</b> {guardAssignmentId}
-          </p>
-
-          {loadingRanks ? (
-            <p>Loading...</p>
-          ) : (
-            <p>
-              <b>Guard Name:</b> {selectedGuard?.name}
-            </p>
-          )}
+          <p><b>Guard ID:</b> {guardId}</p>
+          <p><b>Guard Name:</b> {guardData?.name}</p>
 
           <button
             style={styles.haveBtn}
             onClick={() => navigate("/guardshift")}
           >
-             Back to Shift
+            Back to Shift
           </button>
         </div>
 
         {/* RIGHT SIDE */}
         <div style={styles.formBox}>
-          <h2 style={styles.formTitle}>Duty Acceptance</h2>
+          {checkingDecision ? (
+            <h3>Checking previous decision...</h3>
+          ) : existingDecision ? (
+            <>
+              <h2 style={styles.formTitle}>Duty Status</h2>
 
-          <form onSubmit={handleSubmit}>
-            <div style={{ display: "flex", gap: 15, marginBottom: 20 }}>
-              <button
-                type="button"
-                disabled={submitting}
-                onClick={() => handleStatusClick("ACCEPTED")}
-                style={{
-                  ...styles.actionBtn,
-                  background:
-                    decisionData.status === "ACCEPTED"
-                      ? "#28a745"
-                      : "#e0e0e0",
-                  color:
-                    decisionData.status === "ACCEPTED"
-                      ? "white"
-                      : "black",
-                }}
-              >
-                 Accept Duty
-              </button>
+              <p><b>Status:</b> {existingDecision.status}</p>
+              <p><b>Message:</b> {existingDecision.message}</p>
+
+              <p><b>Officer:</b> {existingDecision.officer?.name}</p>
+              <p><b>Rank:</b> {existingDecision.officer?.rank}</p>
 
               <button
-                type="button"
-                disabled={submitting}
-                onClick={() => handleStatusClick("REJECTED")}
-                style={{
-                  ...styles.actionBtn,
-                  background:
-                    decisionData.status === "REJECTED"
-                      ? "#dc3545"
-                      : "#e0e0e0",
-                  color:
-                    decisionData.status === "REJECTED"
-                      ? "white"
-                      : "black",
-                }}
+                style={{ ...styles.submitBtn, marginTop: 30 }}
+                onClick={() => navigate("/guardshift")}
               >
-                 Reject Duty
+                Back to Shift
               </button>
-            </div>
+            </>
+          ) : (
+            <>
+              <h2 style={styles.formTitle}>Duty Acceptance</h2>
 
-            {/*  REASON BOX ADDED */}
-            {decisionData.status === "REJECTED" && (
-              <div style={{ marginBottom: 20 }}>
-                <label><b>Reason for Rejection</b></label>
-                <textarea
-                  value={decisionData.reason}
-                  onChange={handleReasonChange}
-                  rows="4"
-                  style={{
-                    width: "100%",
-                    padding: "10px",
-                    borderRadius: "5px",
-                    border: "1px solid #ccc",
-                    marginTop: "6px",
-                  }}
-                  placeholder="Enter reason for rejecting duty..."
-                />
-              </div>
-            )}
+              <form onSubmit={handleSubmit}>
+                <div style={{ display: "flex", gap: 15, marginBottom: 20 }}>
+                  <button
+                    type="button"
+                    disabled={submitting}
+                    onClick={() => handleStatusClick("Guard Accepted")}
+                    style={{
+                      ...styles.actionBtn,
+                      background:
+                        decisionData.status === "Guard Accepted"
+                          ? "#28a745"
+                          : "#e0e0e0",
+                      color:
+                        decisionData.status === "Guard Accepted"
+                          ? "white"
+                          : "black",
+                    }}
+                  >
+                    Accept Duty
+                  </button>
 
-            <button
-              type="submit"
-              disabled={submitting}
-              style={{
-                ...styles.submitBtn,
-                marginTop: 10,
-                background:
-                  decisionData.status === "REJECTED"
-                    ? "#dc3545"
-                    : "#1e73be",
-              }}
-            >
-              {submitting ? "Submitting..." : "Submit Duty Decision"}
-            </button>
-          </form>
+                  <button
+                    type="button"
+                    disabled={submitting}
+                    onClick={() => handleStatusClick("Guard Rejected")}
+                    style={{
+                      ...styles.actionBtn,
+                      background:
+                        decisionData.status === "Guard Rejected"
+                          ? "#dc3545"
+                          : "#e0e0e0",
+                      color:
+                        decisionData.status === "Guard Rejected"
+                          ? "white"
+                          : "black",
+                    }}
+                  >
+                    Reject Duty
+                  </button>
+                </div>
+
+                {decisionData.status === "Guard Rejected" && (
+                  <div style={{ marginBottom: 20 }}>
+                    <label><b>Reason for Rejection</b></label>
+                    <textarea
+                      value={decisionData.reason}
+                      onChange={handleReasonChange}
+                      rows="3"
+                      style={{
+                        width: "100%",
+                        padding: "10px",
+                        borderRadius: "5px",
+                        border: "1px solid #ccc",
+                        marginTop: "6px",
+                      }}
+                      placeholder="Enter reason for rejection..."
+                    />
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  style={styles.submitBtn}
+                >
+                  {submitting ? "Submitting..." : "Submit Duty Decision"}
+                </button>
+              </form>
+            </>
+          )}
         </div>
       </div>
     </div>
@@ -291,6 +322,7 @@ const styles = {
     borderRadius: "5px",
     width: "100%",
     cursor: "pointer",
+    background: "#1e73be",
   },
   actionBtn: {
     flex: 1,

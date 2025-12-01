@@ -76,9 +76,8 @@ export default function UserDashboard() {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("userToken");
-    localStorage.removeItem("selectedUser");
-    localStorage.removeItem("role");
+    localStorage.clear();
+    sessionStorage.clear();
     navigate("/login");
   };
 

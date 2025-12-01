@@ -76,8 +76,8 @@ export default function VipDashboard() {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("vipToken");
-    localStorage.removeItem("selectedVip");
+   localStorage.clear();
+    sessionStorage.clear();
     navigate("/login");
   };
 

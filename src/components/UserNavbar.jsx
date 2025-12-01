@@ -71,9 +71,8 @@ export default function UserNavbar() {
   /*  LOGOUT */
   const handleLogout = () => {
     logoutUser();
-    localStorage.removeItem("userToken");
-    localStorage.removeItem("selectedUser");
-    localStorage.removeItem("role");
+     localStorage.clear();
+    sessionStorage.clear();
     navigate("/login");
   };
 
@@ -113,6 +112,9 @@ export default function UserNavbar() {
 
             <NavLink to="/vgmang" style={styles.menuItem}>
               VIP–Guard Management
+            </NavLink>
+            <NavLink to="/dutyhistory" style={styles.menuItem}>
+              Guard Duty History
             </NavLink>
 
             <NavLink to="/userprofile" style={styles.menuItem}>

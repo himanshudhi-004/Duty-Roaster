@@ -57,9 +57,13 @@ import GuardEditPage from "./pages/GuardEditPage";
 import VipEditPage from "./pages/VipEditPage";
 import UserEditPage from "./pages/UserEditPage";
 import VipAssignedGuards from "./components/VipAssignedGuards";
-import UserGuardLeaveRequest from "./components/UserGuardLeaveRequest";
+import AdminUserGuardLeaveRequest from "./components/AdminUserGuardLeaveRequest";
 import AdminRequestAccept from "./components/AdminRequestAccept";
 import GuardDutyDecision from "./components/GuardDutyDecision";
+import GuardDutyHistory from "./components/GuardDutyHistory";
+import VipHistory from "./components/VipHistory";
+
+import AdminUserVipHistory from "./components/AdminUserVipHistory";
 
 function App() {
 
@@ -228,6 +232,17 @@ function App() {
                   }
                 />
 
+                <Route
+                  path="/dutyhistory"
+                  element={
+                    <PrivateRoute roles={["admin", "user"]}>
+                      <AdminUserWrapper>
+                        <AdminUserVipHistory />
+                      </AdminUserWrapper>
+                    </PrivateRoute>
+                  }
+                />
+
                 {/* ---------------- USER ---------------- */}
                 <Route
                   path="/userdashboard"
@@ -260,7 +275,7 @@ function App() {
                   path="/uglrequest"
                   element={
                     <PrivateRoute roles={["user"]}>
-                      <UserLayout><UserGuardLeaveRequest /></UserLayout>
+                      <UserLayout><AdminUserGuardLeaveRequest /></UserLayout>
                     </PrivateRoute>
                   }
                 />
@@ -296,6 +311,14 @@ function App() {
                   element={
                     <PrivateRoute roles={["vip"]}>
                       <VipLayout><VipEditPage /></VipLayout>
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/viphistory"
+                  element={
+                    <PrivateRoute roles={["vip"]}>
+                      <VipLayout><VipHistory /></VipLayout>
                     </PrivateRoute>
                   }
                 />
@@ -341,6 +364,15 @@ function App() {
                   element={
                     <PrivateRoute roles={["guard"]}>
                       <Guardlayout><GuardDutyDecision /></Guardlayout>
+                    </PrivateRoute>
+                  }
+                />
+
+                <Route
+                  path="/guardhistory"
+                  element={
+                    <PrivateRoute roles={["guard"]}>
+                      <Guardlayout><GuardDutyHistory /></Guardlayout>
                     </PrivateRoute>
                   }
                 />

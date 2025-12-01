@@ -22,9 +22,8 @@ export default function Navbar() {
 
   const handleLogout = () => {
     logoutUser();
-    localStorage.removeItem("selectedAdmin");
-    localStorage.removeItem("adminToken");
-    localStorage.removeItem("role");
+     localStorage.clear();
+    sessionStorage.clear();
     navigate("/login");
   };
 
@@ -104,6 +103,7 @@ export default function Navbar() {
             <NavLink to="/viplist" style={styles.menuItem}>VIP Table</NavLink>
             <NavLink to="/guardlist" style={styles.menuItem}>Guard Table</NavLink>
             <NavLink to="/vgmang" style={styles.menuItem}>VIP–Guard Management</NavLink>
+            <NavLink to="/dutyhistory" style={styles.menuItem}>Guard-duty-history</NavLink>
           </div>
         )}
       </div>

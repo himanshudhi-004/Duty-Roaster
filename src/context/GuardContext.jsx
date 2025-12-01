@@ -11,6 +11,7 @@ export const GuardProvider = ({ children }) => {
   useEffect(() => {
     if (selectedGuard) {
       localStorage.setItem("selectedGuard", JSON.stringify(selectedGuard));
+      console.log("Selected Guard stored in localStorage", selectedGuard);
     }
   }, [selectedGuard]);
 

@@ -10,9 +10,12 @@ export default function GuardDetails() {
   const [selectedRank, setSelectedRank] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
 
+  /* ✅ SEARCH STATE */
+  const [searchTerm, setSearchTerm] = useState("");
+
   /* PAGINATION STATES */
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(30); // DEFAULT 30
+  const [rowsPerPage, setRowsPerPage] = useState(30);
 
   /* FETCH GUARDS */
   useEffect(() => {
@@ -50,7 +53,16 @@ export default function GuardDetails() {
   const filteredGuards = guardList.filter((g) => {
     const rankMatch = selectedRank ? g.rank === selectedRank : true;
     const statusMatch = selectedStatus ? g.status === selectedStatus : true;
-    return rankMatch && statusMatch;
+
+    /* ✅ SEARCH FILTER */
+    const searchMatch = searchTerm
+      ? Object.values(g)
+          .join(" ")
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase())
+      : true;
+
+    return rankMatch && statusMatch && searchMatch;
   });
 
   /* PAGINATION */
@@ -111,6 +123,21 @@ export default function GuardDetails() {
             <option>Inactive</option>
           </select>
         </div>
+
+        {/* ✅ SEARCH INPUT (ONLY ADDITION) */}
+        <div style={styles.filterCard}>
+          <label style={styles.filterLabel}>Search</label>
+          <input
+            type="text"
+            placeholder="Search by name, email, id..."
+            value={searchTerm}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setCurrentPage(1);
+            }}
+            style={styles.select}
+          />
+        </div>
       </div>
 
       {/* TABLE */}
@@ -154,9 +181,10 @@ export default function GuardDetails() {
                     </td>
 
                     <td style={styles.actionCol}>
-                      <button style={styles.editBtn}
-                       onClick={() => handleEdit(g)}
-                       >
+                      <button
+                        style={styles.editBtn}
+                        onClick={() => handleEdit(g)}
+                      >
                         <i className="fa fa-edit"></i>
                       </button>
                     </td>
@@ -217,6 +245,7 @@ export default function GuardDetails() {
     </div>
   );
 }
+
 
 /* -------- STYLES -------- */
 const styles = {

@@ -113,7 +113,7 @@ export default function GuardForm() {
               name="id"
               type="text"
               value={guardformData.id}
-              onChange={handle_gd_Change}
+              onChange={handle_gd_Change} required
             />
 
             <FormInput
@@ -121,7 +121,7 @@ export default function GuardForm() {
               name="name"
               type="text"
               value={guardformData.name}
-              onChange={handle_gd_Change}
+              onChange={handle_gd_Change} required
             />
 
             <FormInput
@@ -129,7 +129,7 @@ export default function GuardForm() {
               name="email"
               type="email"
               value={guardformData.email}
-              onChange={handle_gd_Change}
+              onChange={handle_gd_Change} required
             />
 
             <FormInput
@@ -137,7 +137,7 @@ export default function GuardForm() {
               name="username"
               type="text"
               value={guardformData.username}
-              onChange={handle_gd_Change}
+              onChange={handle_gd_Change}   required
             />
 
             <FormInput
@@ -145,7 +145,7 @@ export default function GuardForm() {
               name="password"
               type="text"
               value={guardformData.password}
-              onChange={handle_gd_Change}
+              onChange={handle_gd_Change} required
             />
 
             {/* RANK DROPDOWN */}
@@ -172,7 +172,7 @@ export default function GuardForm() {
               name="experience"
               type="number"
               value={guardformData.experience}
-              onChange={handle_gd_Change}
+              onChange={handle_gd_Change} required
             />
 
             <FormInput
@@ -180,7 +180,7 @@ export default function GuardForm() {
               name="contactno"
               type="text"
               value={guardformData.contactno}
-              onChange={handle_gd_Change}
+              onChange={handle_gd_Change} required
             />
             {/* Grade DROPDOWN */}
             <div className="form-group">

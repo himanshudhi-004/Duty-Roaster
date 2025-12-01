@@ -71,9 +71,8 @@ export default function VipNavbar() {
   /*  LOGOUT */
   const handleLogout = () => {
     logoutUser();
-    localStorage.removeItem("vipToken");
-    localStorage.removeItem("selectedVip");
-    localStorage.removeItem("role");
+     localStorage.clear();
+    sessionStorage.clear();
     navigate("/login");
   };
 
@@ -109,6 +108,10 @@ export default function VipNavbar() {
 
             <NavLink to="/vipprofile" style={styles.menuItem}>
               My Profile
+            </NavLink>
+
+            <NavLink to="/viphistory" style={styles.menuItem}>
+              Guard Duty History
             </NavLink>
           </div>
         )}

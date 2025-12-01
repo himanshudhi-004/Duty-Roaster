@@ -123,6 +123,16 @@ export default function UserSidebar() {
           </li> */}
           <li style={styles.menuItem}>
             <NavLink
+              to="/dutyhistory"
+              style={styles.menuLink}
+              className="menu-link"
+            >
+              <i className="fas fa-user" style={styles.icon}></i>
+              <span>Guard Duty History</span>
+            </NavLink>
+          </li>
+          <li style={styles.menuItem}>
+            <NavLink
               to="/userprofile"
               style={styles.menuLink}
               className="menu-link"

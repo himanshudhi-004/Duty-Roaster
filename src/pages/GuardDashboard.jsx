@@ -100,8 +100,7 @@ export default function GuardDashboard() {
             LOGOUT
   ----------------------------------------- */
   const handleLogout = () => {
-    localStorage.removeItem("guardToken");
-    localStorage.removeItem("role");
+    localStorage.clear()
     navigate("/login");
   };
 
@@ -109,20 +108,22 @@ export default function GuardDashboard() {
             STATS
   ----------------------------------------- */
   const stats = [
+    
     {
-      title: "Total Officers",
-      value: guardList.length,
-      icon: "fas fa-user-shield",
-      color: "#1e73be",
+      title: "Total Assignments Assigned",
+      value: "1",
+      icon: "fas fa-file",
+       color: "#1e73be",
     },
+    
     {
-      title: "Total Assignments",
+      title: "Total Assignments Active",
       value: "1",
       icon: "fas fa-tasks",
       color: "#3cb371",
     },
     {
-      title: "Total Incidents",
+      title: "Total Incidents Inactive",
       value: "0",
       icon: "fas fa-exclamation-triangle",
       color: "#ffa500",

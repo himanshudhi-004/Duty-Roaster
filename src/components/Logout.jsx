@@ -7,20 +7,20 @@ export default function Logout() {
   const navigate = useNavigate();
 
   useEffect(() => {
-
     // Detect which user is logged in
-    if (localStorage.getItem("adminToken")) {
-      logoutUser("admin");
-      navigate("/login");
-    } else if (localStorage.getItem("vipToken")) {
-      logoutUser("admin");
-      navigate("/login");
-    } else if (localStorage.getItem("guardToken")) {
-      logoutUser("admin");
-      navigate("/login");
-    } else {
-      navigate("/login");
-    }
+    const isAdmin = localStorage.getItem("adminToken");
+    const isVip = localStorage.getItem("vipToken");
+    const isGuard = localStorage.getItem("guardToken");
+
+    if (isAdmin) logoutUser("admin");
+    if (isVip) logoutUser("vip");
+    if (isGuard) logoutUser("guard");
+
+    // ✅ CLEAR EVERYTHING FROM LOCAL STORAGE
+    localStorage.clear();
+
+    // ✅ Redirect to login
+    navigate("/login", { replace: true });
 
   }, [navigate]);
 

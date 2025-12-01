@@ -7,8 +7,8 @@ export default function GuardSidebar() {
   const navigate = useNavigate();
   //  Handle Logout
   const handleLogout = () => {
-    localStorage.removeItem("guardToken");
-    localStorage.removeItem("role");
+    localStorage.clear();
+    sessionStorage.clear();
     navigate("/login");
   };
   return (
@@ -65,6 +65,17 @@ export default function GuardSidebar() {
               <span>My Shift</span>
             </NavLink>
           </li>
+          
+          <li style={styles.menuItem}>
+            <NavLink
+              to="/guardhistory"
+              style={styles.menuLink}
+              className="menu-link"
+            >
+              <i className="fas fa-bell" style={styles.icon}></i>
+              <span>Duty History</span>
+            </NavLink>
+          </li>
 
           {/* <li style={styles.menuItem}>
             <NavLink
@@ -113,7 +124,7 @@ export default function GuardSidebar() {
             </NavLink>
           </li>
           <li>
-            <button to="/login" className="menu-link" style={{...styles.menuLink, outline: "none",border: "none"}} onClick={handleLogout}>
+            <button to="/login" className="menu-link" style={{ ...styles.menuLink, outline: "none", border: "none" }} onClick={handleLogout}>
               <i className="fas fa-sign-out-alt" style={styles.icon}></i>
               <span>Logout</span>
             </button>

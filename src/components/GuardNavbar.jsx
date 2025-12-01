@@ -71,9 +71,8 @@ export default function GuardNavbar() {
   /*  LOGOUT */
   const handleLogout = () => {
     logoutUser();
-    localStorage.removeItem("guardToken");
-    localStorage.removeItem("selectedGuard");
-    localStorage.removeItem("role");
+     localStorage.clear();
+    sessionStorage.clear();
     navigate("/login");
   };
 
@@ -113,6 +112,10 @@ export default function GuardNavbar() {
 
             <NavLink to="/guardprofile" style={styles.menuItem}>
               My Profile
+            </NavLink>
+
+            <NavLink to="/guardhistory" style={styles.menuItem}>
+              Duty History
             </NavLink>
           </div>
         )}

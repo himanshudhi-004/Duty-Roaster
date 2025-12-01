@@ -94,22 +94,22 @@ export default function UserForm() {
           <form className="user-form" onSubmit={handle_us_Submit}>
 
             <FormInput label="User ID" name="id" type="text"
-              value={userformData.id} onChange={handle_us_Change} />
+              value={userformData.id} onChange={handle_us_Change}   required/>
 
             <FormInput label="Full Name" name="name" type='text'
-              value={userformData.name} onChange={handle_us_Change} />
+              value={userformData.name} onChange={handle_us_Change} required />
 
             <FormInput label="Username" name="username" type='text'
-              value={userformData.username} onChange={handle_us_Change} />
+              value={userformData.username} onChange={handle_us_Change} required />
 
             <FormInput label="Email Id" name="email" type='email'
-              value={userformData.email} onChange={handle_us_Change} />
+              value={userformData.email} onChange={handle_us_Change}  required />
 
             <FormInput label="Password" name="password" type='text'
-              value={userformData.password} onChange={handle_us_Change} />
+              value={userformData.password} onChange={handle_us_Change} required />
 
             <FormInput label="Contact Number" name="contactno" type='text'
-              value={userformData.contactno} onChange={handle_us_Change} />
+              value={userformData.contactno} onChange={handle_us_Change} required />
 
             <div className="form-group">
               <label>Status</label>

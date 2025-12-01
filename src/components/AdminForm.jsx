@@ -202,22 +202,22 @@ export default function AdminForm() {
           <form className="admin-form" onSubmit={handle_ad_Submit}>
 
             <FormInput label="Admin ID" name="id" type="text"
-              value={adminformData.id} onChange={handle_ad_Change} />
+              value={adminformData.id} onChange={handle_ad_Change}  required/>
 
             <FormInput label="Full Name" name="adminName" type='text'
-              value={adminformData.adminName} onChange={handle_ad_Change} />
+              value={adminformData.adminName} onChange={handle_ad_Change}  required/>
 
             <FormInput label="Admin Username" name="adminUsername" type='text'
-              value={adminformData.adminUsername} onChange={handle_ad_Change} />
+              value={adminformData.adminUsername} onChange={handle_ad_Change}  required/>
 
             <FormInput label="Email Id" name="adminEmail" type='email'
-              value={adminformData.adminEmail} onChange={handle_ad_Change} />
+              value={adminformData.adminEmail} onChange={handle_ad_Change}  required/>
 
             <FormInput label="Password" name="adminPassword" type='password'
-              value={adminformData.adminPassword} onChange={handle_ad_Change} />
+              value={adminformData.adminPassword} onChange={handle_ad_Change}  required/>
 
             <FormInput label="Contact Number" name="contactNo" type='text'
-              value={adminformData.contactNo} onChange={handle_ad_Change} />
+              value={adminformData.contactNo} onChange={handle_ad_Change} required />
 
             <div className="form-group">
               <label>Role</label>

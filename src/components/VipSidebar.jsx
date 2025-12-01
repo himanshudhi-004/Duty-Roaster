@@ -5,8 +5,8 @@ export default function VipSidebar() {
   const navigate = useNavigate();
   //  Handle Logout
   const handleLogout = () => {
-    localStorage.removeItem("vipToken");
-    localStorage.removeItem("role");
+     localStorage.clear();
+    sessionStorage.clear();
     navigate("/login");
   };
   return (
@@ -54,6 +54,17 @@ export default function VipSidebar() {
           {/* <li style={styles.sectionTitle}>Notifications</li> */}
 
 
+          <li style={styles.menuItem}>
+            <NavLink
+              to="/viphistory"
+              style={styles.menuLink}
+              className="menu-link"
+            >
+              <i className="fas fa-user" style={styles.icon}></i>
+              <span>Guard Duty History</span>
+            </NavLink>
+
+          </li>
           <li style={styles.menuItem}>
             <NavLink
               to="/vipprofile"

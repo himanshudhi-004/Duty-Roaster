@@ -18,11 +18,12 @@ export default function VipGuardManagement() {
 
   const [selectedDesignation, setSelectedDesignation] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
+  const [searchText, setSearchText] = useState(""); // ✅ SEARCH STATE
 
   const [popupData, setPopupData] = useState(null);
   const [popupPos, setPopupPos] = useState({ top: 0, left: 0 });
 
-  const role = localStorage.getItem("role"); //  admin / user
+  const role = localStorage.getItem("role");
 
   const navigate = useNavigate();
   const rowRefs = useRef({});
@@ -45,13 +46,24 @@ export default function VipGuardManagement() {
     load();
   }, [refreshTrigger]);
 
-  /* ---------------- FILTER ---------------- */
+  /* ---------------- FILTER + SEARCH ---------------- */
   const designations = [...new Set(vipList.map((v) => v.designation))];
 
   const filtered = vipList.filter((v) => {
-    const desMatch = selectedDesignation ? v.designation === selectedDesignation : true;
+    const desMatch = selectedDesignation
+      ? v.designation === selectedDesignation
+      : true;
     const statusMatch = selectedStatus ? v.status === selectedStatus : true;
-    return desMatch && statusMatch;
+
+    const text = searchText.trim().toLowerCase();
+    const searchMatch = text
+      ? [v.name, v.email, v.contactno, v.designation, v.status]
+          .some((field) =>
+            String(field || "").toLowerCase().includes(text)
+          )
+      : true;
+
+    return desMatch && statusMatch && searchMatch;
   });
 
   /* PAGINATION LOGIC */
@@ -92,6 +104,21 @@ export default function VipGuardManagement() {
 
       {/* ---------------- FILTERS ---------------- */}
       <div style={styles.filterRow}>
+        {/* ✅ SEARCH BOX */}
+        <div style={styles.filterCard}>
+          <label style={styles.filterLabel}>Search</label>
+          <input
+            type="text"
+            value={searchText}
+            onChange={(e) => {
+              setSearchText(e.target.value);
+              setCurrentPage(1);
+            }}
+            placeholder="Search by name, email, contact..."
+            style={styles.input}
+          />
+        </div>
+
         <div style={styles.filterCard}>
           <label style={styles.filterLabel}>Designation</label>
           <select
@@ -140,8 +167,6 @@ export default function VipGuardManagement() {
                 <th style={styles.th}>Designation</th>
                 <th style={styles.th}>Contact</th>
                 <th style={styles.th}>Status</th>
-
-                {/*  WORKED HERE — Actions Head shown only when role is user */}
                 {role === "user" && <th style={styles.th}>Actions</th>}
               </tr>
             </thead>
@@ -181,7 +206,6 @@ export default function VipGuardManagement() {
                       <span style={statusStyle}>{vip.status}</span>
                     </td>
 
-                    {/*  WORKED HERE — Actions column shown only for user */}
                     {role === "user" && (
                       <td style={styles.actionCol}>
                         <button
@@ -199,7 +223,7 @@ export default function VipGuardManagement() {
           </table>
         )}
 
-        {/* PAGINATION UI */}
+        {/* PAGINATION */}
         {totalPages > 1 && (
           <div style={styles.paginationContainer}>
             <button
@@ -247,7 +271,7 @@ export default function VipGuardManagement() {
         )}
       </div>
 
-      {/* POPUP */}
+      {/* POPUP (NO CHANGE) */}
       {popupData && (
         <div
           style={{ ...styles.popup, top: popupPos.top, left: popupPos.left }}
@@ -287,12 +311,22 @@ const styles = {
     boxShadow: "0 3px 12px rgba(0,0,0,0.08)",
   },
   filterLabel: { fontSize: 15, fontWeight: 600, marginBottom: 6 },
+
   select: {
     width: "100%",
     padding: "12px",
     borderRadius: 8,
     border: "1.5px solid #1a73e8",
     fontSize: 15,
+  },
+
+  input: {                          // ✅ SEARCH INPUT STYLE
+    width: "100%",
+    padding: 12,
+    borderRadius: 8,
+    border: "1.5px solid #1a73e8",
+    fontSize: 15,
+    outline: "none",
   },
 
   card: { background: "#fff", padding: 10, borderRadius: 15, boxShadow: "0 6px 25px rgba(0,0,0,0.1)" },

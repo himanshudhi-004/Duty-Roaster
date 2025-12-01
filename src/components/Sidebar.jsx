@@ -7,8 +7,8 @@ export default function Sidebar() {
   const navigate = useNavigate();
   //  Handle Logout
   const handleLogout = () => {
-    localStorage.removeItem("adminToken");
-    localStorage.removeItem("role");
+   localStorage.clear();
+    sessionStorage.clear();
     navigate("/login");
   };
   return (
@@ -134,6 +134,16 @@ export default function Sidebar() {
             >
               <i className="fas fa-file" style={styles.icon}></i>
               <span>Vip-Guard-Management</span>
+            </NavLink>
+          </li>
+          <li style={styles.menuItem}>
+            <NavLink
+              to="/dutyhistory"
+              style={styles.menuLink}
+              className="menu-link"
+            >
+              <i className="fas fa-file" style={styles.icon}></i>
+              <span>Guard-Duty-History</span>
             </NavLink>
           </li>
           {/* <li style={styles.sectionTitle}>Notifications</li>
