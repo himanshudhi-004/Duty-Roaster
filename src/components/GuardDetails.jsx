@@ -10,7 +10,7 @@ export default function GuardDetails() {
   const [selectedRank, setSelectedRank] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
 
-  /* ✅ SEARCH STATE */
+  /*  SEARCH STATE */
   const [searchTerm, setSearchTerm] = useState("");
 
   /* PAGINATION STATES */
@@ -54,7 +54,7 @@ export default function GuardDetails() {
     const rankMatch = selectedRank ? g.rank === selectedRank : true;
     const statusMatch = selectedStatus ? g.status === selectedStatus : true;
 
-    /* ✅ SEARCH FILTER */
+    /*  SEARCH FILTER */
     const searchMatch = searchTerm
       ? Object.values(g)
           .join(" ")
@@ -124,7 +124,7 @@ export default function GuardDetails() {
           </select>
         </div>
 
-        {/* ✅ SEARCH INPUT (ONLY ADDITION) */}
+        {/*  SEARCH INPUT (ONLY ADDITION) */}
         <div style={styles.filterCard}>
           <label style={styles.filterLabel}>Search</label>
           <input

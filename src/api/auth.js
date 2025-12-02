@@ -44,18 +44,29 @@ export const logoutUser = (role) => {
 
 export const checkToken = (role) => {
   const token = localStorage.getItem(`${role}Token`);
-  const lastActive = localStorage.getItem(`${role}LastActive`);
-  // console.log("CHECK TOKEN ROLE:", role);
   if (!token) return false;
-
-  const now = Date.now();
-  const limit = 30 * 60 * 1000;
-
-  if (lastActive && now - lastActive > limit) {
-    logoutUser(role);
-    return false;
-  }
 
   localStorage.setItem(`${role}LastActive`, Date.now());
   return true;
 };
+
+
+
+
+// export const checkToken = (role) => {
+//   const token = localStorage.getItem(`${role}Token`);
+//   const lastActive = localStorage.getItem(`${role}LastActive`);
+//   // console.log("CHECK TOKEN ROLE:", role);
+//   if (!token) return false;
+
+//   const now = Date.now();
+//   const limit = 5 * 60 * 1000;
+
+//   if (lastActive && now - lastActive > limit) {
+//     logoutUser(role);
+//     return false;
+//   }
+
+//   localStorage.setItem(`${role}LastActive`, Date.now());
+//   return true;
+// };

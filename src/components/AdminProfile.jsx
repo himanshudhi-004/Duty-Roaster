@@ -205,7 +205,7 @@ const styles = {
   },
   leftBox: { flex: "1", textAlign: "center" },
 
-  /* ✅ IMAGE STYLE ADDED */
+  /*  IMAGE STYLE ADDED */
   profileImage: {
     width: "140px",
     height: "140px",

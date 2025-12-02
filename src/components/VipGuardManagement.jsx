@@ -18,7 +18,7 @@ export default function VipGuardManagement() {
 
   const [selectedDesignation, setSelectedDesignation] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
-  const [searchText, setSearchText] = useState(""); // ✅ SEARCH STATE
+  const [searchText, setSearchText] = useState(""); //  SEARCH STATE
 
   const [popupData, setPopupData] = useState(null);
   const [popupPos, setPopupPos] = useState({ top: 0, left: 0 });
@@ -104,7 +104,7 @@ export default function VipGuardManagement() {
 
       {/* ---------------- FILTERS ---------------- */}
       <div style={styles.filterRow}>
-        {/* ✅ SEARCH BOX */}
+        {/*  SEARCH BOX */}
         <div style={styles.filterCard}>
           <label style={styles.filterLabel}>Search</label>
           <input
@@ -320,7 +320,7 @@ const styles = {
     fontSize: 15,
   },
 
-  input: {                          // ✅ SEARCH INPUT STYLE
+  input: {                          //  SEARCH INPUT STYLE
     width: "100%",
     padding: 12,
     borderRadius: 8,

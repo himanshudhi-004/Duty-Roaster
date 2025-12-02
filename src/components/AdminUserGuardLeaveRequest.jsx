@@ -8,7 +8,7 @@ export default function AdminUserLeaveRequest() {
   const [leaveRequests, setLeaveRequests] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // ✅ FETCH ALL USER LEAVE REQUESTS
+  //  FETCH ALL USER LEAVE REQUESTS
   const fetchLeaveRequests = async () => {
     try {
       setLoading(true);
@@ -33,7 +33,7 @@ export default function AdminUserLeaveRequest() {
     fetchLeaveRequests();
   }, []);
 
-  // ✅ ACCEPT / REJECT HANDLER
+  //  ACCEPT / REJECT HANDLER
   const updateLeaveStatus = async (leaveId, status) => {
     try {
       const token = localStorage.getItem("adminToken");

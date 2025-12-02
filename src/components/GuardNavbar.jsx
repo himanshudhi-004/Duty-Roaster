@@ -91,7 +91,7 @@ export default function GuardNavbar() {
             setUserDropOpen(false);
           }}
         >
-          ---
+          ☰
         </button>
 
         <span style={styles.brand}>Guard Panel</span>
@@ -116,6 +116,16 @@ export default function GuardNavbar() {
 
             <NavLink to="/guardhistory" style={styles.menuItem}>
               Duty History
+            </NavLink>
+            
+            <NavLink to="/guardNotification" style={styles.menuItem}>
+              Notifications
+            </NavLink>
+            <NavLink to="/guardIncident" style={styles.menuItem}>
+              Incident
+            </NavLink>
+            <NavLink to="/guardIncidentHistory" style={styles.menuItem}>
+              Incident History
             </NavLink>
           </div>
         )}

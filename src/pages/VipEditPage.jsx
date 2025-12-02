@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useVipStore } from "../context/VipContext";
-import VipEditForm from "../components/VipDetailEditPage"; // ✅ FIXED PATH
+import VipEditForm from "../components/VipDetailEditPage"; //  FIXED PATH
 
 export default function VipEditPage() {
   const navigate = useNavigate();

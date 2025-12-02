@@ -46,7 +46,7 @@ export default function VipSidebar() {
               style={styles.menuLink}
               className="menu-link"
             >
-              <i className="fas fa-file-alt" style={styles.icon}></i>
+              <i className="fas fa-user-shield" style={styles.icon}></i>
               <span>Assigned Guards</span>
             </NavLink>
           </li>
@@ -60,8 +60,41 @@ export default function VipSidebar() {
               style={styles.menuLink}
               className="menu-link"
             >
-              <i className="fas fa-user" style={styles.icon}></i>
+              <i className="fas fa-history" style={styles.icon}></i>
               <span>Guard Duty History</span>
+            </NavLink>
+
+          </li>
+          {/* <li style={styles.menuItem}>
+            <NavLink
+              to="/vipIncident"
+              style={styles.menuLink}
+              className="menu-link"
+            >
+              <i className="fas fa-bell" style={styles.icon}></i>
+              <span>Incidents</span>
+            </NavLink>
+
+          </li> */}
+          <li style={styles.menuItem}>
+            <NavLink
+              to="/vipNotification"
+              style={styles.menuLink}
+              className="menu-link"
+            >
+              <i className="fas fa-bell" style={styles.icon}></i>
+              <span>Notifications</span>
+            </NavLink>
+
+          </li>
+          <li style={styles.menuItem}>
+            <NavLink
+              to="/vipduty"
+              style={styles.menuLink}
+              className="menu-link"
+            >
+              <i className="fas fa-tasks" style={styles.icon}></i>
+              <span>Duty Management</span>
             </NavLink>
 
           </li>

@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useGuardStore } from "../context/GuardContext";
-import GuardEditForm from "../components/GuardDetailEditPage"; // ✅ FIXED PATH
+import GuardEditForm from "../components/GuardDetailEditPage"; //  FIXED PATH
 
 export default function GuardEditPage() {
   const navigate = useNavigate();

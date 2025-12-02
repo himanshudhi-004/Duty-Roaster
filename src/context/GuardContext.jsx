@@ -23,6 +23,7 @@ export const GuardProvider = ({ children }) => {
     setSelectedGuard(null);
     localStorage.removeItem("selectedGuard");
   };
+  console.log("GuardContext selectedGuard:", selectedGuard);
 
   return (
     <GuardContext.Provider

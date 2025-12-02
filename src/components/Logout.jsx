@@ -9,17 +9,19 @@ export default function Logout() {
   useEffect(() => {
     // Detect which user is logged in
     const isAdmin = localStorage.getItem("adminToken");
+    const isUser = localStorage.getItem("userToken");
     const isVip = localStorage.getItem("vipToken");
     const isGuard = localStorage.getItem("guardToken");
 
     if (isAdmin) logoutUser("admin");
+    if (isUser) logoutUser("user");
     if (isVip) logoutUser("vip");
     if (isGuard) logoutUser("guard");
 
-    // ✅ CLEAR EVERYTHING FROM LOCAL STORAGE
+    //  CLEAR EVERYTHING FROM LOCAL STORAGE
     localStorage.clear();
 
-    // ✅ Redirect to login
+    //  Redirect to login
     navigate("/login", { replace: true });
 
   }, [navigate]);

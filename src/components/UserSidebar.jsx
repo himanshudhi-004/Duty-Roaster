@@ -7,8 +7,8 @@ export default function UserSidebar() {
   const navigate = useNavigate();
   //  Handle Logout
   const handleLogout = () => {
-    localStorage.removeItem("userToken");
-    localStorage.removeItem("role");
+     localStorage.clear();
+    sessionStorage.clear();
     navigate("/login");
   };
   return (
@@ -60,7 +60,7 @@ export default function UserSidebar() {
               style={styles.menuLink}
               className="menu-link"
             >
-              <i className="fas fa-users" style={styles.icon}></i>
+              <i className="fas fa-table" style={styles.icon}></i>
               <span>Guard Table</span>
             </NavLink>
           </li>
@@ -72,12 +72,12 @@ export default function UserSidebar() {
               style={styles.menuLink}
               className="menu-link"
             >
-              <i className="fas fa-file" style={styles.icon}></i>
+              <i className="fas fa-users-cog" style={styles.icon}></i>
               <span>Vip-Guard-Management</span>
             </NavLink>
           </li>
 
-          <li style={styles.menuItem}>
+          {/* <li style={styles.menuItem}>
             <NavLink
               to="/uglrequest"
               style={styles.menuLink}
@@ -86,7 +86,7 @@ export default function UserSidebar() {
               <i className="fas fa-file" style={styles.icon}></i>
               <span>Guard Leave Requests</span>
             </NavLink>
-          </li>
+          </li> */}
 
           <li style={styles.menuItem}>
             <NavLink
@@ -94,7 +94,7 @@ export default function UserSidebar() {
               style={styles.menuLink}
               className="menu-link"
             >
-              <i className="fas fa-user" style={styles.icon}></i>
+              <i className="fas fa-check-circle" style={styles.icon}></i>
               <span>Duty Accept/Reject</span>
             </NavLink>
           </li>
@@ -121,14 +121,34 @@ export default function UserSidebar() {
               <span>Guard Notifications</span>
             </NavLink>
           </li> */}
+          {/* <li style={styles.menuItem}>
+            <NavLink
+              to="/markduty"
+              style={styles.menuLink}
+              className="menu-link"
+            >
+              <i className="fas fa-user" style={styles.icon}></i>
+              <span>Duty Management</span>
+            </NavLink>
+          </li> */}
           <li style={styles.menuItem}>
             <NavLink
               to="/dutyhistory"
               style={styles.menuLink}
               className="menu-link"
             >
-              <i className="fas fa-user" style={styles.icon}></i>
+              <i className="fas fa-history" style={styles.icon}></i>
               <span>Guard Duty History</span>
+            </NavLink>
+          </li>
+          <li style={styles.menuItem}>
+            <NavLink
+              to="/incidents"
+              style={styles.menuLink}
+              className="menu-link"
+            >
+              <i className="fas fa-exclamation-triangle" style={styles.icon}></i>
+              <span>Incidents</span>
             </NavLink>
           </li>
           <li style={styles.menuItem}>

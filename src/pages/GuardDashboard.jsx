@@ -100,7 +100,8 @@ export default function GuardDashboard() {
             LOGOUT
   ----------------------------------------- */
   const handleLogout = () => {
-    localStorage.clear()
+    localStorage.clear();
+    sessionStorage.clear();
     navigate("/login");
   };
 

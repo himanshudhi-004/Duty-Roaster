@@ -61,7 +61,7 @@ export default function GuardSidebar() {
               style={styles.menuLink}
               className="menu-link"
             >
-              <i className="fas fa-bell" style={styles.icon}></i>
+              <i className="fas fa-briefcase" style={styles.icon}></i>
               <span>My Shift</span>
             </NavLink>
           </li>
@@ -72,8 +72,40 @@ export default function GuardSidebar() {
               style={styles.menuLink}
               className="menu-link"
             >
-              <i className="fas fa-bell" style={styles.icon}></i>
+              <i className="fas fa-history" style={styles.icon}></i>
               <span>Duty History</span>
+            </NavLink>
+          </li>
+
+          <li style={styles.menuItem}>
+            <NavLink
+              to="/guardNotification"
+              style={styles.menuLink}
+              className="menu-link"
+            >
+              <i className="fas fa-bell" style={styles.icon}></i>
+              <span>Notifications</span>
+            </NavLink>
+          </li>
+          <li style={styles.menuItem}>
+            <NavLink
+              to="/guardIncident"
+              style={styles.menuLink}
+              className="menu-link"
+            >
+              <i className="fas fa-exclamation-triangle" style={styles.icon}></i>
+              <span>Incidents</span>
+            </NavLink>
+          </li>
+
+          <li style={styles.menuItem}>
+            <NavLink
+              to="/guardIncidentHistory"
+              style={styles.menuLink}
+              className="menu-link"
+            >
+              <i className="fas fa-clipboard-list" style={styles.icon}></i>
+              <span>Incidents History</span>
             </NavLink>
           </li>
 

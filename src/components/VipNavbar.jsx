@@ -91,7 +91,7 @@ export default function VipNavbar() {
             setUserDropOpen(false);
           }}
         >
-          ---
+          ☰
         </button>
 
         <span style={styles.brand}>VIP Panel</span>
@@ -112,6 +112,18 @@ export default function VipNavbar() {
 
             <NavLink to="/viphistory" style={styles.menuItem}>
               Guard Duty History
+            </NavLink>
+
+            <NavLink to="/vipNotification" style={styles.menuItem}>
+              Notifications
+            </NavLink>
+
+            {/* <NavLink to="/vipIncident" style={styles.menuItem}>
+              Incidents
+            </NavLink> */}
+
+            <NavLink to="/vipduty" style={styles.menuItem}>
+              Duty Management
             </NavLink>
           </div>
         )}

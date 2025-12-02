@@ -91,7 +91,7 @@ export default function UserNavbar() {
             setUserDropOpen(false);
           }}
         >
-          ---
+          ☰
         </button>
 
         <span style={styles.brand}>Manger Panel</span>
@@ -120,6 +120,14 @@ export default function UserNavbar() {
             <NavLink to="/userprofile" style={styles.menuItem}>
               My Profile
             </NavLink>
+
+            <NavLink to="/incidents" style={styles.menuItem}>
+              Incidents
+            </NavLink>
+
+            {/* <NavLink to="/markduty" style={styles.menuItem}>
+              Duty Management
+            </NavLink> */}
           </div>
         )}
       </div>

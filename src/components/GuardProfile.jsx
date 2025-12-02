@@ -34,7 +34,7 @@ export default function GuardProfile() {
       const profile = Array.isArray(res.data) ? res.data[0] : res.data;
 
       setUserDetails(profile);
-      setSelectedGuard(profile); // ✅ STORE IN CONTEXT
+      setSelectedGuard(profile); //  STORE IN CONTEXT
 
       if (profile?.image) {
         setProfileImage(`${BASE_URL}/${profile.image}`);
@@ -204,7 +204,7 @@ const styles = {
   },
   leftBox: { flex: "1", textAlign: "center" },
 
-  /* ✅ IMAGE STYLE ADDED */
+  /*  IMAGE STYLE ADDED */
   profileImage: {
     width: "140px",
     height: "140px",
