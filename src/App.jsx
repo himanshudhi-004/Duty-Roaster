@@ -6,7 +6,7 @@ import { VipProvider } from "./context/VipContext";
 import { GuardProvider } from "./context/GuardContext";
 import { AdminProvider } from "./context/AdminContext";
 import { UserProvider } from "./context/UserContext";
-import { NotificationProvider } from "./context/NotificationContext";
+
 
 /* ---------------- AUTH ---------------- */
 import AdminLogin from "./components/AdminLogin";
@@ -92,7 +92,7 @@ function App() {
 
   return (
     <Router>
-      <NotificationProvider>
+     
         <AdminProvider>
           <UserProvider>
             <VipProvider>
@@ -462,7 +462,7 @@ function App() {
             </VipProvider>
           </UserProvider>
         </AdminProvider>
-      </NotificationProvider>
+      
     </Router>
   );
 }

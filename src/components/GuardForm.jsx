@@ -108,13 +108,13 @@ export default function GuardForm() {
           </h2>
 
           <form onSubmit={handle_gd_Submit}>
-            <FormInput
+            {/* <FormInput
               label="Guard ID"
               name="id"
               type="text"
               value={guardformData.id}
               onChange={handle_gd_Change} required
-            />
+            /> */}
 
             <FormInput
               label="Full Name"

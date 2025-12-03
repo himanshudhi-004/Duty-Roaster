@@ -1,76 +1,199 @@
-import React, { useEffect, useState } from "react";
-import { useGuardStore } from "../context/GuardContext";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
+// import React, { useEffect, useState } from "react";
+// import { useGuardStore } from "../context/GuardContext";
+// import axios from "axios";
+// import { useNavigate } from "react-router-dom";
+// import { jwtDecode } from "jwt-decode";
 
-const BASE_URL = process.env.REACT_APP_BASE_URL;
+// const BASE_URL = process.env.REACT_APP_BASE_URL;
+
+// export default function GuardProfile() {
+//   const navigate = useNavigate();
+//   const { handleEdit, setSelectedGuard } = useGuardStore();
+
+//   const [userDetails, setUserDetails] = useState(null);
+//   const [loading, setLoading] = useState(true);
+//   const [profileImage, setProfileImage] = useState(null);
+
+//   useEffect(() => {
+//     fetchProfile();
+//   }, []);
+
+//   const fetchProfile = async () => {
+//     try {
+//       const token = localStorage.getItem("guardToken");
+//       if (!token) return;
+
+//       const decoded = jwtDecode(token);
+//       const username = decoded.username || decoded.sub || decoded.email;
+
+//       const res = await axios.get(`${BASE_URL}/api/officer/profile`, {
+//         params: { username },
+//         headers: { Authorization: `Bearer ${token}` },
+//       });
+
+//       const profile = Array.isArray(res.data) ? res.data[0] : res.data;
+
+//       setUserDetails(profile);
+//       setSelectedGuard(profile); //  STORE IN CONTEXT
+
+//       if (profile?.image) {
+//         setProfileImage(`${BASE_URL}/${profile.image}`);
+//       }
+//     } catch (err) {
+//       console.log("Profile Fetch Error:", err);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   /* ---------------- IMAGE UPLOAD ----------------- */
+//   const handleImageUpload = async (e) => {
+//     const file = e.target.files[0];
+//     if (!file) return;
+
+//     const token = localStorage.getItem("guardToken");
+//     const formData = new FormData();
+//     formData.append("image", file);
+
+//     try {
+//       const res = await axios.post(
+//         `${BASE_URL}/api/officer/upload-profile-image/${userDetails.id}`,
+//         formData,
+//         {
+//           headers: {
+//             Authorization: `Bearer ${token}`,
+//             "Content-Type": "multipart/form-data",
+//           },
+//         }
+//       );
+
+//       setProfileImage(`${BASE_URL}/${res.data.image}`);
+//     } catch (err) {
+//       console.log("Image Upload Error:", err);
+//     }
+//   };
+
+//   if (loading) {
+//     return (
+//       <div className="text-center py-5">
+//         <i className="fa fa-spinner fa-spin fa-2x text-primary mb-3"></i>
+//         <h5>Loading profile...</h5>
+//       </div>
+//     );
+//   }
+
+//   if (!userDetails) {
+//     return (
+//       <div className="text-center py-5 text-danger">
+//         <h4>Unable to load profile.</h4>
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <div style={styles.pageContainer}>
+//       <div style={styles.header}>
+//         <h2 style={styles.headerTitle}>
+//           <i className="fa fa-user-circle me-2"></i> Guard Profile
+//         </h2>
+//         <p style={styles.headerSubtitle}>Overview of Guard account details</p>
+//       </div>
+
+//       <div style={styles.card}>
+//         <div style={styles.cardBody}>
+//           <div style={styles.profileRow}>
+//             {/* ----------- IMAGE SECTION (ADDED ONLY) ----------- */}
+//             <div style={styles.leftBox}>
+//               <img
+//                 src={
+//                   profileImage ||
+//                   "https://cdn-icons-png.flaticon.com/512/149/149071.png"
+//                 }
+//                 alt="Profile"
+//                 style={styles.profileImage}
+//               />
+
+//               <input
+//                 type="file"
+//                 accept="image/*"
+//                 onChange={handleImageUpload}
+//                 style={{ marginTop: "10px" }}
+//               />
+
+//               <h4 style={styles.name}>{userDetails.name}</h4>
+//               <p style={styles.role}>Guard Detail</p>
+//             </div>
+
+//             {/* ----------- DETAILS SECTION (UNCHANGED) ----------- */}
+//             <div style={styles.rightBox}>
+//               {[
+//                 ["Guard ID", userDetails.id],
+//                 ["Username", userDetails.username],
+//                 ["Email", userDetails.email],
+//                 ["Contact No", userDetails.contactno],
+//                 [
+//                   "Status",
+//                   <span
+//                     style={{
+//                       ...styles.statusBadge,
+//                       background:
+//                         userDetails.status === "Active"
+//                           ? "#28a745"
+//                           : "#dc3545",
+//                     }}
+//                   >
+//                     {userDetails.status}
+//                   </span>,
+//                 ],
+//               ].map(([label, value], i) => (
+//                 <div style={styles.detailRow} key={i}>
+//                   <div style={styles.detailLabel}>{label}:</div>
+//                   <div style={styles.detailValue}>{value}</div>
+//                 </div>
+//               ))}
+
+//               <div style={{ marginTop: "20px" }}>
+//                 <button
+//                   style={styles.editBtn}
+//                   onClick={() => {
+//                     handleEdit(userDetails);
+//                     navigate("/guardedit");
+//                   }}
+//                 >
+//                   <i className="fa fa-edit me-1"></i> Edit Profile
+//                 </button>
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+import React, { useEffect } from "react";
+import { useGuardStore } from "../context/GuardContext";
+import { useNavigate } from "react-router-dom";
 
 export default function GuardProfile() {
   const navigate = useNavigate();
-  const { handleEdit, setSelectedGuard } = useGuardStore();
-
-  const [userDetails, setUserDetails] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [profileImage, setProfileImage] = useState(null);
+  const {
+    selectedGuard,
+    profileImage,
+    loading,
+    fetchGuardProfile,
+    uploadGuardImage,
+    handleEdit,
+  } = useGuardStore();
 
   useEffect(() => {
-    fetchProfile();
+    fetchGuardProfile();
   }, []);
 
-  const fetchProfile = async () => {
-    try {
-      const token = localStorage.getItem("guardToken");
-      if (!token) return;
-
-      const decoded = jwtDecode(token);
-      const username = decoded.username || decoded.sub || decoded.email;
-
-      const res = await axios.get(`${BASE_URL}/api/officer/profile`, {
-        params: { username },
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      const profile = Array.isArray(res.data) ? res.data[0] : res.data;
-
-      setUserDetails(profile);
-      setSelectedGuard(profile); //  STORE IN CONTEXT
-
-      if (profile?.image) {
-        setProfileImage(`${BASE_URL}/${profile.image}`);
-      }
-    } catch (err) {
-      console.log("Profile Fetch Error:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  /* ---------------- IMAGE UPLOAD ----------------- */
-  const handleImageUpload = async (e) => {
+  const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
-    const token = localStorage.getItem("guardToken");
-    const formData = new FormData();
-    formData.append("image", file);
-
-    try {
-      const res = await axios.post(
-        `${BASE_URL}/api/officer/upload-profile-image/${userDetails.id}`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      setProfileImage(`${BASE_URL}/${res.data.image}`);
-    } catch (err) {
-      console.log("Image Upload Error:", err);
-    }
+    uploadGuardImage(file);
   };
 
   if (loading) {
@@ -82,7 +205,7 @@ export default function GuardProfile() {
     );
   }
 
-  if (!userDetails) {
+  if (!selectedGuard) {
     return (
       <div className="text-center py-5 text-danger">
         <h4>Unable to load profile.</h4>
@@ -100,69 +223,65 @@ export default function GuardProfile() {
       </div>
 
       <div style={styles.card}>
-        <div style={styles.cardBody}>
-          <div style={styles.profileRow}>
-            {/* ----------- IMAGE SECTION (ADDED ONLY) ----------- */}
-            <div style={styles.leftBox}>
-              <img
-                src={
-                  profileImage ||
-                  "https://cdn-icons-png.flaticon.com/512/149/149071.png"
-                }
-                alt="Profile"
-                style={styles.profileImage}
-              />
+        <div style={styles.profileRow}>
+          <div style={styles.leftBox}>
+            <img
+              src={
+                profileImage ||
+                "https://cdn-icons-png.flaticon.com/512/149/149071.png"
+              }
+              alt="Profile"
+              style={styles.profileImage}
+            />
 
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                style={{ marginTop: "10px" }}
-              />
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              style={{ marginTop: "10px" }}
+            />
 
-              <h4 style={styles.name}>{userDetails.name}</h4>
-              <p style={styles.role}>Guard Detail</p>
-            </div>
+            <h4 style={styles.name}>{selectedGuard.name}</h4>
+            <p style={styles.role}>Guard Detail</p>
+          </div>
 
-            {/* ----------- DETAILS SECTION (UNCHANGED) ----------- */}
-            <div style={styles.rightBox}>
-              {[
-                ["Guard ID", userDetails.id],
-                ["Username", userDetails.username],
-                ["Email", userDetails.email],
-                ["Contact No", userDetails.contactno],
-                [
-                  "Status",
-                  <span
-                    style={{
-                      ...styles.statusBadge,
-                      background:
-                        userDetails.status === "Active"
-                          ? "#28a745"
-                          : "#dc3545",
-                    }}
-                  >
-                    {userDetails.status}
-                  </span>,
-                ],
-              ].map(([label, value], i) => (
-                <div style={styles.detailRow} key={i}>
-                  <div style={styles.detailLabel}>{label}:</div>
-                  <div style={styles.detailValue}>{value}</div>
-                </div>
-              ))}
-
-              <div style={{ marginTop: "20px" }}>
-                <button
-                  style={styles.editBtn}
-                  onClick={() => {
-                    handleEdit(userDetails);
-                    navigate("/guardedit");
+          <div style={styles.rightBox}>
+            {[
+              ["Guard ID", selectedGuard.id],
+              ["Username", selectedGuard.username],
+              ["Email", selectedGuard.email],
+              ["Contact No", selectedGuard.contactno],
+              [
+                "Status",
+                <span
+                  style={{
+                    ...styles.statusBadge,
+                    background:
+                      selectedGuard.status === "Active"
+                        ? "#28a745"
+                        : "#dc3545",
                   }}
                 >
-                  <i className="fa fa-edit me-1"></i> Edit Profile
-                </button>
+                  {selectedGuard.status}
+                </span>,
+              ],
+            ].map(([label, value], i) => (
+              <div style={styles.detailRow} key={i}>
+                <div style={styles.detailLabel}>{label}:</div>
+                <div style={styles.detailValue}>{value}</div>
               </div>
+            ))}
+
+            <div style={{ marginTop: "20px" }}>
+              <button
+                style={styles.editBtn}
+                onClick={() => {
+                  handleEdit(selectedGuard);
+                  navigate("/guardedit");
+                }}
+              >
+                <i className="fa fa-edit me-1"></i> Edit Profile
+              </button>
             </div>
           </div>
         </div>
@@ -170,6 +289,9 @@ export default function GuardProfile() {
     </div>
   );
 }
+
+
+
 
 /* ------------------ UI THEME STYLES (UNCHANGED + IMAGE STYLE ADDED) ------------------ */
 const styles = {
