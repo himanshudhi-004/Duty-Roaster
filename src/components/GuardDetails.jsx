@@ -428,7 +428,7 @@ export default function GuardDetails() {
           <label style={styles.filterLabel}>Search</label>
           <input
             type="text"
-            placeholder="Search..."
+            placeholder="Search by Name, Email, Contact..."
             value={searchTerm}
             onChange={(e) => {
               setSearchTerm(e.target.value);

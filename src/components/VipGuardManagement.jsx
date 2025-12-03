@@ -104,21 +104,7 @@ export default function VipGuardManagement() {
 
       {/* ---------------- FILTERS ---------------- */}
       <div style={styles.filterRow}>
-        {/*  SEARCH BOX */}
-        <div style={styles.filterCard}>
-          <label style={styles.filterLabel}>Search</label>
-          <input
-            type="text"
-            value={searchText}
-            onChange={(e) => {
-              setSearchText(e.target.value);
-              setCurrentPage(1);
-            }}
-            placeholder="Search by name, email, contact..."
-            style={styles.input}
-          />
-        </div>
-
+        
         <div style={styles.filterCard}>
           <label style={styles.filterLabel}>Designation</label>
           <select
@@ -151,6 +137,21 @@ export default function VipGuardManagement() {
             <option>Inactive</option>
           </select>
         </div>
+        {/*  SEARCH BOX */}
+        <div style={styles.filterCard}>
+          <label style={styles.filterLabel}>Search</label>
+          <input
+            type="text"
+            value={searchText}
+            onChange={(e) => {
+              setSearchText(e.target.value);
+              setCurrentPage(1);
+            }}
+            placeholder="Search by name, email, contact..."
+            style={styles.input}
+          />
+        </div>
+
       </div>
 
       {/* VIP TABLE */}

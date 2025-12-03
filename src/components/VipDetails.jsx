@@ -507,19 +507,7 @@ export default function VipDetails() {
 
       {/* FILTER ROW */}
       <div style={styles.filterRow}>
-        <div style={styles.filterCard}>
-          <label style={styles.filterLabel}>Search</label>
-          <input
-            type="text"
-            value={searchText}
-            onChange={(e) => {
-              setSearchText(e.target.value);
-              setCurrentPage(1);
-            }}
-            placeholder="Search by Name, Email, Contact..."
-            style={styles.input}
-          />
-        </div>
+        
 
         <div style={styles.filterCard}>
           <label style={styles.filterLabel}>Designation</label>
@@ -552,6 +540,20 @@ export default function VipDetails() {
             <option>Active</option>
             <option>Inactive</option>
           </select>
+        </div>
+
+        <div style={styles.filterCard}>
+          <label style={styles.filterLabel}>Search</label>
+          <input
+            type="text"
+            value={searchText}
+            onChange={(e) => {
+              setSearchText(e.target.value);
+              setCurrentPage(1);
+            }}
+            placeholder="Search by Name, Email, Contact..."
+            style={styles.input}
+          />
         </div>
       </div>
 
