@@ -73,6 +73,7 @@ import GuardIncident from "./components/GuardIncident";
 import GuardIncidentHistory from "./components/GuardIncidentHistory";
 import VipDuty from "./components/VipDuty";
 import MarkDuty from "./components/MarkDuty";
+import ManagerSettings from "./components/ManagerSettings";
 
 function App() {
 
@@ -306,6 +307,14 @@ function App() {
                     element={
                       <PrivateRoute roles={["user"]}>
                         <UserLayout><AdminUserGuardLeaveRequest /></UserLayout>
+                      </PrivateRoute>
+                    }
+                  />
+                  <Route
+                    path="/setting"
+                    element={
+                      <PrivateRoute roles={["user"]}>
+                        <UserLayout><ManagerSettings /></UserLayout>
                       </PrivateRoute>
                     }
                   />

@@ -402,7 +402,6 @@
 // };
 
 
-
 import React, { useEffect, useState } from "react";
 import { getAllVip, deleteVip } from "../api/vipform";
 import { useVipStore } from "../context/VipContext";
@@ -438,9 +437,9 @@ export default function VipDetails() {
   }, [refreshTrigger]);
 
   /* DELETE */
-  const handleDelete = async (id) => {
+  const handleDelete = async (vip) => {
     try {
-      await deleteVip(id);
+      await deleteVip(vip.id || vip._id);
       const updated = await getAllVip();
       setVipList(Array.isArray(updated) ? updated : []);
       toast.success("VIP Deleted Successfully!");
@@ -464,8 +463,7 @@ export default function VipDetails() {
     const text = searchText.trim().toLowerCase();
     const searchMatch = text
       ? [v.name, v.email, v.contactno, v.designation, v.status].some(
-          (field) =>
-            String(field || "").toLowerCase().includes(text)
+          (field) => String(field || "").toLowerCase().includes(text)
         )
       : true;
 
@@ -484,16 +482,13 @@ export default function VipDetails() {
     if (page >= 1 && page <= totalPages) setCurrentPage(page);
   };
 
-  /* SHIFT PAGINATION (ONLY 2 NUMBERS) */
+  /* SHIFT PAGINATION */
   const pageWindow = 2;
-
   const startPage = Math.max(
     1,
     currentPage - Math.floor(pageWindow / 2)
   );
-
   const endPage = Math.min(totalPages, startPage + pageWindow - 1);
-
   const visiblePages = Array.from(
     { length: endPage - startPage + 1 },
     (_, i) => startPage + i
@@ -560,123 +555,139 @@ export default function VipDetails() {
         </div>
       </div>
 
-      {/* TABLE */}
-      <div style={styles.tableCard}>
-        {currentData.length === 0 ? (
-          <div style={styles.noData}>No VIP Records Found</div>
-        ) : (
-          <table style={styles.table}>
-            <thead>
-              <tr>
-                <th style={styles.th}>#</th>
-                <th style={styles.th}>Name</th>
-                <th style={styles.th}>Email</th>
-                <th style={styles.th}>Designation</th>
-                <th style={styles.th}>Contact</th>
-                <th style={styles.th}>Status</th>
-                <th style={styles.th}>Actions</th>
-              </tr>
-            </thead>
+      {/* ✅ RESPONSIVE TABLE WRAPPER */}
+      <div style={styles.tableWrapper}>
+        <div style={styles.tableCard}>
+          {currentData.length === 0 ? (
+            <div style={styles.noData}>No VIP Records Found</div>
+          ) : (
+            <table style={styles.table}>
+              <thead>
+                <tr>
+                  <th style={styles.th}>#</th>
+                  <th style={styles.th}>Name</th>
+                  <th style={styles.th}>Email</th>
+                  <th style={styles.th}>Designation</th>
+                  <th style={styles.th}>Contact</th>
+                  <th style={styles.th}>Status</th>
+                  <th style={styles.th}>Actions</th>
+                </tr>
+              </thead>
 
-            <tbody>
-              {currentData.map((vip, index) => {
-                const statusStyle =
-                  vip.status === "Active"
-                    ? styles.statusActive
-                    : styles.statusInactive;
+              <tbody>
+                {currentData.map((vip, index) => {
+                  const statusStyle =
+                    vip.status === "Active"
+                      ? styles.statusActive
+                      : styles.statusInactive;
 
-                return (
-                  <tr key={vip.id || index} style={styles.row}>
-                    <td style={styles.td}>
-                      {index + 1 + (currentPage - 1) * rowsPerPage}
-                    </td>
-                    <td style={styles.td}>{vip.name}</td>
-                    <td style={styles.td}>{vip.email}</td>
-                    <td style={styles.td}>
-                      <span style={styles.badge}>
-                        {vip.designation}
-                      </span>
-                    </td>
-                    <td style={styles.td}>{vip.contactno}</td>
-                    <td style={styles.td}>
-                      <span style={statusStyle}>{vip.status}</span>
-                    </td>
-                    <td style={styles.actionCol}>
-                      <button
-                        style={styles.editBtn}
-                        onClick={() => handleEdit(vip)}
-                      >
-                        <i className="fa fa-edit"></i>
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        )}
+                  return (
+                    <tr key={vip.id || index} style={styles.row}>
+                      <td style={styles.td}>
+                        {index + 1 + (currentPage - 1) * rowsPerPage}
+                      </td>
+                      <td style={styles.td}>{vip.name}</td>
+                      <td style={styles.td}>{vip.email}</td>
+                      <td style={styles.td}>
+                        <span style={styles.badge}>
+                          {vip.designation}
+                        </span>
+                      </td>
+                      <td style={styles.td}>{vip.contactno}</td>
+                      <td style={styles.td}>
+                        <span style={statusStyle}>{vip.status}</span>
+                      </td>
 
-        {/* SHIFT PAGINATION */}
-        {totalPages > 1 && (
-          <div style={styles.paginationContainer}>
-            <button
-              disabled={currentPage === 1}
-              style={styles.pageBtn}
-              onClick={() => goToPage(currentPage - 1)}
-            >
-              Prev
-            </button>
+                      <td style={styles.actionCol}>
+                        <button
+                          style={styles.editBtn}
+                          onClick={() => handleEdit(vip)}
+                        >
+                          <i className="fa fa-edit"></i>
+                        </button>
 
-            {visiblePages.map((page) => (
+                        <button
+                          style={styles.deleteBtn}
+                          onClick={() => handleDelete(vip)}
+                        >
+                          <i className="fa fa-trash"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          )}
+
+          {/* SHIFT PAGINATION */}
+          {totalPages > 1 && (
+            <div style={styles.paginationContainer}>
               <button
-                key={page}
-                style={{
-                  ...styles.pageBtn,
-                  ...(currentPage === page ? styles.activePage : {}),
-                }}
-                onClick={() => goToPage(page)}
+                disabled={currentPage === 1}
+                style={styles.pageBtn}
+                onClick={() => goToPage(currentPage - 1)}
               >
-                {page}
+                Prev
               </button>
-            ))}
 
-            <button
-              disabled={currentPage === totalPages}
-              style={styles.pageBtn}
-              onClick={() => goToPage(currentPage + 1)}
-            >
-              Next
-            </button>
+              {visiblePages.map((page) => (
+                <button
+                  key={page}
+                  style={{
+                    ...styles.pageBtn,
+                    ...(currentPage === page ? styles.activePage : {}),
+                  }}
+                  onClick={() => goToPage(page)}
+                >
+                  {page}
+                </button>
+              ))}
 
-            <select
-              value={rowsPerPage}
-              style={styles.rowsSelect}
-              onChange={(e) => {
-                setRowsPerPage(Number(e.target.value));
-                setCurrentPage(1);
-              }}
-            >
-              <option value={30}>30 / Page</option>
-              <option value={20}>20 / Page</option>
-              <option value={10}>10 / Page</option>
-            </select>
-          </div>
-        )}
+              <button
+                disabled={currentPage === totalPages}
+                style={styles.pageBtn}
+                onClick={() => goToPage(currentPage + 1)}
+              >
+                Next
+              </button>
+
+              <select
+                value={rowsPerPage}
+                style={styles.rowsSelect}
+                onChange={(e) => {
+                  setRowsPerPage(Number(e.target.value));
+                  setCurrentPage(1);
+                }}
+              >
+                <option value={30}>30 / Page</option>
+                <option value={20}>20 / Page</option>
+                <option value={10}>10 / Page</option>
+              </select>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
 }
 
-/* ---- STYLES ---- */
+/* ✅ RESPONSIVE STYLES ONLY (DATA UNTOUCHED) */
+
 const styles = {
   page: { width: "100%", padding: "0px", margin: 0, background: "#fff" },
+
   headerRow: {
     width: "100%",
     display: "flex",
+    flexWrap: "wrap",
     justifyContent: "space-between",
+    gap: 10,
     padding: "10px 20px",
   },
+
   title: { fontSize: 28, fontWeight: 800, color: "#1967d2" },
+
   totalBox: {
     display: "flex",
     alignItems: "center",
@@ -685,24 +696,29 @@ const styles = {
     padding: "12px 18px",
     borderRadius: 12,
   },
+
   totalNumber: { fontSize: 26, fontWeight: 800, color: "#1967d2" },
   totalLabel: { fontSize: 15, fontWeight: 600, color: "#1967d2" },
 
   filterRow: {
     display: "flex",
+    flexWrap: "wrap",
     gap: 20,
     width: "100%",
     padding: "0px 20px",
     marginBottom: 20,
   },
+
   filterCard: {
-    flex: 1,
+    flex: "1 1 250px",
     background: "#fff",
     padding: 15,
     borderRadius: 12,
     boxShadow: "0 4px 15px rgba(0,0,0,0.08)",
   },
+
   filterLabel: { fontWeight: 600, marginBottom: 6, fontSize: 15 },
+
   select: {
     width: "100%",
     padding: 12,
@@ -710,6 +726,7 @@ const styles = {
     border: "1.5px solid #1a73e8",
     fontSize: 15,
   },
+
   input: {
     width: "100%",
     padding: 12,
@@ -719,8 +736,14 @@ const styles = {
     outline: "none",
   },
 
-  tableCard: {
+  /* ✅ IMPORTANT RESPONSIVE FIX */
+  tableWrapper: {
     width: "100%",
+    overflowX: "auto",
+  },
+
+  tableCard: {
+    minWidth: 850,
     background: "#fff",
     padding: "10px 20px",
     borderRadius: 12,
@@ -728,14 +751,22 @@ const styles = {
   },
 
   table: { width: "100%", borderCollapse: "collapse" },
+
   th: {
     background: "#f4f4f6",
-    padding: "14px 10px",
+    padding: "12px 8px",
     textAlign: "left",
     fontWeight: 700,
+    whiteSpace: "nowrap",
   },
-  td: { padding: "12px 10px", borderBottom: "1px solid #eee" },
-  row: { height: 50, transition: "0.25s" },
+
+  td: {
+    padding: "10px 8px",
+    borderBottom: "1px solid #eee",
+    whiteSpace: "nowrap",
+  },
+
+  row: { height: 50 },
 
   badge: {
     background: "#d7ecff",
@@ -744,42 +775,62 @@ const styles = {
     color: "#005bb7",
     fontWeight: 600,
   },
-  actionCol: { display: "flex", gap: 10 },
+
+  actionCol: {
+    display: "flex",
+    gap: 8,
+  },
 
   editBtn: {
     background: "#28a745",
-    padding: "7px 12px",
+    padding: "6px 10px",
     borderRadius: 6,
     color: "#fff",
     border: 0,
-    marginTop: 7,
+    cursor: "pointer",
+  },
+
+  deleteBtn: {
+    background: "#eb522cff",
+    padding: "6px 10px",
+    borderRadius: 6,
+    color: "#fff",
+    border: 0,
     cursor: "pointer",
   },
 
   statusActive: {
     background: "#e6ffe6",
-    padding: "5px 12px",
+    padding: "5px 10px",
     borderRadius: 20,
     color: "#2e7d32",
     fontWeight: 600,
   },
+
   statusInactive: {
     background: "#ffe6e6",
-    padding: "5px 12px",
+    padding: "5px 10px",
     borderRadius: 20,
     color: "#d32f2f",
     fontWeight: 600,
   },
 
-  noData: { textAlign: "center", padding: 40, fontSize: 18, color: "#777" },
+  noData: {
+    textAlign: "center",
+    padding: 40,
+    fontSize: 18,
+    color: "#777",
+  },
 
   paginationContainer: {
     display: "flex",
+    flexWrap: "wrap",
     justifyContent: "center",
     alignItems: "center",
     padding: 15,
     gap: 10,
   },
+
   pageBtn: {
     padding: "6px 14px",
     borderRadius: 6,
@@ -787,11 +838,13 @@ const styles = {
     background: "white",
     cursor: "pointer",
   },
+
   activePage: {
     background: "#1967d2",
     color: "white",
     fontWeight: 700,
   },
+
   rowsSelect: {
     padding: "6px 14px",
     borderRadius: 6,

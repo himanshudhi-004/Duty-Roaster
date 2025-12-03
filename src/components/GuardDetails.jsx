@@ -296,7 +296,6 @@
 //   rowsSelect: { padding: "6px 14px", borderRadius: 6, border: "1px solid #1967d2" },
 // };
 
-
 import React, { useEffect, useState } from "react";
 import { getAllGuard, deleteGuard } from "../api/vipform";
 import { useGuardStore } from "../context/GuardContext";
@@ -332,9 +331,9 @@ export default function GuardDetails() {
   }, [refreshTrigger]);
 
   /* DELETE */
-  const handleDelete = async (id) => {
+  const handleDelete = async (g) => {
     try {
-      await deleteGuard(id);
+      await deleteGuard(g._id || g.id);
       const updated = await getAllGuard();
       setGuardList(Array.isArray(updated) ? updated : []);
       toast.success("Guard deleted successfully!");
@@ -360,9 +359,8 @@ export default function GuardDetails() {
     return rankMatch && statusMatch && searchMatch;
   });
 
-  /* PAGINATION LOGIC */
+  /* PAGINATION */
   const totalPages = Math.ceil(filteredGuards.length / rowsPerPage);
-
   const currentData = filteredGuards.slice(
     (currentPage - 1) * rowsPerPage,
     currentPage * rowsPerPage
@@ -372,16 +370,9 @@ export default function GuardDetails() {
     if (page >= 1 && page <= totalPages) setCurrentPage(page);
   };
 
-  /* SHIFT PAGINATION: ONLY 2 NUMBERS */
   const pageWindow = 2;
-
-  const startPage = Math.max(
-    1,
-    currentPage - Math.floor(pageWindow / 2)
-  );
-
+  const startPage = Math.max(1, currentPage - Math.floor(pageWindow / 2));
   const endPage = Math.min(totalPages, startPage + pageWindow - 1);
-
   const visiblePages = Array.from(
     { length: endPage - startPage + 1 },
     (_, i) => startPage + i
@@ -448,119 +439,136 @@ export default function GuardDetails() {
         </div>
       </div>
 
-      {/* TABLE */}
-      <div style={styles.tableCard}>
-        {currentData.length === 0 ? (
-          <div style={styles.noData}>No Guards Found</div>
-        ) : (
-          <table style={styles.table}>
-            <thead>
-              <tr>
-                <th style={styles.th}>#</th>
-                <th style={styles.th}>Name</th>
-                <th style={styles.th}>Email</th>
-                <th style={styles.th}>Rank</th>
-                <th style={styles.th}>Experience</th>
-                <th style={styles.th}>Contact</th>
-                <th style={styles.th}>Status</th>
-                <th style={styles.th}>Actions</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {currentData.map((g, i) => (
-                <tr key={i} style={styles.row}>
-                  <td style={styles.td}>
-                    {i + 1 + (currentPage - 1) * rowsPerPage}
-                  </td>
-                  <td style={styles.td}>{g.name}</td>
-                  <td style={styles.td}>{g.email}</td>
-                  <td style={styles.td}>
-                    <span style={styles.rankBadge}>{g.rank}</span>
-                  </td>
-                  <td style={styles.td}>{g.experience}</td>
-                  <td style={styles.td}>{g.contactno}</td>
-                  <td style={styles.td}>
-                    <span
-                      style={
-                        g.status === "Active"
-                          ? styles.statusActive
-                          : styles.statusInactive
-                      }
-                    >
-                      {g.status}
-                    </span>
-                  </td>
-                  <td style={styles.actionCol}>
-                    <button
-                      style={styles.editBtn}
-                      onClick={() => handleEdit(g)}
-                    >
-                      <i className="fa fa-edit"></i>
-                    </button>
-                  </td>
+      {/* ✅ RESPONSIVE TABLE WRAPPER */}
+      <div style={styles.tableWrapper}>
+        <div style={styles.tableCard}>
+          {currentData.length === 0 ? (
+            <div style={styles.noData}>No Guards Found</div>
+          ) : (
+            <table style={styles.table}>
+              <thead>
+                <tr>
+                  <th style={styles.th}>#</th>
+                  <th style={styles.th}>Name</th>
+                  <th style={styles.th}>Email</th>
+                  <th style={styles.th}>Rank</th>
+                  <th style={styles.th}>Experience</th>
+                  <th style={styles.th}>Contact</th>
+                  <th style={styles.th}>Status</th>
+                  <th style={styles.th}>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+              </thead>
 
-        {/* PAGINATION */}
-        {totalPages > 1 && (
-          <div style={styles.paginationContainer}>
-            <button
-              disabled={currentPage === 1}
-              style={styles.pageBtn}
-              onClick={() => goToPage(currentPage - 1)}
-            >
-              Prev
-            </button>
+              <tbody>
+                {currentData.map((g, i) => (
+                  <tr key={i} style={styles.row}>
+                    <td style={styles.td}>
+                      {i + 1 + (currentPage - 1) * rowsPerPage}
+                    </td>
+                    <td style={styles.td}>{g.name}</td>
+                    <td style={styles.td}>{g.email}</td>
+                    <td style={styles.td}>
+                      <span style={styles.rankBadge}>{g.rank}</span>
+                    </td>
+                    <td style={styles.td}>{g.experience}</td>
+                    <td style={styles.td}>{g.contactno}</td>
+                    <td style={styles.td}>
+                      <span
+                        style={
+                          g.status === "Active"
+                            ? styles.statusActive
+                            : styles.statusInactive
+                        }
+                      >
+                        {g.status}
+                      </span>
+                    </td>
+                    <td style={styles.actionCol}>
+                      <button
+                        style={styles.editBtn}
+                        onClick={() => handleEdit(g)}
+                      >
+                        <i className="fa fa-edit"></i>
+                      </button>
 
-            {visiblePages.map((page) => (
+                      <button
+                        style={styles.deleteBtn}
+                        onClick={() => handleDelete(g)}
+                      >
+                        <i className="fa fa-trash"></i>
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+
+          {/* PAGINATION */}
+          {totalPages > 1 && (
+            <div style={styles.paginationContainer}>
               <button
-                key={page}
-                style={{
-                  ...styles.pageBtn,
-                  ...(currentPage === page ? styles.activePage : {}),
-                }}
-                onClick={() => goToPage(page)}
+                disabled={currentPage === 1}
+                style={styles.pageBtn}
+                onClick={() => goToPage(currentPage - 1)}
               >
-                {page}
+                Prev
               </button>
-            ))}
 
-            <button
-              disabled={currentPage === totalPages}
-              style={styles.pageBtn}
-              onClick={() => goToPage(currentPage + 1)}
-            >
-              Next
-            </button>
+              {visiblePages.map((page) => (
+                <button
+                  key={page}
+                  style={{
+                    ...styles.pageBtn,
+                    ...(currentPage === page ? styles.activePage : {}),
+                  }}
+                  onClick={() => goToPage(page)}
+                >
+                  {page}
+                </button>
+              ))}
 
-            <select
-              value={rowsPerPage}
-              style={styles.rowsSelect}
-              onChange={(e) => {
-                setRowsPerPage(Number(e.target.value));
-                setCurrentPage(1);
-              }}
-            >
-              <option value={30}>30 / Page</option>
-              <option value={20}>20 / Page</option>
-              <option value={10}>10 / Page</option>
-            </select>
-          </div>
-        )}
+              <button
+                disabled={currentPage === totalPages}
+                style={styles.pageBtn}
+                onClick={() => goToPage(currentPage + 1)}
+              >
+                Next
+              </button>
+
+              <select
+                value={rowsPerPage}
+                style={styles.rowsSelect}
+                onChange={(e) => {
+                  setRowsPerPage(Number(e.target.value));
+                  setCurrentPage(1);
+                }}
+              >
+                <option value={30}>30 / Page</option>
+                <option value={20}>20 / Page</option>
+                <option value={10}>10 / Page</option>
+              </select>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
 }
 
-/* ---------------- STYLES ---------------- */
+/* ✅ RESPONSIVE STYLES ONLY (DATA UNTOUCHED) */
 
 const styles = {
   page: { width: "100%", padding: "0px", margin: 0, background: "#fff" },
-  headerRow: { display: "flex", justifyContent: "space-between", padding: "10px 20px" },
+
+  headerRow: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: 10,
+    justifyContent: "space-between",
+    padding: "10px 20px",
+  },
+
   title: { fontSize: 28, fontWeight: 800, color: "#1967d2" },
 
   totalBox: {
@@ -571,17 +579,26 @@ const styles = {
     padding: "12px 18px",
     borderRadius: 12,
   },
+
   totalNumber: { fontSize: 26, fontWeight: 800, color: "#1967d2" },
   totalLabel: { fontSize: 15, fontWeight: 600, color: "#1967d2" },
 
-  filterRow: { display: "flex", gap: 20, padding: "0 20px", marginBottom: 20 },
+  filterRow: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: 20,
+    padding: "0 20px",
+    marginBottom: 20,
+  },
+
   filterCard: {
-    flex: 1,
+    flex: "1 1 250px",
     background: "#fff",
     padding: 15,
     borderRadius: 12,
     boxShadow: "0 4px 15px rgba(0,0,0,0.08)",
   },
+
   filterLabel: { fontSize: 15, fontWeight: 600, marginBottom: 6 },
   select: {
     width: "100%",
@@ -590,30 +607,62 @@ const styles = {
     border: "1.5px solid #1a73e8",
   },
 
-  tableCard: {
+  /* ✅ KEY RESPONSIVE FIX */
+  tableWrapper: {
     width: "100%",
+    overflowX: "auto",
+  },
+
+  tableCard: {
+    minWidth: 900,
     background: "#fff",
     padding: "10px 20px",
     borderRadius: 12,
     boxShadow: "0 6px 25px rgba(0,0,0,0.1)",
   },
+
   table: { width: "100%", borderCollapse: "collapse" },
-  th: { background: "#f4f4f6", padding: "14px 10px", textAlign: "left", fontWeight: 700 },
-  td: { padding: "12px 10px", borderBottom: "1px solid #eee" },
+
+  th: {
+    background: "#f4f4f6",
+    padding: "12px 8px",
+    textAlign: "left",
+    fontWeight: 700,
+    whiteSpace: "nowrap",
+  },
+
+  td: {
+    padding: "10px 8px",
+    borderBottom: "1px solid #eee",
+    whiteSpace: "nowrap",
+  },
+
   row: { height: 50 },
 
   rankBadge: {
     background: "#d7ecff",
-    padding: "6px 12px",
+    padding: "5px 10px",
     borderRadius: 8,
     color: "#005bb7",
     fontWeight: 600,
   },
-  actionCol: { display: "flex", gap: 10 },
+
+  actionCol: {
+    display: "flex",
+    gap: 8,
+  },
 
   editBtn: {
     background: "#28a745",
-    padding: "7px 12px",
+    padding: "6px 10px",
+    borderRadius: 6,
+    color: "#fff",
+    border: 0,
+  },
+
+  deleteBtn: {
+    background: "#fc4f30ff",
+    padding: "6px 10px",
     borderRadius: 6,
     color: "#fff",
     border: 0,
@@ -621,22 +670,35 @@ const styles = {
 
   statusActive: {
     background: "#e6ffe6",
-    padding: "5px 12px",
+    padding: "5px 10px",
     borderRadius: 20,
     color: "#2e7d32",
     fontWeight: 600,
   },
+
   statusInactive: {
     background: "#ffe6e6",
-    padding: "5px 12px",
+    padding: "5px 10px",
     borderRadius: 20,
     color: "#d32f2f",
     fontWeight: 600,
   },
 
-  noData: { textAlign: "center", padding: 40, fontSize: 18, color: "#888" },
+  noData: {
+    textAlign: "center",
+    padding: 40,
+    fontSize: 18,
+    color: "#888",
+  },
 
-  paginationContainer: { display: "flex", justifyContent: "center", gap: 10, padding: 15 },
+  paginationContainer: {
+    display: "flex",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    gap: 10,
+    padding: 15,
+  },
+
   pageBtn: {
     padding: "6px 14px",
     borderRadius: 6,
@@ -644,7 +706,9 @@ const styles = {
     background: "white",
     cursor: "pointer",
   },
+
   activePage: { background: "#1967d2", color: "white", fontWeight: 700 },
+
   rowsSelect: {
     padding: "6px 14px",
     borderRadius: 6,

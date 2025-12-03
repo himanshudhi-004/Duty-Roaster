@@ -205,8 +205,9 @@ export const updateVip = async (id, vipformData) => {
 
 // Delete VIP
 export const deleteVip = async (id) => {
+  
   try {
-    const response = await api.delete(`/api/categories/${id}`);
+    const response = await api.delete(`/api/categories/${id.id}`);
     return response.data;
   } catch (error) {
     console.error("Error deleting VIP:", error.message);
@@ -258,7 +259,7 @@ export const updateGuard = async (id, guardformData) => {
 // Delete guard
 export const deleteGuard = async (id) => {
   try {
-    const response = await api.delete(`/api/officer/${id}`);
+    const response = await api.delete(`/api/officer/${id.id}`);
     return response.data;
   } catch (error) {
     console.error("Error deleting Guard:", error.message);

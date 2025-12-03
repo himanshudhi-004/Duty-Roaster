@@ -93,8 +93,8 @@ export default function UserForm() {
 
           <form className="user-form" onSubmit={handle_us_Submit}>
 
-            <FormInput label="User ID" name="id" type="text"
-              value={userformData.id} onChange={handle_us_Change}   required/>
+            {/* <FormInput label="User ID" name="id" type="text"
+              value={userformData.id} onChange={handle_us_Change}   required/> */}
 
             <FormInput label="Full Name" name="name" type='text'
               value={userformData.name} onChange={handle_us_Change} required />

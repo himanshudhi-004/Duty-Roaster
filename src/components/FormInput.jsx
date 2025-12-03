@@ -10,7 +10,8 @@ export default function FormInput({ label, name, value, onChange, type = "text" 
         name={name}
         value={value}
         onChange={onChange}
-        requiredstyle={{
+        required
+        style={{
           width: "100%",
           padding: "10px",
           borderRadius: "5px",

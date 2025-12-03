@@ -22,12 +22,12 @@ export default function Navbar() {
 
   const handleLogout = () => {
     logoutUser();
-     localStorage.clear();
+    localStorage.clear();
     sessionStorage.clear();
     navigate("/login");
   };
 
-  /*  RESPONSIVE WIDTH + ORIENTATION */
+  /* RESPONSIVE WIDTH */
   useEffect(() => {
     const handleResize = () => {
       const isMobile = window.innerWidth <= 851;
@@ -39,7 +39,7 @@ export default function Navbar() {
       }
     };
 
-    handleResize(); // initial check
+    handleResize();
     window.addEventListener("resize", handleResize);
     window.addEventListener("orientationchange", handleResize);
 
@@ -49,13 +49,13 @@ export default function Navbar() {
     };
   }, []);
 
-  /*  CLOSE DROPDOWNS ON ROUTE CHANGE */
+  /* CLOSE ON ROUTE CHANGE */
   useEffect(() => {
     setLeftMenuOpen(false);
     setUserDropOpen(false);
   }, [location.pathname]);
 
-  /*  OUTSIDE CLICK CLOSE */
+  /* OUTSIDE CLICK */
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (leftMenuRef.current && !leftMenuRef.current.contains(e.target)) {
@@ -75,12 +75,11 @@ export default function Navbar() {
     };
   }, []);
 
-  /*  AUTO HIDE ON DESKTOP */
   if (!showNavbar) return null;
 
   return (
     <nav style={styles.navbar}>
-      {/*  LEFT SIDE */}
+      {/* LEFT SIDE */}
       <div style={styles.leftBox} ref={leftMenuRef}>
         <button
           style={styles.dashBtn}
@@ -105,12 +104,11 @@ export default function Navbar() {
             <NavLink to="/vgmang" style={styles.menuItem}>VIP–Guard Management</NavLink>
             <NavLink to="/dutyhistory" style={styles.menuItem}>Guard-duty-history</NavLink>
             <NavLink to="/incidents" style={styles.menuItem}>Incidents</NavLink>
-            {/* <NavLink to="/markduty" style={styles.menuItem}>Duty Management</NavLink> */}
           </div>
         )}
       </div>
 
-      {/*  RIGHT SIDE */}
+      {/* RIGHT SIDE */}
       <div style={styles.userDropdownBox} ref={userRef}>
         <button
           style={styles.profileIconBtn}
@@ -156,9 +154,7 @@ export default function Navbar() {
   );
 }
 
-/* ===============================
-    PERFECT RESPONSIVE STYLES
-================================ */
+/* ✅ RESPONSIVE STYLES ONLY */
 
 const styles = {
   navbar: {
@@ -180,6 +176,7 @@ const styles = {
     gap: 10,
     position: "relative",
     maxWidth: "70%",
+    flexWrap: "nowrap",
   },
 
   dashBtn: {
@@ -196,7 +193,7 @@ const styles = {
   },
 
   brand: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: "700",
     color: "#4e54c8",
     whiteSpace: "nowrap",
@@ -227,6 +224,7 @@ const styles = {
 
   userDropdownBox: {
     position: "relative",
+    flexShrink: 0,
   },
 
   profileIconBtn: {

@@ -76,12 +76,14 @@ export const GuardProvider = ({ children }) => {
 
       const decoded = jwtDecode(token);
       const username = decoded.username || decoded.sub || decoded.email;
-
+      
       const res = await axios.get(`${BASE_URL}/api/officer/profile`, {
+
         params: { username },
         headers: { Authorization: `Bearer ${token}` },
       });
-
+      console.log("Fetched Guard Profile:", await res.data);
+      
       const profile = Array.isArray(res.data) ? res.data[0] : res.data;
 
       setSelectedGuard(profile);
