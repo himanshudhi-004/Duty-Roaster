@@ -97,7 +97,7 @@ export default function VipEditForm({ vipData, onBack }) {
       />
 
       {/*  STATUS FIXED */}
-      <div className="form-group">
+      {/* <div className="form-group">
         <label>Vip Status</label>
         <select
           name="status"
@@ -110,7 +110,7 @@ export default function VipEditForm({ vipData, onBack }) {
           <option value="Active">Active</option>
           <option value="Inactive">Inactive</option>
         </select>
-      </div>
+      </div> */}
 
       <SubmitButton label="Update" />
       <button

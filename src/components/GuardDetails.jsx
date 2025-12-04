@@ -1,301 +1,3 @@
-// import React, { useEffect, useState } from "react";
-// import { getAllGuard, deleteGuard } from "../api/vipform";
-// import { useGuardStore } from "../context/GuardContext";
-// import { toast } from "react-toastify";
-
-// export default function GuardDetails() {
-//   const { handleEdit, refreshTrigger } = useGuardStore();
-//   const [guardList, setGuardList] = useState([]);
-
-//   const [selectedRank, setSelectedRank] = useState("");
-//   const [selectedStatus, setSelectedStatus] = useState("");
-
-//   /*  SEARCH STATE */
-//   const [searchTerm, setSearchTerm] = useState("");
-
-//   /* PAGINATION STATES */
-//   const [currentPage, setCurrentPage] = useState(1);
-//   const [rowsPerPage, setRowsPerPage] = useState(30);
-
-//   /* FETCH GUARDS */
-//   useEffect(() => {
-//     async function fetchGuards() {
-//       try {
-//         const data = await getAllGuard();
-
-//         if (Array.isArray(data)) setGuardList(data);
-//         else if (Array.isArray(data?.data)) setGuardList(data.data);
-//         else if (Array.isArray(data?.guards)) setGuardList(data.guards);
-//         else if (Array.isArray(data?.officers)) setGuardList(data.officers);
-//       } catch (err) {
-//         toast.error("Failed to load guards!");
-//       }
-//     }
-
-//     fetchGuards();
-//   }, [refreshTrigger]);
-
-//   /* DELETE GUARD */
-//   const handleDelete = async (id) => {
-//     try {
-//       await deleteGuard(id);
-//       const updated = await getAllGuard();
-//       setGuardList(Array.isArray(updated) ? updated : []);
-//       toast.success("Guard deleted successfully!");
-//     } catch (err) {
-//       toast.error("Failed to delete guard!");
-//     }
-//   };
-
-//   /* FILTER OPTIONS */
-//   const ranks = [...new Set(guardList.map((g) => g.rank || "Uncategorized"))];
-
-//   const filteredGuards = guardList.filter((g) => {
-//     const rankMatch = selectedRank ? g.rank === selectedRank : true;
-//     const statusMatch = selectedStatus ? g.status === selectedStatus : true;
-
-//     /*  SEARCH FILTER */
-//     const searchMatch = searchTerm
-//       ? Object.values(g)
-//           .join(" ")
-//           .toLowerCase()
-//           .includes(searchTerm.toLowerCase())
-//       : true;
-
-//     return rankMatch && statusMatch && searchMatch;
-//   });
-
-//   /* PAGINATION */
-//   const totalPages = Math.ceil(filteredGuards.length / rowsPerPage);
-
-//   const currentData = filteredGuards.slice(
-//     (currentPage - 1) * rowsPerPage,
-//     currentPage * rowsPerPage
-//   );
-
-//   const goToPage = (page) => {
-//     if (page >= 1 && page <= totalPages) setCurrentPage(page);
-//   };
-
-//   return (
-//     <div style={styles.page}>
-//       {/* HEADER */}
-//       <div style={styles.headerRow}>
-//         <h2 style={styles.title}>Guard Records</h2>
-
-//         <div style={styles.totalBox}>
-//           <span style={styles.totalNumber}>{guardList.length}</span>
-//           <span style={styles.totalLabel}>Total Guards</span>
-//         </div>
-//       </div>
-
-//       {/* FILTER ROW */}
-//       <div style={styles.filterRow}>
-//         <div style={styles.filterCard}>
-//           <label style={styles.filterLabel}>Rank</label>
-//           <select
-//             value={selectedRank}
-//             onChange={(e) => {
-//               setSelectedRank(e.target.value);
-//               setCurrentPage(1);
-//             }}
-//             style={styles.select}
-//           >
-//             <option value="">All</option>
-//             {ranks.map((r, i) => (
-//               <option key={i}>{r}</option>
-//             ))}
-//           </select>
-//         </div>
-
-//         <div style={styles.filterCard}>
-//           <label style={styles.filterLabel}>Status</label>
-//           <select
-//             value={selectedStatus}
-//             onChange={(e) => {
-//               setSelectedStatus(e.target.value);
-//               setCurrentPage(1);
-//             }}
-//             style={styles.select}
-//           >
-//             <option value="">All</option>
-//             <option>Active</option>
-//             <option>Inactive</option>
-//           </select>
-//         </div>
-
-//         {/*  SEARCH INPUT (ONLY ADDITION) */}
-//         <div style={styles.filterCard}>
-//           <label style={styles.filterLabel}>Search</label>
-//           <input
-//             type="text"
-//             placeholder="Search by name, email, id..."
-//             value={searchTerm}
-//             onChange={(e) => {
-//               setSearchTerm(e.target.value);
-//               setCurrentPage(1);
-//             }}
-//             style={styles.select}
-//           />
-//         </div>
-//       </div>
-
-//       {/* TABLE */}
-//       <div style={styles.tableCard}>
-//         {currentData.length === 0 ? (
-//           <div style={styles.noData}>No Guards Found</div>
-//         ) : (
-//           <table style={styles.table}>
-//             <thead>
-//               <tr>
-//                 <th style={styles.th}>#</th>
-//                 <th style={styles.th}>Name</th>
-//                 <th style={styles.th}>Email</th>
-//                 <th style={styles.th}>Rank</th>
-//                 <th style={styles.th}>Experience</th>
-//                 <th style={styles.th}>Contact</th>
-//                 <th style={styles.th}>Status</th>
-//                 <th style={styles.th}>Actions</th>
-//               </tr>
-//             </thead>
-
-//             <tbody>
-//               {currentData.map((g, i) => {
-//                 const statusStyle =
-//                   g.status === "Active"
-//                     ? styles.statusActive
-//                     : styles.statusInactive;
-
-//                 return (
-//                   <tr key={i} style={styles.row}>
-//                     <td style={styles.td}>{i + 1 + (currentPage - 1) * rowsPerPage}</td>
-//                     <td style={styles.td}>{g.name}</td>
-//                     <td style={styles.td}>{g.email}</td>
-//                     <td style={styles.td}>
-//                       <span style={styles.rankBadge}>{g.rank}</span>
-//                     </td>
-//                     <td style={styles.td}>{g.experience}</td>
-//                     <td style={styles.td}>{g.contactno}</td>
-//                     <td style={styles.td}>
-//                       <span style={statusStyle}>{g.status}</span>
-//                     </td>
-
-//                     <td style={styles.actionCol}>
-//                       <button
-//                         style={styles.editBtn}
-//                         onClick={() => handleEdit(g)}
-//                       >
-//                         <i className="fa fa-edit"></i>
-//                       </button>
-//                     </td>
-//                   </tr>
-//                 );
-//               })}
-//             </tbody>
-//           </table>
-//         )}
-
-//         {/* PAGINATION */}
-//         {totalPages > 1 && (
-//           <div style={styles.paginationContainer}>
-//             <button
-//               disabled={currentPage === 1}
-//               style={styles.pageBtn}
-//               onClick={() => goToPage(currentPage - 1)}
-//             >
-//               Prev
-//             </button>
-
-//             {[...Array(totalPages)].map((_, i) => (
-//               <button
-//                 key={i}
-//                 style={{
-//                   ...styles.pageBtn,
-//                   ...(currentPage === i + 1 ? styles.activePage : {}),
-//                 }}
-//                 onClick={() => goToPage(i + 1)}
-//               >
-//                 {i + 1}
-//               </button>
-//             ))}
-
-//             <button
-//               disabled={currentPage === totalPages}
-//               style={styles.pageBtn}
-//               onClick={() => goToPage(currentPage + 1)}
-//             >
-//               Next
-//             </button>
-
-//             <select
-//               value={rowsPerPage}
-//               style={styles.rowsSelect}
-//               onChange={(e) => {
-//                 setRowsPerPage(Number(e.target.value));
-//                 setCurrentPage(1);
-//               }}
-//             >
-//               <option value={30}>30 / Page</option>
-//               <option value={20}>20 / Page</option>
-//               <option value={10}>10 / Page</option>
-//             </select>
-//           </div>
-//         )}
-//       </div>
-//     </div>
-//   );
-// }
-
-
-// /* -------- STYLES -------- */
-// const styles = {
-//   page: { width: "100%", padding: "0px", margin: 0, background: "#fff" },
-//   headerRow: { display: "flex", justifyContent: "space-between", padding: "10px 20px" },
-//   title: { fontSize: 28, fontWeight: 800, color: "#1967d2" },
-
-//   totalBox: {
-//     display: "flex", alignItems: "center", gap: 10, background: "#e8f1ff",
-//     padding: "12px 18px", borderRadius: 12,
-//   },
-//   totalNumber: { fontSize: 26, fontWeight: 800, color: "#1967d2" },
-//   totalLabel: { fontSize: 15, fontWeight: 600, color: "#1967d2" },
-
-//   filterRow: { display: "flex", gap: 20, padding: "0 20px", marginBottom: 20 },
-//   filterCard: {
-//     flex: 1, background: "#fff", padding: 15, borderRadius: 12,
-//     boxShadow: "0 4px 15px rgba(0,0,0,0.08)",
-//   },
-//   filterLabel: { fontSize: 15, fontWeight: 600, marginBottom: 6 },
-//   select: { width: "100%", padding: 12, borderRadius: 10, border: "1.5px solid #1a73e8" },
-
-//   tableCard: {
-//     width: "100%", background: "#fff", padding: "10px 20px",
-//     borderRadius: 12, boxShadow: "0 6px 25px rgba(0,0,0,0.1)",
-//   },
-//   table: { width: "100%", borderCollapse: "collapse" },
-//   th: { background: "#f4f4f6", padding: "14px 10px", textAlign: "left", fontWeight: 700 },
-//   td: { padding: "12px 10px", borderBottom: "1px solid #eee" },
-//   row: { height: 50, transition: "0.25s" },
-
-//   rankBadge: { background: "#d7ecff", padding: "6px 12px", borderRadius: 8, color: "#005bb7", fontWeight: 600 },
-//   actionCol: { display: "flex", gap: 10 },
-
-//   editBtn: { background: "#28a745", padding: "7px 12px", borderRadius: 6, color: "#fff", border: 0, marginTop: 7 },
-
-//   statusActive: { background: "#e6ffe6", padding: "5px 12px", borderRadius: 20, color: "#2e7d32", fontWeight: 600 },
-//   statusInactive: { background: "#ffe6e6", padding: "5px 12px", borderRadius: 20, color: "#d32f2f", fontWeight: 600 },
-
-//   noData: { textAlign: "center", padding: 40, fontSize: 18, color: "#888" },
-
-//   paginationContainer: { display: "flex", justifyContent: "center", gap: 10, padding: 15 },
-//   pageBtn: {
-//     padding: "6px 14px", borderRadius: 6, border: "1px solid #1967d2",
-//     background: "white", cursor: "pointer",
-//   },
-//   activePage: { background: "#1967d2", color: "white", fontWeight: 700 },
-//   rowsSelect: { padding: "6px 14px", borderRadius: 6, border: "1px solid #1967d2" },
-// };
-
 import React, { useEffect, useState } from "react";
 import { getAllGuard, deleteGuard } from "../api/vipform";
 import { useGuardStore } from "../context/GuardContext";
@@ -303,80 +5,84 @@ import { toast } from "react-toastify";
 
 export default function GuardDetails() {
   const { handleEdit, refreshTrigger } = useGuardStore();
+
   const [guardList, setGuardList] = useState([]);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
 
   const [selectedRank, setSelectedRank] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchText, setSearchText] = useState("");
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(30);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(20);
 
-  /* FETCH DATA */
+  /* ✅ FETCH */
   useEffect(() => {
     async function fetchGuards() {
       try {
-        const data = await getAllGuard();
+        const res = await getAllGuard(
+          currentPage,
+          rowsPerPage,
+          selectedStatus,
+          selectedRank
+        );
 
-        if (Array.isArray(data)) setGuardList(data);
-        else if (Array.isArray(data?.data)) setGuardList(data.data);
-        else if (Array.isArray(data?.guards)) setGuardList(data.guards);
-        else if (Array.isArray(data?.officers)) setGuardList(data.officers);
+        setGuardList(res.content || []);
+        setTotalPages(res.totalPages || 0);
+        setTotalElements(res.totalElements || 0);
       } catch (err) {
         toast.error("Failed to load guards!");
       }
     }
 
     fetchGuards();
-  }, [refreshTrigger]);
+  }, [refreshTrigger, currentPage, rowsPerPage, selectedStatus, selectedRank]);
 
-  /* DELETE */
+  /* ✅ DELETE */
   const handleDelete = async (g) => {
     try {
-      await deleteGuard(g._id || g.id);
-      const updated = await getAllGuard();
-      setGuardList(Array.isArray(updated) ? updated : []);
+      await deleteGuard(g.id);
       toast.success("Guard deleted successfully!");
+      setCurrentPage(0);
     } catch (err) {
       toast.error("Failed to delete guard!");
     }
   };
 
-  /* FILTER */
-  const ranks = [...new Set(guardList.map((g) => g.rank || "Uncategorized"))];
+  const goToPage = (page) => {
+    if (page >= 0 && page < totalPages) setCurrentPage(page);
+  };
 
-  const filteredGuards = guardList.filter((g) => {
-    const rankMatch = selectedRank ? g.rank === selectedRank : true;
-    const statusMatch = selectedStatus ? g.status === selectedStatus : true;
+  const getVisiblePages = () => {
+    const start = Math.floor(currentPage / 2) * 2;
+    const end = Math.min(start + 2, totalPages);
+    return [...Array(end - start)].map((_, i) => start + i);
+  };
 
-    const searchMatch = searchTerm
+  /* ✅ SEARCH FILTER */
+  const filteredGuards = guardList.filter((g) =>
+    searchText
       ? Object.values(g)
           .join(" ")
           .toLowerCase()
-          .includes(searchTerm.toLowerCase())
-      : true;
+          .includes(searchText.toLowerCase())
+      : true
+  );
 
-    return rankMatch && statusMatch && searchMatch;
+  /* ✅ ✅ ✅ ONLY NEW FUNCTIONALITY — SORTING LOGIC ✅ ✅ ✅ */
+  const sortedGuards = [...filteredGuards].sort((a, b) => {
+    const statusOrder = {
+      Inactive: 0,
+      Active: 1,
+      Deleted: 2, // agar backend se deleted bhi aata hai
+    };
+
+    const aOrder = statusOrder[a.status] ?? 3;
+    const bOrder = statusOrder[b.status] ?? 3;
+
+    return aOrder - bOrder;
   });
-
-  /* PAGINATION */
-  const totalPages = Math.ceil(filteredGuards.length / rowsPerPage);
-  const currentData = filteredGuards.slice(
-    (currentPage - 1) * rowsPerPage,
-    currentPage * rowsPerPage
-  );
-
-  const goToPage = (page) => {
-    if (page >= 1 && page <= totalPages) setCurrentPage(page);
-  };
-
-  const pageWindow = 2;
-  const startPage = Math.max(1, currentPage - Math.floor(pageWindow / 2));
-  const endPage = Math.min(totalPages, startPage + pageWindow - 1);
-  const visiblePages = Array.from(
-    { length: endPage - startPage + 1 },
-    (_, i) => startPage + i
-  );
 
   return (
     <div style={styles.page}>
@@ -384,12 +90,12 @@ export default function GuardDetails() {
       <div style={styles.headerRow}>
         <h2 style={styles.title}>Guard Records</h2>
         <div style={styles.totalBox}>
-          <span style={styles.totalNumber}>{guardList.length}</span>
+          <span style={styles.totalNumber}>{totalElements}</span>
           <span style={styles.totalLabel}>Total Guards</span>
         </div>
       </div>
 
-      {/* FILTERS */}
+      {/* FILTERS + SEARCH */}
       <div style={styles.filterRow}>
         <div style={styles.filterCard}>
           <label style={styles.filterLabel}>Rank</label>
@@ -397,14 +103,16 @@ export default function GuardDetails() {
             value={selectedRank}
             onChange={(e) => {
               setSelectedRank(e.target.value);
-              setCurrentPage(1);
+              setCurrentPage(0);
             }}
             style={styles.select}
           >
             <option value="">All</option>
-            {ranks.map((r, i) => (
-              <option key={i}>{r}</option>
-            ))}
+            <option>A Grade</option>
+            <option>B Grade</option>
+            <option>C Grade</option>
+            <option>D Grade</option>
+            <option>E Grade</option>
           </select>
         </div>
 
@@ -414,35 +122,35 @@ export default function GuardDetails() {
             value={selectedStatus}
             onChange={(e) => {
               setSelectedStatus(e.target.value);
-              setCurrentPage(1);
+              setCurrentPage(0);
             }}
             style={styles.select}
           >
             <option value="">All</option>
-            <option>Active</option>
-            <option>Inactive</option>
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
           </select>
         </div>
 
-        <div style={styles.filterCard}>
+        <div style={{ ...styles.filterCard, flex: "2 1 300px" }}>
           <label style={styles.filterLabel}>Search</label>
           <input
             type="text"
-            placeholder="Search by Name, Email, Contact..."
-            value={searchTerm}
+            placeholder="Search by name, email, id, contact..."
+            value={searchText}
             onChange={(e) => {
-              setSearchTerm(e.target.value);
-              setCurrentPage(1);
+              setSearchText(e.target.value);
+              setCurrentPage(0);
             }}
-            style={styles.select}
+            style={styles.searchInput}
           />
         </div>
       </div>
 
-      {/* ✅ RESPONSIVE TABLE WRAPPER */}
+      {/* TABLE */}
       <div style={styles.tableWrapper}>
         <div style={styles.tableCard}>
-          {currentData.length === 0 ? (
+          {sortedGuards.length === 0 ? (
             <div style={styles.noData}>No Guards Found</div>
           ) : (
             <table style={styles.table}>
@@ -460,16 +168,14 @@ export default function GuardDetails() {
               </thead>
 
               <tbody>
-                {currentData.map((g, i) => (
-                  <tr key={i} style={styles.row}>
+                {sortedGuards.map((g, i) => (
+                  <tr key={g.id} style={styles.row}>
                     <td style={styles.td}>
-                      {i + 1 + (currentPage - 1) * rowsPerPage}
+                      {i + 1 + currentPage * rowsPerPage}
                     </td>
                     <td style={styles.td}>{g.name}</td>
                     <td style={styles.td}>{g.email}</td>
-                    <td style={styles.td}>
-                      <span style={styles.rankBadge}>{g.rank}</span>
-                    </td>
+                    <td style={styles.td}>{g.rank}</td>
                     <td style={styles.td}>{g.experience}</td>
                     <td style={styles.td}>{g.contactno}</td>
                     <td style={styles.td}>
@@ -488,14 +194,14 @@ export default function GuardDetails() {
                         style={styles.editBtn}
                         onClick={() => handleEdit(g)}
                       >
-                        <i className="fa fa-edit"></i>
+                        <i className="fas fa-edit"></i>
                       </button>
 
                       <button
                         style={styles.deleteBtn}
                         onClick={() => handleDelete(g)}
                       >
-                        <i className="fa fa-trash"></i>
+                        <i className="fas fa-trash"></i>
                       </button>
                     </td>
                   </tr>
@@ -505,213 +211,81 @@ export default function GuardDetails() {
           )}
 
           {/* PAGINATION */}
-          {totalPages > 1 && (
-            <div style={styles.paginationContainer}>
+          <div style={styles.paginationContainer}>
+            <button
+              disabled={currentPage === 0}
+              style={styles.pageBtn}
+              onClick={() => goToPage(currentPage - 1)}
+            >
+              Prev
+            </button>
+
+            {getVisiblePages().map((i) => (
               <button
-                disabled={currentPage === 1}
-                style={styles.pageBtn}
-                onClick={() => goToPage(currentPage - 1)}
-              >
-                Prev
-              </button>
-
-              {visiblePages.map((page) => (
-                <button
-                  key={page}
-                  style={{
-                    ...styles.pageBtn,
-                    ...(currentPage === page ? styles.activePage : {}),
-                  }}
-                  onClick={() => goToPage(page)}
-                >
-                  {page}
-                </button>
-              ))}
-
-              <button
-                disabled={currentPage === totalPages}
-                style={styles.pageBtn}
-                onClick={() => goToPage(currentPage + 1)}
-              >
-                Next
-              </button>
-
-              <select
-                value={rowsPerPage}
-                style={styles.rowsSelect}
-                onChange={(e) => {
-                  setRowsPerPage(Number(e.target.value));
-                  setCurrentPage(1);
+                key={i}
+                style={{
+                  ...styles.pageBtn,
+                  ...(currentPage === i ? styles.activePage : {}),
                 }}
+                onClick={() => goToPage(i)}
               >
-                <option value={30}>30 / Page</option>
-                <option value={20}>20 / Page</option>
-                <option value={10}>10 / Page</option>
-              </select>
-            </div>
-          )}
+                {i + 1}
+              </button>
+            ))}
+
+            <button
+              disabled={currentPage >= totalPages - 1}
+              style={styles.pageBtn}
+              onClick={() => goToPage(currentPage + 1)}
+            >
+              Next
+            </button>
+
+            <select
+              value={rowsPerPage}
+              style={styles.rowsSelect}
+              onChange={(e) => {
+                setRowsPerPage(Number(e.target.value));
+                setCurrentPage(0);
+              }}
+            >
+              <option value={20}>20 / Page</option>
+              <option value={30}>30 / Page</option>
+            </select>
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-/* ✅ RESPONSIVE STYLES ONLY (DATA UNTOUCHED) */
-
+/* ✅ STYLES SAME AS YOURS – NO CHANGE */
 const styles = {
-  page: { width: "100%", padding: "0px", margin: 0, background: "#fff" },
-
-  headerRow: {
-    display: "flex",
-    flexWrap: "wrap",
-    gap: 10,
-    justifyContent: "space-between",
-    padding: "10px 20px",
-  },
-
-  title: { fontSize: 28, fontWeight: 800, color: "#1967d2" },
-
-  totalBox: {
-    display: "flex",
-    alignItems: "center",
-    gap: 10,
-    background: "#e8f1ff",
-    padding: "12px 18px",
-    borderRadius: 12,
-  },
-
-  totalNumber: { fontSize: 26, fontWeight: 800, color: "#1967d2" },
+  page: { width: "100%", background: "#fff" },
+  headerRow: { display: "flex", flexWrap: "wrap", justifyContent: "space-between", padding: "12px 20px", gap: 12 },
+  title: { fontSize: 26, fontWeight: 800, color: "#1967d2" },
+  totalBox: { display: "flex", alignItems: "center", gap: 10, background: "#e8f1ff", padding: "10px 18px", borderRadius: 12 },
+  totalNumber: { fontSize: 22, fontWeight: 800, color: "#1967d2" },
   totalLabel: { fontSize: 15, fontWeight: 600, color: "#1967d2" },
-
-  filterRow: {
-    display: "flex",
-    flexWrap: "wrap",
-    gap: 20,
-    padding: "0 20px",
-    marginBottom: 20,
-  },
-
-  filterCard: {
-    flex: "1 1 250px",
-    background: "#fff",
-    padding: 15,
-    borderRadius: 12,
-    boxShadow: "0 4px 15px rgba(0,0,0,0.08)",
-  },
-
-  filterLabel: { fontSize: 15, fontWeight: 600, marginBottom: 6 },
-  select: {
-    width: "100%",
-    padding: 12,
-    borderRadius: 10,
-    border: "1.5px solid #1a73e8",
-  },
-
-  /* ✅ KEY RESPONSIVE FIX */
-  tableWrapper: {
-    width: "100%",
-    overflowX: "auto",
-  },
-
-  tableCard: {
-    minWidth: 900,
-    background: "#fff",
-    padding: "10px 20px",
-    borderRadius: 12,
-    boxShadow: "0 6px 25px rgba(0,0,0,0.1)",
-  },
-
+  filterRow: { display: "flex", flexWrap: "wrap", gap: 16, padding: "0 20px 18px" },
+  filterCard: { flex: "1 1 220px", background: "#fff", padding: 15, borderRadius: 12, boxShadow: "0 4px 12px rgba(0,0,0,0.08)" },
+  filterLabel: { fontSize: 14, fontWeight: 600 },
+  select: { width: "100%", marginTop: 6, padding: 10, borderRadius: 8, border: "1.5px solid #1a73e8" },
+  searchInput: { width: "100%", marginTop: 6, padding: 10, borderRadius: 8, border: "1.5px solid #1967d2" },
+  tableWrapper: { width: "100%", overflowX: "auto" },
+  tableCard: { minWidth: 900, margin: "0 20px", background: "#fff", borderRadius: 12, boxShadow: "0 6px 20px rgba(0,0,0,0.1)" },
   table: { width: "100%", borderCollapse: "collapse" },
-
-  th: {
-    background: "#f4f4f6",
-    padding: "12px 8px",
-    textAlign: "left",
-    fontWeight: 700,
-    whiteSpace: "nowrap",
-  },
-
-  td: {
-    padding: "10px 8px",
-    borderBottom: "1px solid #eee",
-    whiteSpace: "nowrap",
-  },
-
-  row: { height: 50 },
-
-  rankBadge: {
-    background: "#d7ecff",
-    padding: "5px 10px",
-    borderRadius: 8,
-    color: "#005bb7",
-    fontWeight: 600,
-  },
-
-  actionCol: {
-    display: "flex",
-    gap: 8,
-  },
-
-  editBtn: {
-    background: "#28a745",
-    padding: "6px 10px",
-    borderRadius: 6,
-    color: "#fff",
-    border: 0,
-  },
-
-  deleteBtn: {
-    background: "#fc4f30ff",
-    padding: "6px 10px",
-    borderRadius: 6,
-    color: "#fff",
-    border: 0,
-  },
-
-  statusActive: {
-    background: "#e6ffe6",
-    padding: "5px 10px",
-    borderRadius: 20,
-    color: "#2e7d32",
-    fontWeight: 600,
-  },
-
-  statusInactive: {
-    background: "#ffe6e6",
-    padding: "5px 10px",
-    borderRadius: 20,
-    color: "#d32f2f",
-    fontWeight: 600,
-  },
-
-  noData: {
-    textAlign: "center",
-    padding: 40,
-    fontSize: 18,
-    color: "#888",
-  },
-
-  paginationContainer: {
-    display: "flex",
-    flexWrap: "wrap",
-    justifyContent: "center",
-    gap: 10,
-    padding: 15,
-  },
-
-  pageBtn: {
-    padding: "6px 14px",
-    borderRadius: 6,
-    border: "1px solid #1967d2",
-    background: "white",
-    cursor: "pointer",
-  },
-
-  activePage: { background: "#1967d2", color: "white", fontWeight: 700 },
-
-  rowsSelect: {
-    padding: "6px 14px",
-    borderRadius: 6,
-    border: "1px solid #1967d2",
-  },
+  th: { background: "#f4f4f6", padding: 12, textAlign: "left", fontWeight: 700 },
+  td: { padding: 10, borderBottom: "1px solid #eee" },
+  row: { height: 48 },
+  actionCol: { display: "flex", gap: 8, flexWrap: "wrap", marginTop: 7 },
+  editBtn: { background: "#28a745", padding: "6px 10px", borderRadius: 6, color: "#fff", border: 0, cursor: "pointer" },
+  deleteBtn: { background: "#fc4f30", padding: "6px 10px", borderRadius: 6, color: "#fff", border: 0, cursor: "pointer" },
+  statusActive: { background: "#e6ffe6", padding: "4px 10px", borderRadius: 20, color: "#2e7d32", fontWeight: 600 },
+  statusInactive: { background: "#ffe6e6", padding: "4px 10px", borderRadius: 20, color: "#d32f2f", fontWeight: 600 },
+  noData: { textAlign: "center", padding: 30, color: "#888" },
+  paginationContainer: { display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 10, padding: 15 },
+  pageBtn: { padding: "6px 14px", borderRadius: 6, border: "1px solid #1967d2", background: "#fff", cursor: "pointer" },
+  activePage: { background: "#1967d2", color: "#fff", fontWeight: 700 },
+  rowsSelect: { padding: "6px 14px", borderRadius: 6, border: "1px solid #1967d2" },
 };

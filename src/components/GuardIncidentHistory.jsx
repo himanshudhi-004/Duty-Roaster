@@ -207,7 +207,8 @@ export default function GuardIncidentHistory() {
                     <th style={thStyle}>Guard ID</th>
                     <th style={thStyle}>Status</th>
                     <th style={thStyle}>Message</th>
-                    <th style={thStyle}>Assigned At</th>
+                    <th style={thStyle}>Request Time</th>
+                    <th style={thStyle}>Response Time</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -240,7 +241,8 @@ export default function GuardIncidentHistory() {
                         </td>
 
                         <td style={tdStyle}>{item.message || "-"}</td>
-                        <td style={tdStyle}>{item.AssignetAt || "-"}</td>
+                        <td style={tdStyle}>{item.requestTime || "-"}</td>
+                        <td style={tdStyle}>{item.responseTime || "-"}</td>
                       </tr>
                     );
                   })}

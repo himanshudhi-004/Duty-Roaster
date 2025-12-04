@@ -90,7 +90,7 @@ export default function VIPForm() {
       setRefreshTrigger((prev) => !prev);
     } catch (err) {
       console.error("Form submission failed:", err);
-      alert("Error while saving data");
+      toast.error("Error while saving data");
     }
   };
 
@@ -243,7 +243,7 @@ export default function VIPForm() {
 const styles = {
   container: {
     width: "100%",
-    minHeight: "100vh",
+    minHeight: "94vh",
     maxWidth: "100%",
     display: "flex",
     overflow: "hidden",

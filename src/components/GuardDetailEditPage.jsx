@@ -107,7 +107,7 @@ export default function GuardEditForm({ guardData, onBack }) {
       />
 
       {/*  STATUS FIXED */}
-      <div className="form-group">
+      {/* <div className="form-group">
         <label>Guard Status</label>
         <select
           name="status"
@@ -120,7 +120,7 @@ export default function GuardEditForm({ guardData, onBack }) {
           <option value="Active">Active</option>
           <option value="Inactive">Inactive</option>
         </select>
-      </div>
+      </div> */}
 
       <SubmitButton label="Update" />
       <button

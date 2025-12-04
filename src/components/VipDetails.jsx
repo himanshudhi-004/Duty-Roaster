@@ -438,8 +438,9 @@ export default function VipDetails() {
 
   /* DELETE */
   const handleDelete = async (vip) => {
+    console.log(vip.id)
     try {
-      await deleteVip(vip.id || vip._id);
+      await deleteVip(vip.id );
       const updated = await getAllVip();
       setVipList(Array.isArray(updated) ? updated : []);
       toast.success("VIP Deleted Successfully!");
@@ -781,6 +782,7 @@ const styles = {
   actionCol: {
     display: "flex",
     gap: 8,
+    marginTop: 7,
   },
 
   editBtn: {

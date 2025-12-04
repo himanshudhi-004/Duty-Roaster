@@ -205,9 +205,9 @@ export const updateVip = async (id, vipformData) => {
 
 // Delete VIP
 export const deleteVip = async (id) => {
-  
+  console.log("asdf",id)
   try {
-    const response = await api.delete(`/api/categories/${id.id}`);
+    const response = await api.delete(`/api/categories/${id}`);
     return response.data;
   } catch (error) {
     console.error("Error deleting VIP:", error.message);
@@ -228,22 +228,50 @@ export const submit_gd_FormData = async (guardformData) => {
 };
 
 // Get all guards
-export const getAllGuard = async () => {
+export const getAllGuard = async (
+  page = 0,
+  size = 20,
+  status = "",
+  rank = ""
+) => {
   try {
-    const response = await api.get("/api/officer");
-    const res = response.data;
+    const response = await api.get("/api/officer", {
+      params: {
+        page,
+        size,
+        status: status || undefined,
+        rank: rank || undefined,
+      },
+    });
 
-    if (Array.isArray(res)) return res;
-    if (Array.isArray(res?.data)) return res.data;
-    if (Array.isArray(res?.guards)) return res.guards;
-    if (Array.isArray(res?.officers)) return res.officers;
-
-    return [];
+    return response.data; // ✅ Page Object
   } catch (error) {
     console.error("Error fetching Guard data:", error.message);
-    return [];
+    return {
+      content: [],
+      totalPages: 0,
+      totalElements: 0,
+    };
   }
 };
+
+
+// export const getAllGuard = async () => {
+//   try {
+//     const response = await api.get("/api/officer");
+//     const res = response.data;
+
+//     if (Array.isArray(res)) return res;
+//     if (Array.isArray(res?.data)) return res.data;
+//     if (Array.isArray(res?.guards)) return res.guards;
+//     if (Array.isArray(res?.officers)) return res.officers;
+
+//     return [];
+//   } catch (error) {
+//     console.error("Error fetching Guard data:", error.message);
+//     return [];
+//   }
+// };
 
 // Update guard
 export const updateGuard = async (id, guardformData) => {
@@ -259,7 +287,7 @@ export const updateGuard = async (id, guardformData) => {
 // Delete guard
 export const deleteGuard = async (id) => {
   try {
-    const response = await api.delete(`/api/officer/${id.id}`);
+    const response = await api.delete(`/api/officer/${id}`);
     return response.data;
   } catch (error) {
     console.error("Error deleting Guard:", error.message);
