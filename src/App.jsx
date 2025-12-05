@@ -13,6 +13,7 @@ import AdminLogin from "./components/AdminLogin";
 import Logout from "./components/Logout";
 import PrivateRoute from "./components/PrivateRoute";
 
+
 /* ---------------- ADMIN ---------------- */
 import AdminForm from "./components/AdminForm";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -74,6 +75,9 @@ import GuardIncidentHistory from "./components/GuardIncidentHistory";
 import VipDuty from "./components/VipDuty";
 import MarkDuty from "./components/MarkDuty";
 import ManagerSettings from "./components/ManagerSettings";
+import UpdationHistory from "./components/UpdationHistory";
+
+import Notification from "./components/Notifications";
 
 function App() {
 
@@ -273,6 +277,28 @@ function App() {
                       </PrivateRoute>
                     }
                   />
+                  <Route
+                    path="/updatehistory"
+                    element={
+                      <PrivateRoute roles={["admin", "user"]}>
+                        <AdminUserWrapper>
+                          <UpdationHistory />
+                        </AdminUserWrapper>
+                      </PrivateRoute>
+                    }
+                  />
+                  
+                  {/* <Route
+                    path="/notify"
+                    element={
+                      <PrivateRoute roles={["admin", "user"]}>
+                        <AdminUserWrapper>
+                          <Notifications />
+                        </AdminUserWrapper>
+                      </PrivateRoute>
+                    }
+                  /> */}
+                  
 
                   {/* ---------------- USER ---------------- */}
                   <Route

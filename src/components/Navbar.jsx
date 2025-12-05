@@ -97,12 +97,14 @@ export default function Navbar() {
         {leftMenuOpen && (
           <div style={styles.leftDropdown}>
             <NavLink to="/admindashboard" style={styles.menuItem}>Dashboard</NavLink>
+            <NavLink to="/notify" style={styles.menuItem}>Notifications</NavLink>
             <NavLink to="/vipform" style={styles.menuItem}>VIP Form</NavLink>
             <NavLink to="/guardform" style={styles.menuItem}>Guard Form</NavLink>
             <NavLink to="/viplist" style={styles.menuItem}>VIP Table</NavLink>
             <NavLink to="/guardlist" style={styles.menuItem}>Guard Table</NavLink>
             <NavLink to="/vgmang" style={styles.menuItem}>VIP–Guard Management</NavLink>
             <NavLink to="/dutyhistory" style={styles.menuItem}>Guard-duty-history</NavLink>
+            <NavLink to="/updatehistory" style={styles.menuItem}>Updation history</NavLink>
             <NavLink to="/incidents" style={styles.menuItem}>Incidents</NavLink>
           </div>
         )}

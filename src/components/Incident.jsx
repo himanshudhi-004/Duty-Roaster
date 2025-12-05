@@ -58,18 +58,18 @@
 //       const Accidentreq = {
 //         id: item.id,
 //         req: finalStatus,
-      
+
 //       };
 
 //       // await axios.post(`${BASE_URL}/api/duty/accidentupdate`, payload, {
 //       //   headers: {
 //       //     Authorization: `Bearer ${token}`,
-         
+
 //       //   },
 //       // });
-      
+
 //        const res = await axios.post(`${BASE_URL}/api/duty/accidentupdate`, Accidentreq, {
-        
+
 //         headers: { Authorization: `Bearer ${token}` },
 //       });
 
@@ -670,8 +670,8 @@ export default function Incident() {
             ? "admin_accepted"
             : "admin_rejected"
           : action === "accept"
-          ? "manager_accepted"
-          : "manager_rejected";
+            ? "manager_accepted"
+            : "manager_rejected";
 
       const Accidentreq = {
         id: item.id,
@@ -700,14 +700,14 @@ export default function Incident() {
 
     const searchMatch = text
       ? [
-          item.guardData?.id,
-          item.guardData?.name,
-          item.req,
-          item.message,
-          item.status,
-        ].some((field) =>
-          String(field || "").toLowerCase().includes(text)
-        )
+        item.guardData?.id,
+        item.guardData?.name,
+        item.req,
+        item.message,
+        item.status,
+      ].some((field) =>
+        String(field || "").toLowerCase().includes(text)
+      )
       : true;
 
     const statusMatch = selectedStatus
@@ -764,6 +764,8 @@ export default function Incident() {
                   <th style={styles.th}>Arise Type</th>
                   <th style={styles.th}>Message</th>
                   <th style={styles.th}>Status</th>
+                  <th style={styles.th}>Request Time</th>
+                  <th style={styles.th}>Response Time</th>
                   {(role === "admin" || role === "user") && (
                     <th style={styles.th}>Action</th>
                   )}
@@ -776,8 +778,8 @@ export default function Incident() {
                     item.status?.includes("accepted")
                       ? styles.statusActive
                       : item.status?.includes("rejected")
-                      ? styles.statusInactive
-                      : styles.statusOther;
+                        ? styles.statusInactive
+                        : styles.statusOther;
 
                   return (
                     <tr key={item.id} style={styles.row}>
@@ -795,10 +797,23 @@ export default function Incident() {
                         </span>
                       </td>
 
+                      <td style={styles.td}>
+                        {item.requestTime
+                          ? new Date(item.requestTime.split(".")[0]).toLocaleString("en-IN")
+                          : "N/A"}
+                      </td>
+
+                      <td style={styles.td}>
+                        {item.responseTime
+                          ? new Date(item.responseTime.split(".")[0]).toLocaleString("en-IN")
+                          : "N/A"}
+                      </td>
+
+
                       {(role === "admin" || role === "user") && (
                         <td style={styles.td}>
                           {item.status?.includes("accepted") ||
-                          item.status?.includes("rejected") ? (
+                            item.status?.includes("rejected") ? (
                             <span style={{ color: "#888" }}>Completed</span>
                           ) : (
                             <div

@@ -416,6 +416,10 @@ export default function UserNavbar() {
             <NavLink to="/userdashboard" style={styles.menuItem}>
               Dashboard
             </NavLink>
+            
+            <NavLink to="/notify" style={styles.menuItem}>
+              Notifications
+            </NavLink>
 
             <NavLink to="/viplist" style={styles.menuItem}>
               VIP Table
@@ -433,6 +437,10 @@ export default function UserNavbar() {
               Guard Duty History
             </NavLink>
 
+            <NavLink to="/updatehistory" style={styles.menuItem}>
+              Updation History
+            </NavLink>
+            
             <NavLink to="/userprofile" style={styles.menuItem}>
               My Profile
             </NavLink>

@@ -463,7 +463,7 @@ export default function VipDetails() {
 
     const text = searchText.trim().toLowerCase();
     const searchMatch = text
-      ? [v.name, v.email, v.contactno, v.designation, v.status].some(
+      ? [v.id, v.name, v.email, v.contactno, v.designation, v.status].some(
           (field) => String(field || "").toLowerCase().includes(text)
         )
       : true;
@@ -569,6 +569,7 @@ export default function VipDetails() {
                 <tr>
                   <th style={styles.th}>#</th>
                   <th style={styles.th}>Name</th>
+                  <th style={styles.th}>Vip Id</th>
                   <th style={styles.th}>Email</th>
                   <th style={styles.th}>Designation</th>
                   <th style={styles.th}>Contact</th>
@@ -590,6 +591,7 @@ export default function VipDetails() {
                         {index + 1 + (currentPage - 1) * rowsPerPage}
                       </td>
                       <td style={styles.td}>{vip.name}</td>
+                      <td style={styles.td}>{vip.id}</td>
                       <td style={styles.td}>{vip.email}</td>
                       <td style={styles.td}>
                         <span style={styles.badge}>

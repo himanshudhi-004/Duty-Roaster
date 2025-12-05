@@ -1,13 +1,13 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import {useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { logoutUser } from "../api/auth";
 
 export default function Sidebar() {
   const navigate = useNavigate();
   //  Handle Logout
   const handleLogout = () => {
-   localStorage.clear();
+    localStorage.clear();
     sessionStorage.clear();
     navigate("/login");
   };
@@ -40,28 +40,18 @@ export default function Sidebar() {
             </NavLink>
           </li>
 
-          {/* <li style={styles.menuItem}>
-            <NavLink
-              to="/vipdashboard"
-              style={styles.menuLink}
-              className="menu-link"
-            >
-              <i className="fas fa-home" style={styles.icon}></i>
-              <span>Vip Dashboard</span>
-            </NavLink>
-          </li>
+          <li style={styles.sectionTitle}>Notifications</li>
 
           <li style={styles.menuItem}>
             <NavLink
-              to="/guarddashboard"
+              to="/notify"
               style={styles.menuLink}
               className="menu-link"
             >
-              <i className="fas fa-home" style={styles.icon}></i>
-              <span>Guard Dashboard</span>
+              <i className="fas fa-bell" style={styles.icon}></i>
+              <span>Notifications</span>
             </NavLink>
-          </li>  */}
-
+          </li>
           {/* Section */}
           <li style={styles.sectionTitle}>Manage Forms</li>
 
@@ -124,7 +114,7 @@ export default function Sidebar() {
               <span>Guard Table</span>
             </NavLink>
           </li>
-
+          <li style={styles.sectionTitle}>Others</li>
           {/* Management */}
           <li style={styles.menuItem}>
             <NavLink
@@ -148,6 +138,16 @@ export default function Sidebar() {
           </li> */}
           <li style={styles.menuItem}>
             <NavLink
+              to="/updatehistory"
+              style={styles.menuLink}
+              className="menu-link"
+            >
+              <i className="fas fa-history" style={styles.icon}></i>
+              <span>Updation History</span>
+            </NavLink>
+          </li>
+          <li style={styles.menuItem}>
+            <NavLink
               to="/dutyhistory"
               style={styles.menuLink}
               className="menu-link"
@@ -166,19 +166,8 @@ export default function Sidebar() {
               <span>Incidents</span>
             </NavLink>
           </li>
-          {/* <li style={styles.sectionTitle}>Notifications</li>
 
-          <li style={styles.menuItem}>
-            <NavLink
-              to="/viplist"
-              style={styles.menuLink}
-              className="menu-link"
-            >
-              <i className="fas fa-bell" style={styles.icon}></i>
-              <span>VIP Notifications</span>
-            </NavLink>
-          </li>
-
+          {/*
           <li style={styles.menuItem}>
             <NavLink
               to="/guardlist"
@@ -210,11 +199,11 @@ export default function Sidebar() {
             </NavLink>
           </li>
           <li>
-            <NavLink to="/login" className="menu-link"  style={styles.menuLink} onClick={handleLogout}>
-             <i className="fas fa-sign-out-alt" style={styles.icon}></i>
+            <NavLink to="/login" className="menu-link" style={styles.menuLink} onClick={handleLogout}>
+              <i className="fas fa-sign-out-alt" style={styles.icon}></i>
               <span>Logout</span>
             </NavLink>
-            
+
           </li>
         </ul>
       </div>

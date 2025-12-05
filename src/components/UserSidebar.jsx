@@ -7,7 +7,7 @@ export default function UserSidebar() {
   const navigate = useNavigate();
   //  Handle Logout
   const handleLogout = () => {
-     localStorage.clear();
+    localStorage.clear();
     sessionStorage.clear();
     navigate("/login");
   };
@@ -39,6 +39,18 @@ export default function UserSidebar() {
               <span>Dashboard</span>
             </NavLink>
           </li>
+          <li style={styles.sectionTitle}>Notifications</li>
+
+          <li style={styles.menuItem}>
+            <NavLink
+              to="/notify"
+              style={styles.menuLink}
+              className="menu-link"
+            >
+              <i className="fas fa-bell" style={styles.icon}></i>
+              <span>Notifications</span>
+            </NavLink>
+          </li>
 
           {/* Table Section */}
           <li style={styles.sectionTitle}>Tables</li>
@@ -62,6 +74,17 @@ export default function UserSidebar() {
             >
               <i className="fas fa-table" style={styles.icon}></i>
               <span>Guard Table</span>
+            </NavLink>
+          </li>
+
+          <li style={styles.menuItem}>
+            <NavLink
+              to="/updatehistory"
+              style={styles.menuLink}
+              className="menu-link"
+            >
+              <i className="fas fa-table" style={styles.icon}></i>
+              <span>Update Table</span>
             </NavLink>
           </li>
 

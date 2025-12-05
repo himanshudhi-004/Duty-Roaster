@@ -166,7 +166,8 @@ export const deleteUser = async (id) => {
 // Add VIP
 export const submit_vip_FormData = async (vipformData) => {
   try {
-    const response = await api.post("/api/categories", vipformData);
+    const role = localStorage.getItem("role");
+    const response = await api.post(`/api/categories/${role}`, vipformData);
     return response.data;
   } catch (error) {
     console.error("Error submitting VIP form:", error.message);
@@ -195,7 +196,8 @@ export const getAllVip = async () => {
 // Update VIP
 export const updateVip = async (id, vipformData) => {
   try {
-    const response = await api.put(`/api/categories/${id}`, vipformData);
+    const role = localStorage.getItem("role");
+    const response = await api.put(`/api/categories/${id}/${role}`, vipformData);
     return response.data;
   } catch (error) {
     console.error("Error updating VIP data:", error.message);
@@ -205,9 +207,9 @@ export const updateVip = async (id, vipformData) => {
 
 // Delete VIP
 export const deleteVip = async (id) => {
-  console.log("asdf",id)
   try {
-    const response = await api.delete(`/api/categories/${id}`);
+    const role = localStorage.getItem("role");
+    const response = await api.delete(`/api/categories/${id}/${role}`);
     return response.data;
   } catch (error) {
     console.error("Error deleting VIP:", error.message);
@@ -219,7 +221,8 @@ export const deleteVip = async (id) => {
 
 export const submit_gd_FormData = async (guardformData) => {
   try {
-    const response = await api.post("/api/officer", guardformData);
+    const role = localStorage.getItem("role");
+    const response = await api.post(`/api/officer/${role}`, guardformData);
     return response.data;
   } catch (error) {
     console.error("Error submitting Guard form:", error.message);
@@ -276,7 +279,8 @@ export const getAllGuard = async (
 // Update guard
 export const updateGuard = async (id, guardformData) => {
   try {
-    const response = await api.put(`/api/officer/${id}`, guardformData);
+    const role = localStorage.getItem("role");
+    const response = await api.put(`/api/officer/${id}/${role}`, guardformData);
     return response.data;
   } catch (error) {
     console.error("Error updating Guard data:", error.message);
@@ -287,7 +291,8 @@ export const updateGuard = async (id, guardformData) => {
 // Delete guard
 export const deleteGuard = async (id) => {
   try {
-    const response = await api.delete(`/api/officer/${id}`);
+    const role = localStorage.getItem("role");
+    const response = await api.delete(`/api/officer/${id}/${role}`);
     return response.data;
   } catch (error) {
     console.error("Error deleting Guard:", error.message);

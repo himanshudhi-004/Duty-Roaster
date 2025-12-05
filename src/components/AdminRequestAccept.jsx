@@ -466,7 +466,7 @@
 //     try {
 //       const finalStatus =
 //         role === "admin" 
-        
+
 //           ? action === "accept"
 //             ? "Admin Accepted"
 //             : "Admin Rejected"
@@ -477,7 +477,7 @@
 //       const payload = {
 //         id: item.id,
 //         status: finalStatus,
-       
+
 //       };
 
 //       await axios.post(`${BASE_URL}/api/duty/decision/management`, payload, {
@@ -778,7 +778,7 @@
 //           : action === "accept"
 //           ? "manager_accepted"
 //           : "manager_rejected";
-          
+
 //       const payload = {
 //         id: item.id,
 //         status: finalStatus,
@@ -1082,8 +1082,8 @@ export default function AdminRequestAccept() {
             ? "admin_accepted"
             : "admin_rejected"
           : action === "accept"
-          ? "manager_accepted"
-          : "manager_rejected";
+            ? "manager_accepted"
+            : "manager_rejected";
 
       const payload = {
         id: item.id,
@@ -1107,19 +1107,19 @@ export default function AdminRequestAccept() {
 
     const searchMatch = text
       ? [
-          item.officer?.name,
-          item.officer?.rank,
-          item.status,
-          item.message,
-        ].some((field) =>
-          String(field || "").toLowerCase().includes(text)
-        )
+        item.officer?.name,
+        item.officer?.rank,
+        item.status,
+        item.message,
+      ].some((field) =>
+        String(field || "").toLowerCase().includes(text)
+      )
       : true;
 
     const statusMatch = selectedStatus
       ? String(item.status || "").toLowerCase().includes(
-          selectedStatus.toLowerCase()
-        )
+        selectedStatus.toLowerCase()
+      )
       : true;
 
     return searchMatch && statusMatch;
@@ -1196,8 +1196,8 @@ export default function AdminRequestAccept() {
                   statusText.toLowerCase().includes("accepted")
                     ? styles.statusActive
                     : statusText.toLowerCase().includes("rejected")
-                    ? styles.statusInactive
-                    : styles.statusOther;
+                      ? styles.statusInactive
+                      : styles.statusOther;
 
                 return (
                   <tr key={item.id} style={styles.row}>
@@ -1209,8 +1209,18 @@ export default function AdminRequestAccept() {
                     <td style={styles.td}>
                       <span style={statusStyle}>{statusText}</span>
                     </td>
-                    <td style={styles.td}>{item.requestTime || "N/A"}</td>
-                    <td style={styles.td}>{item.responseTime || "N/A"}</td>
+                    <td style={styles.td}>
+                      {item.requestTime
+                        ? new Date(item.requestTime.split(".")[0]).toLocaleString("en-IN")
+                        : "N/A"}
+                    </td>
+
+                    <td style={styles.td}>
+                      {item.responseTime
+                        ? new Date(item.responseTime.split(".")[0]).toLocaleString("en-IN")
+                        : "N/A"}
+                    </td>
+
 
                     <td style={styles.td}>
                       {isGuardRejected ? (

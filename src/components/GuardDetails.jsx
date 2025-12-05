@@ -17,15 +17,14 @@ export default function GuardDetails() {
   const [currentPage, setCurrentPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(20);
 
-  /* ✅ FETCH */
+  /*  FETCH (NO RANK SENT TO API) */
   useEffect(() => {
     async function fetchGuards() {
       try {
         const res = await getAllGuard(
           currentPage,
           rowsPerPage,
-          selectedStatus,
-          selectedRank
+          selectedStatus
         );
 
         setGuardList(res.content || []);
@@ -37,9 +36,9 @@ export default function GuardDetails() {
     }
 
     fetchGuards();
-  }, [refreshTrigger, currentPage, rowsPerPage, selectedStatus, selectedRank]);
+  }, [refreshTrigger, currentPage, rowsPerPage, selectedStatus]);
 
-  /* ✅ DELETE */
+  /*  DELETE */
   const handleDelete = async (g) => {
     try {
       await deleteGuard(g.id);
@@ -60,22 +59,27 @@ export default function GuardDetails() {
     return [...Array(end - start)].map((_, i) => start + i);
   };
 
-  /* ✅ SEARCH FILTER */
-  const filteredGuards = guardList.filter((g) =>
+  /*  SEARCH FILTER */
+  const searchedGuards = guardList.filter((g) =>
     searchText
       ? Object.values(g)
-          .join(" ")
-          .toLowerCase()
-          .includes(searchText.toLowerCase())
+        .join(" ")
+        .toLowerCase()
+        .includes(searchText.toLowerCase())
       : true
   );
 
-  /* ✅ ✅ ✅ ONLY NEW FUNCTIONALITY — SORTING LOGIC ✅ ✅ ✅ */
-  const sortedGuards = [...filteredGuards].sort((a, b) => {
+  /*    VIP-STYLE DYNAMIC RANK FILTER    */
+  const rankFilteredGuards = searchedGuards.filter((g) =>
+    selectedRank ? g.rank === selectedRank : true
+  );
+
+  /*    STATUS SORTING (UNCHANGED)    */
+  const sortedGuards = [...rankFilteredGuards].sort((a, b) => {
     const statusOrder = {
       Inactive: 0,
       Active: 1,
-      Deleted: 2, // agar backend se deleted bhi aata hai
+      Deleted: 2,
     };
 
     const aOrder = statusOrder[a.status] ?? 3;
@@ -83,6 +87,11 @@ export default function GuardDetails() {
 
     return aOrder - bOrder;
   });
+
+  /*    DYNAMIC RANK LIST (LIKE VIP DESIGNATION)    */
+  const ranks = [
+    ...new Set(guardList.map((g) => g.rank || "Uncategorized")),
+  ];
 
   return (
     <div style={styles.page}>
@@ -97,6 +106,7 @@ export default function GuardDetails() {
 
       {/* FILTERS + SEARCH */}
       <div style={styles.filterRow}>
+        {/*  DYNAMIC RANK DROPDOWN */}
         <div style={styles.filterCard}>
           <label style={styles.filterLabel}>Rank</label>
           <select
@@ -108,11 +118,11 @@ export default function GuardDetails() {
             style={styles.select}
           >
             <option value="">All</option>
-            <option>A Grade</option>
-            <option>B Grade</option>
-            <option>C Grade</option>
-            <option>D Grade</option>
-            <option>E Grade</option>
+            {ranks.map((r, i) => (
+              <option key={i} value={r}>
+                {r}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -158,6 +168,7 @@ export default function GuardDetails() {
                 <tr>
                   <th style={styles.th}>#</th>
                   <th style={styles.th}>Name</th>
+                  <th style={styles.th}>Id</th>
                   <th style={styles.th}>Email</th>
                   <th style={styles.th}>Rank</th>
                   <th style={styles.th}>Experience</th>
@@ -174,6 +185,7 @@ export default function GuardDetails() {
                       {i + 1 + currentPage * rowsPerPage}
                     </td>
                     <td style={styles.td}>{g.name}</td>
+                    <td style={styles.td}>{g.id}</td>
                     <td style={styles.td}>{g.email}</td>
                     <td style={styles.td}>{g.rank}</td>
                     <td style={styles.td}>{g.experience}</td>
@@ -259,7 +271,7 @@ export default function GuardDetails() {
   );
 }
 
-/* ✅ STYLES SAME AS YOURS – NO CHANGE */
+/*  STYLES — COMPLETELY UNCHANGED */
 const styles = {
   page: { width: "100%", background: "#fff" },
   headerRow: { display: "flex", flexWrap: "wrap", justifyContent: "space-between", padding: "12px 20px", gap: 12 },
