@@ -288,16 +288,16 @@ function App() {
                     }
                   />
                   
-                  {/* <Route
+                   <Route
                     path="/notify"
                     element={
                       <PrivateRoute roles={["admin", "user"]}>
                         <AdminUserWrapper>
-                          <Notifications />
+                          <Notification />
                         </AdminUserWrapper>
                       </PrivateRoute>
                     }
-                  /> */}
+                  /> 
                   
 
                   {/* ---------------- USER ---------------- */}
@@ -338,6 +338,14 @@ function App() {
                   />
                   <Route
                     path="/setting"
+                    element={
+                      <PrivateRoute roles={["user"]}>
+                        <UserLayout><ManagerSettings /></UserLayout>
+                      </PrivateRoute>
+                    }
+                  />
+                  <Route
+                    path="/notify"
                     element={
                       <PrivateRoute roles={["user"]}>
                         <UserLayout><ManagerSettings /></UserLayout>

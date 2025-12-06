@@ -53,13 +53,13 @@ export default function VipProfile() {
     if (!file) return;
 
     const token = localStorage.getItem("vipToken");
-    const formData = new FormData();
-    formData.append("image", file);
+    const imaged = new FormData();
+    imaged.append("imaged", file);
 
     try {
       const res = await axios.post(
-        `${BASE_URL}/api/categories/upload-profile-image/${userDetails.id}`,
-        formData,
+        `${BASE_URL}/api/profile/upload`,
+        imaged,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -108,7 +108,7 @@ export default function VipProfile() {
               <img
                 src={
                   profileImage ||
-                  "https://cdn-icons-png.flaticon.com/512/149/149071.png"
+                  "https://res.cloudinary.com/dsbd6q2iv/image/upload/v1765013629/vrsunh0niwci5yvncsa4.jpg"
                 }
                 alt="Profile"
                 style={styles.profileImage}
