@@ -1,11 +1,11 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
-import { useGuardStore } from "./GuardContext"; // ✅ IMPORT GUARD CONTEXT
+import { useGuardStore } from "./GuardContext"; //  IMPORT GUARD CONTEXT
 
 const NotificationContext = createContext();
 
 export const NotificationProvider = ({ children }) => {
-  const { selectedGuard } = useGuardStore(); // ✅ GET SELECTED GUARD
+  const { selectedGuard } = useGuardStore(); //  GET SELECTED GUARD
 
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -13,11 +13,11 @@ export const NotificationProvider = ({ children }) => {
 
   const BASE_URL = process.env.REACT_APP_BASE_URL;
 
-  // ✅ TOKEN & ROLE
+  //  TOKEN & ROLE
   const token = localStorage.getItem("token");
   const role = localStorage.getItem("role");
 
-  // ✅ USER ID (GUARD FROM CONTEXT FIRST)
+  //  USER ID (GUARD FROM CONTEXT FIRST)
   const userId =
     selectedGuard?._id ||
     JSON.parse(localStorage.getItem("admin"))?._id ||
@@ -146,12 +146,12 @@ export const useNotification = () => useContext(NotificationContext);
 
 // import React, { createContext, useContext, useEffect, useState } from "react";
 // import axios from "axios";
-// import { useGuardStore } from "./GuardContext"; // ✅ IMPORT GUARD CONTEXT
+// import { useGuardStore } from "./GuardContext"; //  IMPORT GUARD CONTEXT
 
 // const NotificationContext = createContext();
 
 // export const NotificationProvider = ({ children }) => {
-//   const { selectedGuard } = useGuardStore(); // ✅ GET SELECTED GUARD
+//   const { selectedGuard } = useGuardStore(); //  GET SELECTED GUARD
 
 //   const [notifications, setNotifications] = useState([]);
 //   const [unreadCount, setUnreadCount] = useState(0);
@@ -159,11 +159,11 @@ export const useNotification = () => useContext(NotificationContext);
 
 //   const BASE_URL = process.env.REACT_APP_BASE_URL;
 
-//   // ✅ TOKEN & ROLE
+//   //  TOKEN & ROLE
 //   const token = localStorage.getItem("token");
 //   const role = localStorage.getItem("role");
 
-//   // ✅ USER ID (GUARD FROM CONTEXT FIRST)
+//   //  USER ID (GUARD FROM CONTEXT FIRST)
 //   const userId =
 //     selectedGuard?._id ||
 //     JSON.parse(localStorage.getItem("admin"))?._id ||

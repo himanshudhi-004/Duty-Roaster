@@ -20,7 +20,7 @@ export default function VipNotification() {
   const notificationSound = useRef(new Audio("/notify.mp3"));
   const prevUnreadCount = useRef(0);
 
-  /* ✅ STABLE FETCH FUNCTION */
+  /*  STABLE FETCH FUNCTION */
   const fetchNotifications = useRef(null);
 
   useEffect(() => {
@@ -45,7 +45,7 @@ export default function VipNotification() {
     };
   }, [vipId]);
 
-  /* ✅ POLLING + VIP CHANGE HANDLER */
+  /*  POLLING + VIP CHANGE HANDLER */
   useEffect(() => {
     if (!vipId) return;
 
@@ -64,7 +64,7 @@ export default function VipNotification() {
     return () => clearInterval(interval);
   }, [vipId]);
 
-  /* ✅ UNREAD COUNT */
+  /*  UNREAD COUNT */
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   /* 🔊 PLAY SOUND ON NEW NOTIFICATION */
@@ -75,7 +75,7 @@ export default function VipNotification() {
     prevUnreadCount.current = unreadCount;
   }, [unreadCount]);
 
-  /* ✅ SEARCH + FILTER */
+  /*  SEARCH + FILTER */
   const filteredData = useMemo(() => {
     const text = search.trim().toLowerCase();
 
@@ -96,7 +96,7 @@ export default function VipNotification() {
     });
   }, [notifications, search, statusFilter]);
 
-  /* ✅ PAGINATION */
+  /*  PAGINATION */
   const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
 
   const paginatedData = filteredData.slice(
@@ -104,7 +104,7 @@ export default function VipNotification() {
     currentPage * ITEMS_PER_PAGE
   );
 
-  /* ✅ MARK SINGLE READ */
+  /*  MARK SINGLE READ */
   const handleMarkAsRead = async (id) => {
     try {
       const token = localStorage.getItem("vipToken");
@@ -120,7 +120,7 @@ export default function VipNotification() {
     }
   };
 
-  /* ✅ MARK ALL READ (FIXED _id BUG) */
+  /*  MARK ALL READ (FIXED _id BUG) */
   const handleMarkAllAsRead = async () => {
     const token = localStorage.getItem("vipToken");
     const unread = notifications.filter((n) => !n.read);
@@ -156,7 +156,7 @@ export default function VipNotification() {
         VIP Notification Management ({unreadCount})
       </h2>
 
-      {/* ✅ FILTER ROW */}
+      {/*  FILTER ROW */}
       <div style={styles.filterRow}>
         <div style={styles.filterCard}>
           <label style={styles.filterLabel}>Search</label>
@@ -189,7 +189,7 @@ export default function VipNotification() {
         </div>
       </div>
 
-      {/* ✅ TABLE */}
+      {/*  TABLE */}
       <div style={styles.card}>
         {loading ? (
           <div style={styles.noData}>Loading...</div>
@@ -251,7 +251,7 @@ export default function VipNotification() {
         )}
       </div>
 
-      {/* ✅ PAGINATION */}
+      {/*  PAGINATION */}
       {totalPages > 1 && (
         <div style={{ display: "flex", justifyContent: "center", marginTop: 20, gap: 8 }}>
           <button
@@ -289,7 +289,7 @@ export default function VipNotification() {
   );
 }
 
-/* ✅ STYLES */
+/*  STYLES */
 const styles = {
   container: { padding: 30, background: "#fff" },
   title: { fontSize: 30, fontWeight: 800, marginBottom: 25, color: "#1967d2" },

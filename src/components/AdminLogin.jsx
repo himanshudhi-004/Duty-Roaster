@@ -2,14 +2,16 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-import { loginUser } from "../api/auth"; 
+import { loginUser } from "../api/auth";
 import { toast } from "react-toastify";
 import { FaUserShield } from "react-icons/fa";
+
 
 export default function AdminLogin() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+
 
   const [loginData, setLoginData] = useState({
     username: "",
@@ -61,6 +63,7 @@ export default function AdminLogin() {
       setLoading(false);
     }
   };
+
 
   return (
     <div
@@ -179,6 +182,16 @@ export default function AdminLogin() {
           >
             {loading ? "Logging in..." : "Sign In"}
           </button>
+
+          <button
+            type="button"
+            className="btn btn-outline-primary mt-2"
+            onClick={() => navigate("/registration")}
+          >
+            Registrations
+          </button>
+
+
 
           <p
             style={{

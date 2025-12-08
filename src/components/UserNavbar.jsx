@@ -449,9 +449,7 @@ export default function UserNavbar() {
               Incidents
             </NavLink>
             
-            <NavLink to="/setting" style={styles.menuItem}>
-              Settings
-            </NavLink>
+           
           </div>
         )}
       </div>

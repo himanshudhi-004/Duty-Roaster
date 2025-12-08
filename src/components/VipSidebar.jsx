@@ -7,6 +7,7 @@ export default function VipSidebar() {
   const handleLogout = () => {
      localStorage.clear();
     sessionStorage.clear();
+    
     navigate("/login");
   };
   return (
@@ -205,3 +206,6 @@ const styles = {
     opacity: 0.8,
   },
 };
+
+
+

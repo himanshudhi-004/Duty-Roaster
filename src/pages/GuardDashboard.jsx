@@ -408,7 +408,7 @@ const styles = {
     padding: 20,
     textAlign: "center",
     boxShadow: "0 8px 20px rgba(0,0,0,0.1)",
-    transition: "all 0.3s ease", // ✅ hover animation enabled
+    transition: "all 0.3s ease", //  hover animation enabled
     cursor: "pointer",
   },
   iconCircle: {

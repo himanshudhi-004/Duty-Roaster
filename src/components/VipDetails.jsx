@@ -558,7 +558,7 @@ export default function VipDetails() {
         </div>
       </div>
 
-      {/* ✅ RESPONSIVE TABLE WRAPPER */}
+      {/*  RESPONSIVE TABLE WRAPPER */}
       <div style={styles.tableWrapper}>
         <div style={styles.tableCard}>
           {currentData.length === 0 ? (
@@ -677,7 +677,7 @@ export default function VipDetails() {
   );
 }
 
-/* ✅ RESPONSIVE STYLES ONLY (DATA UNTOUCHED) */
+/*  RESPONSIVE STYLES ONLY (DATA UNTOUCHED) */
 
 const styles = {
   page: { width: "100%", padding: "0px", margin: 0, background: "#fff" },
@@ -741,7 +741,7 @@ const styles = {
     outline: "none",
   },
 
-  /* ✅ IMPORTANT RESPONSIVE FIX */
+  /*  IMPORTANT RESPONSIVE FIX */
   tableWrapper: {
     width: "100%",
     overflowX: "auto",

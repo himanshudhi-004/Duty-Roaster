@@ -39,7 +39,7 @@
 //         }
 //       );
 
-//       toast.success("✅ Duty marked as Completed Successfully!");
+//       toast.success(" Duty marked as Completed Successfully!");
 //       console.log("API Response:", res.data);
 //     } catch (err) {
 //       console.error("Duty Complete Error:", err);
@@ -165,7 +165,7 @@ export default function VipDuty() {
   const { selectedVip, handleBack } = useVipStore();
   const [loading, setLoading] = useState(false);
 
-  // ✅ DUTY COMPLETE API CALL (UNCHANGED)
+  //  DUTY COMPLETE API CALL (UNCHANGED)
   const handleDutyComplete = async () => {
     const confirm = window.confirm(
       "Are you sure you want to mark this duty as COMPLETED?"
@@ -187,7 +187,7 @@ export default function VipDuty() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      toast.success("✅ Duty marked as Completed Successfully!");
+      toast.success(" Duty marked as Completed Successfully!");
       console.log("API Response:", res.data);
     } catch (err) {
       console.error("Duty Complete Error:", err);
@@ -197,12 +197,12 @@ export default function VipDuty() {
     }
   };
 
-  // ✅ NOT COMPLETE (UNCHANGED)
+  //  NOT COMPLETE (UNCHANGED)
   const handleDutyNotComplete = () => {
     toast.info("❗ Duty marked as Not Completed");
   };
 
-  // ✅ NO VIP SELECTED (UNCHANGED)
+  //  NO VIP SELECTED (UNCHANGED)
   if (!selectedVip) {
     return (
       <div style={styles.container}>
@@ -236,7 +236,7 @@ export default function VipDuty() {
 
   <ul style={styles.instructionList}>
     <li>
-      ✅ <strong>Duty Completed:</strong> Click when the VIP duty is finished
+       <strong>Duty Completed:</strong> Click when the VIP duty is finished
       successfully.
     </li>
 
@@ -271,7 +271,7 @@ export default function VipDuty() {
           onClick={handleDutyComplete}
           disabled={loading}
         >
-          {loading ? "Processing..." : "✅ Duty Completed"}
+          {loading ? "Processing..." : " Duty Completed"}
         </button>
 
         {/* <button

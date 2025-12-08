@@ -39,7 +39,7 @@ import { useGuardStore } from "../context/GuardContext";
 
 export default function Logout() {
   const navigate = useNavigate();
-  const { handleBack } = useGuardStore(); // ✅ clears context memory
+  const { handleBack } = useGuardStore(); //  clears context memory
 
   useEffect(() => {
     const isAdmin = localStorage.getItem("adminToken");
@@ -52,13 +52,13 @@ export default function Logout() {
     if (isVip) logoutUser("vip");
     if (isGuard) logoutUser("guard");
 
-    // ✅ CLEAR REACT CONTEXT
+    //  CLEAR REACT CONTEXT
     handleBack();
 
-    // ✅ CLEAR STORAGE
+    //  CLEAR STORAGE
     localStorage.clear();
 
-    // ✅ REDIRECT
+    //  REDIRECT
     navigate("/login", { replace: true });
   }, [navigate, handleBack]);
 

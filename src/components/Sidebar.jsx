@@ -116,7 +116,7 @@ export default function Sidebar() {
           </li>
           <li style={styles.sectionTitle}>Others</li>
           {/* Management */}
-          <li style={styles.menuItem}>
+          {/* <li style={styles.menuItem}>
             <NavLink
               to="/vgmang"
               style={styles.menuLink}
@@ -125,7 +125,7 @@ export default function Sidebar() {
               <i className="fas fa-users-cog" style={styles.icon}></i>
               <span>Vip-Guard-Management</span>
             </NavLink>
-          </li>
+          </li> */}
           {/* <li style={styles.menuItem}>
             <NavLink
               to="/markduty"
@@ -186,6 +186,16 @@ export default function Sidebar() {
             >
               <i className="fas fa-check-circle" style={styles.icon}></i>
               <span>Duty Accept/Reject</span>
+            </NavLink>
+          </li>
+          <li style={styles.menuItem}>
+            <NavLink
+              to="/setting"
+              style={styles.menuLink}
+              className="menu-link"
+            >
+              <i className="fas fa-cog" aria-hidden="true" style={styles.icon}></i>
+              <span>Settings</span>
             </NavLink>
           </li>
           <li style={styles.menuItem}>

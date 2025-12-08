@@ -1,78 +1,49 @@
 import React, { useEffect, useState, useMemo } from "react";
 import axios from "axios";
-
 import { toast } from "react-toastify";
 import { getAllGuard } from "../api/vipform";
+import { jwtDecode } from "jwt-decode";
+import { useAdminStore } from "../context/AdminContext";
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 
-export default function ManagerSettings() {
-  const [selectedManager, setSelectedManager] = useState(null);
-  const [managerName, setManagerName] = useState("");
+export default function AdminSettings() {
+  const { selectedAdmin } = useAdminStore();
 
+  const [adminName, setAdminName] = useState("");
   const [guardList, setGuardList] = useState([]);
   const [gradeList, setGradeList] = useState([]);
   const [selectedGrade, setSelectedGrade] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // ✅ RESPONSIVE BREAKPOINT
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
-  // ✅ AUTO SECURITY GROUP NAME
   const [groupName] = useState(
     `SEC-GRP-${Math.floor(1000 + Math.random() * 9000)}`
   );
 
-  /* ================= RESPONSIVE LISTENER ================= */
+  /* ================= RESPONSIVE ================= */
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  /* ================= TOKEN BASED MANAGER SYNC ================= */
+  /* ================= ADMIN FROM TOKEN / CONTEXT ================= */
   useEffect(() => {
-    const syncManagerProfile = async () => {
-      try {
-        if (selectedManager?.name) return;
+    if (selectedAdmin?.name) {
+      setAdminName(selectedAdmin.name);
+      return;
+    }
 
-        const stored = localStorage.getItem("selectedManager");
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          setSelectedManager(parsed);
-          setManagerName(parsed.name);
-          return;
-        }
+    const token = localStorage.getItem("adminToken");
+    if (!token) return;
 
-        const token = localStorage.getItem("userToken");
-        if (!token) return;
+    const decoded = jwtDecode(token);
+    const name = decoded?.name || decoded?.username || decoded?.email;
 
-        const decoded = jwtDecode(token);
-        
-
-        const res = await axios.get(`${BASE_URL}/user/profile`, {
-          params: { username },
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        const profile = Array.isArray(res.data)
-          ? res.data[0]
-          : res.data;
-
-        setSelectedManager(profile);
-        setManagerName(profile.name);
-
-        localStorage.setItem(
-          "selectedManager",
-          JSON.stringify(profile)
-        );
-      } catch (err) {
-        console.log("Manager Sync Error:", err);
-      }
-    };
-
-    syncManagerProfile();
-  }, [selectedManager]);
+    setAdminName(name);
+  }, [selectedAdmin]);
 
   /* ================= FETCH ALL GUARDS ================= */
   useEffect(() => {
@@ -86,8 +57,11 @@ export default function ManagerSettings() {
         else if (Array.isArray(data?.guards)) finalData = data.guards;
         else if (Array.isArray(data?.officers)) finalData = data.officers;
 
+        console.log("✅ Guards API Data:", finalData);
+
         setGuardList(finalData);
       } catch (err) {
+        console.error("❌ Guard Fetch Error:", err);
         toast.error("Failed to load guard ranks!");
       }
     }
@@ -95,9 +69,13 @@ export default function ManagerSettings() {
     fetchGuards();
   }, []);
 
-  /* ================= ✅ UNIQUE RANKS ================= */
+  /* ================= UNIQUE RANKS ================= */
   const availableRanks = useMemo(() => {
-    return [...new Set(guardList.map((g) => g.rank).filter(Boolean))];
+    const ranks = guardList
+      .map((g) => g.rank || g.designation || g.grade || g.rank_name)
+      .filter(Boolean);
+
+    return [...new Set(ranks)];
   }, [guardList]);
 
   /* ================= ADD RANK ================= */
@@ -116,11 +94,7 @@ export default function ManagerSettings() {
       return;
     }
 
-    setGradeList([
-      ...gradeList,
-      { rank: selectedGrade, total: "" },
-    ]);
-
+    setGradeList([...gradeList, { rank: selectedGrade, total: "" }]);
     setSelectedGrade("");
   };
 
@@ -131,7 +105,7 @@ export default function ManagerSettings() {
     setGradeList(updated);
   };
 
-  /* ================= SUBMIT ================= */
+  /* ================= SUBMIT (ADMIN) ================= */
   const handleSubmit = async () => {
     if (gradeList.length === 0) {
       toast.error("Please add at least one rank");
@@ -146,7 +120,7 @@ export default function ManagerSettings() {
     }
 
     const payload = {
-      manager: managerName,
+      admin: adminName,
       securityGroup: groupName,
       grades: gradeList.map((g) => ({
         rank: g.rank,
@@ -156,10 +130,10 @@ export default function ManagerSettings() {
 
     try {
       setLoading(true);
-      const token = localStorage.getItem("managerToken");
+      const token = localStorage.getItem("adminToken");
 
       await axios.post(
-        `${BASE_URL}/api/manager/settings`,
+        `${BASE_URL}/api/admin/settings`,
         payload,
         {
           headers: {
@@ -181,15 +155,13 @@ export default function ManagerSettings() {
 
   return (
     <div style={styles.pageContainer}>
-      {/* ---------- HEADER ---------- */}
       <div style={styles.header}>
-        <h2 style={styles.headerTitle}>Manager Settings</h2>
+        <h2 style={styles.headerTitle}>Admin Settings</h2>
         <p style={styles.headerSubtitle}>
-          Logged in as: <b>{managerName || "Manager"}</b>
+          Logged in as: <b>{adminName || "Admin"}</b>
         </p>
       </div>
 
-      {/* ---------- CARD ---------- */}
       <div style={styles.card}>
         <div
           style={{
@@ -197,7 +169,7 @@ export default function ManagerSettings() {
             flexDirection: isMobile ? "column" : "row",
           }}
         >
-          {/* -------- LEFT -------- */}
+          {/* LEFT */}
           <div style={{ ...styles.leftBox, width: isMobile ? "100%" : "32%" }}>
             <h4 style={styles.pointsTitle}>Security Group Rules</h4>
             <ul style={styles.pointList}>
@@ -211,22 +183,15 @@ export default function ManagerSettings() {
             </div>
           </div>
 
-          {/* -------- RIGHT -------- */}
+          {/* RIGHT */}
           <div style={{ ...styles.rightBox, width: isMobile ? "100%" : "68%" }}>
-            {/* ADD BAR */}
-            <div
-              style={{
-                ...styles.addBar,
-                flexDirection: isMobile ? "column" : "row",
-              }}
-            >
+            <p>Ranks Found: {availableRanks.length}</p>
+
+            <div style={{ ...styles.addBar, flexDirection: isMobile ? "column" : "row" }}>
               <select
                 value={selectedGrade}
                 onChange={(e) => setSelectedGrade(e.target.value)}
-                style={{
-                  ...styles.select,
-                  width: isMobile ? "100%" : "70%",
-                }}
+                style={{ ...styles.select, width: isMobile ? "100%" : "70%" }}
               >
                 <option value="">-- Select Rank --</option>
                 {availableRanks.map((r, i) => (
@@ -238,16 +203,12 @@ export default function ManagerSettings() {
 
               <button
                 onClick={handleAddGrade}
-                style={{
-                  ...styles.addBtn,
-                  width: isMobile ? "100%" : "30%",
-                }}
+                style={{ ...styles.addBtn, width: isMobile ? "100%" : "30%" }}
               >
                 ➕ Add
               </button>
             </div>
 
-            {/* ✅ GROUP BOX */}
             {gradeList.length > 0 && (
               <div style={styles.groupBox}>
                 <div style={styles.groupTitle}>
@@ -281,7 +242,6 @@ export default function ManagerSettings() {
               </div>
             )}
 
-            {/* SUBMIT */}
             {gradeList.length > 0 && (
               <button
                 onClick={handleSubmit}
@@ -302,7 +262,7 @@ export default function ManagerSettings() {
   );
 }
 
-/* ================= RESPONSIVE STYLES ================= */
+/* ================= STYLES (UNCHANGED) ================= */
 const styles = {
   pageContainer: {
     padding: 20,
@@ -310,7 +270,6 @@ const styles = {
     background: "rgba(255,255,255,0.15)",
     backdropFilter: "blur(6px)",
   },
-
   header: {
     marginBottom: 20,
     padding: 16,
@@ -318,28 +277,22 @@ const styles = {
     borderRadius: 14,
     color: "white",
   },
-
   headerTitle: { margin: 0, fontSize: 24, fontWeight: 700 },
   headerSubtitle: { marginTop: 4, opacity: 0.9 },
-
   card: {
     background: "rgba(255,255,255,0.55)",
     borderRadius: 18,
     padding: 20,
     backdropFilter: "blur(8px)",
   },
-
   profileRow: { display: "flex", gap: 20 },
-
   leftBox: {
     padding: 16,
     borderRadius: 12,
     background: "rgba(255,255,255,0.7)",
   },
-
   pointsTitle: { fontSize: 18, fontWeight: 700 },
   pointList: { paddingLeft: 18 },
-
   noteBox: {
     marginTop: 10,
     padding: 10,
@@ -347,17 +300,12 @@ const styles = {
     borderRadius: 8,
     fontWeight: 600,
   },
-
-  rightBox: {},
-
   addBar: { display: "flex", gap: 10, marginBottom: 15 },
-
   select: {
     padding: 10,
     borderRadius: 10,
     border: "1px solid #ccc",
   },
-
   addBtn: {
     background: "#00c853",
     color: "white",
@@ -366,18 +314,18 @@ const styles = {
     border: "none",
     fontWeight: 600,
   },
-
   groupBox: {
     background: "rgba(255,255,255,0.8)",
     padding: 12,
     borderRadius: 12,
     marginBottom: 12,
   },
-
-  groupTitle: { fontWeight: 700, color: "#2f80ed", marginBottom: 10 },
-
+  groupTitle: {
+    fontWeight: 700,
+    color: "#2f80ed",
+    marginBottom: 10,
+  },
   gradeRow: { display: "flex", gap: 10, marginBottom: 10 },
-
   gradeBadge: {
     background: "#2f80ed",
     color: "white",
@@ -386,13 +334,11 @@ const styles = {
     minWidth: 80,
     textAlign: "center",
   },
-
   input: {
     padding: 10,
     borderRadius: 10,
     border: "1px solid #ccc",
   },
-
   submitBtn: {
     background: "#ff5e62",
     color: "white",

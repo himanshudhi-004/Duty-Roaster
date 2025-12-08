@@ -359,7 +359,7 @@
 //     fetchIncidents();
 //   }, []);
 
-//   // ✅✅✅ ONLY THIS FUNCTION IS MODIFIED ✅✅✅
+//   //  ONLY THIS FUNCTION IS MODIFIED 
 //   const handleStatusUpdate = async (item, action) => {
 //     try {
 //       const finalStatus =
@@ -380,7 +380,7 @@
 //         headers: { Authorization: `Bearer ${token}` },
 //       });
 
-//       // ✅ INSTANT UI UPDATE (NO BUTTON AFTER CLICK)
+//       //  INSTANT UI UPDATE (NO BUTTON AFTER CLICK)
 //       setIncidents((prev) =>
 //         prev.map((inc) =>
 //           inc.id === item.id ? { ...inc, status: finalStatus } : inc
@@ -857,7 +857,7 @@ export default function Incident() {
   );
 }
 
-/* ✅✅✅ RESPONSIVE STYLES ONLY ✅✅✅ */
+/*  RESPONSIVE STYLES ONLY  */
 const styles = {
   container: { padding: 30, background: "#fff", maxWidth: "100%" },
 

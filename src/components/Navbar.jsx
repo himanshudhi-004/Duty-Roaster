@@ -102,10 +102,11 @@ export default function Navbar() {
             <NavLink to="/guardform" style={styles.menuItem}>Guard Form</NavLink>
             <NavLink to="/viplist" style={styles.menuItem}>VIP Table</NavLink>
             <NavLink to="/guardlist" style={styles.menuItem}>Guard Table</NavLink>
-            <NavLink to="/vgmang" style={styles.menuItem}>VIP–Guard Management</NavLink>
+            {/* <NavLink to="/vgmang" style={styles.menuItem}>VIP–Guard Management</NavLink> */}
             <NavLink to="/dutyhistory" style={styles.menuItem}>Guard-duty-history</NavLink>
             <NavLink to="/updatehistory" style={styles.menuItem}>Updation history</NavLink>
             <NavLink to="/incidents" style={styles.menuItem}>Incidents</NavLink>
+             <NavLink to="/setting" style={styles.menuItem}>Settings</NavLink>
           </div>
         )}
       </div>
@@ -156,7 +157,7 @@ export default function Navbar() {
   );
 }
 
-/* ✅ RESPONSIVE STYLES ONLY */
+/*  RESPONSIVE STYLES ONLY */
 
 const styles = {
   navbar: {

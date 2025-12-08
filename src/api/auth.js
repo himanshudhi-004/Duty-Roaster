@@ -38,7 +38,7 @@ import axios from "axios";
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 
-// ✅ LOGIN USER (NO TIMER)
+//  LOGIN USER (NO TIMER)
 export const loginUser = async (data) => {
   try {
     const res = await axios.post(`${BASE_URL}/auth/login`, data);
@@ -53,13 +53,13 @@ export const loginUser = async (data) => {
   }
 };
 
-// ✅ LOGOUT USER (NO TIMER REMOVAL)
+//  LOGOUT USER (NO TIMER REMOVAL)
 export const logoutUser = (role) => {
   localStorage.removeItem(`${role}Token`);
   return { success: true };
 };
 
-// ✅ CHECK TOKEN ONLY (NO TIME LOGIC)
+//  CHECK TOKEN ONLY (NO TIME LOGIC)
 export const checkToken = (role) => {
   const token = localStorage.getItem(`${role}Token`);
   if (!token) return false;

@@ -174,16 +174,7 @@ export default function UserSidebar() {
               <span>Incidents</span>
             </NavLink>
           </li>
-          {/* <li style={styles.menuItem}>
-            <NavLink
-              to="/setting"
-              style={styles.menuLink}
-              className="menu-link"
-            >
-              <i className="fas fa-cog" aria-hidden="true" style={styles.icon}></i>
-              <span>Settings</span>
-            </NavLink>
-          </li> */}
+            
           <li style={styles.menuItem}>
             <NavLink
               to="/userprofile"

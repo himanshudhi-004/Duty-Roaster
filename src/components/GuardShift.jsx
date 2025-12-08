@@ -185,13 +185,13 @@ export default function GuardShift() {
 
     async function fetchVip() {
       try {
-        const token = localStorage.getItem("guardToken"); // ✅ GET GUARD TOKEN
+        const token = localStorage.getItem("guardToken"); //  GET GUARD TOKEN
 
         const res = await axios.get(
           `${BASE_URL}/api/assignments/getvip/${finalGuardId}`,
           {
             headers: {
-              Authorization: `Bearer ${token}`, // ✅ TOKEN SENT
+              Authorization: `Bearer ${token}`, //  TOKEN SENT
             },
           }
         );
@@ -272,7 +272,7 @@ export default function GuardShift() {
                 ← Back
               </button>
 
-              {/* ✅ SEND vip.id TO Guard Decision */}
+              {/*  SEND vip.id TO Guard Decision */}
               <button
                 style={{ ...styles.backBtn, background: "#28a745" }}
                 onClick={() => navigate(`/guarddecision/${vip.id}`)}

@@ -166,8 +166,10 @@ export const deleteUser = async (id) => {
 // Add VIP
 export const submit_vip_FormData = async (vipformData) => {
   try {
-    const role = localStorage.getItem("role");
-    const response = await api.post(`/api/categories/${role}`, vipformData);
+    //  Get role or fallback to "self"
+    const role = localStorage.getItem("role") || "self";
+
+    const response = await api.post(`/api/categories/register/${role}`, vipformData);
     return response.data;
   } catch (error) {
     console.error("Error submitting VIP form:", error.message);
@@ -221,8 +223,8 @@ export const deleteVip = async (id) => {
 
 export const submit_gd_FormData = async (guardformData) => {
   try {
-    const role = localStorage.getItem("role");
-    const response = await api.post(`/api/officer/${role}`, guardformData);
+    const role = localStorage.getItem("role") || "self";
+    const response = await api.post(`/api/officer/register/${role}`, guardformData);
     return response.data;
   } catch (error) {
     console.error("Error submitting Guard form:", error.message);
@@ -247,7 +249,7 @@ export const getAllGuard = async (
       },
     });
 
-    return response.data; // ✅ Page Object
+    return response.data; //  Page Object
   } catch (error) {
     console.error("Error fetching Guard data:", error.message);
     return {

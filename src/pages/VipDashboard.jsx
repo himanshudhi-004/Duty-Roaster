@@ -225,7 +225,7 @@ const styles = {
     padding: 25,
     textAlign: "center",
     boxShadow: "0 5px 20px rgba(0,0,0,0.08)",
-    transition: "all 0.3s ease", // ✅ hover animation enabled
+    transition: "all 0.3s ease", //  hover animation enabled
     cursor: "pointer",
   },
   iconCircle: {
@@ -485,14 +485,14 @@ const styles = {
 //   const [guardList, setGuardList] = useState([]);
 //   const [loading, setLoading] = useState(true);
 
-//   /* ✅ INSTANT FROM CONTEXT */
+//   /*  INSTANT FROM CONTEXT */
 //   useEffect(() => {
 //     if (selectedVip?.name) {
 //       setVipName(selectedVip.name);
 //     }
 //   }, [selectedVip]);
 
-//   /* ✅ FALLBACK FOR REFRESH / DIRECT URL */
+//   /*  FALLBACK FOR REFRESH / DIRECT URL */
 //   useEffect(() => {
 //     const syncVipProfile = async () => {
 //       try {
@@ -530,13 +530,13 @@ const styles = {
 //     syncVipProfile();
 //   }, []);
 
-//   /* ✅ LOAD ALL VIPs */
+//   /*  LOAD ALL VIPs */
 //   const loadVip = async () => {
 //     const data = await getAllVip();
 //     setVipList(Array.isArray(data) ? data : data?.data || []);
 //   };
 
-//   /* ✅✅✅ LOAD ALL GUARDS WITH PAGINATION (FIXED) ✅✅✅ */
+//   /*  LOAD ALL GUARDS WITH PAGINATION (FIXED)  */
 //   const loadGuards = async () => {
 //     try {
 //       let allGuards = [];
@@ -584,7 +584,7 @@ const styles = {
 //     },
 //     {
 //       title: "Total Officers",
-//       value: guardList.length, // ✅ NOW 100% ACCURATE
+//       value: guardList.length, //  NOW 100% ACCURATE
 //       icon: "fas fa-user-shield",
 //       color: "#3cb371",
 //     },
@@ -658,7 +658,7 @@ const styles = {
 //   );
 // }
 
-// /* ✅ STYLES (UNCHANGED) */
+// /*  STYLES (UNCHANGED) */
 // const styles = {
 //   page: { padding: 25 },
 //   headerSection: {

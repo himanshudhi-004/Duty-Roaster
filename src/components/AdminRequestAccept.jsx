@@ -1187,7 +1187,7 @@ export default function AdminRequestAccept() {
               {sortedData.map((item, index) => {
                 const statusText = item.status || "Completed";
 
-                // ✅ ONLY show buttons if status === "Guard Rejected"
+                //  ONLY show buttons if status === "Guard Rejected"
                 const isGuardRejected =
                   String(statusText).toLowerCase().trim() ===
                   "guard rejected";

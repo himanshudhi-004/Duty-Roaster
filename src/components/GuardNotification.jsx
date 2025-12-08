@@ -20,7 +20,7 @@ export default function GuardNotification() {
   const notificationSound = useRef(new Audio("/notify.mp3"));
   const prevUnreadCount = useRef(0);
 
-  /* ✅ STABLE FETCH FUNCTION (FIXES STALE guardId BUG) */
+  /*  STABLE FETCH FUNCTION (FIXES STALE guardId BUG) */
   const fetchNotifications = useRef(null);
 
   useEffect(() => {
@@ -45,7 +45,7 @@ export default function GuardNotification() {
     };
   }, [guardId]);
 
-  /* ✅ POLLING + RESET ON GUARD CHANGE */
+  /*  POLLING + RESET ON GUARD CHANGE */
   useEffect(() => {
     if (!guardId) return;
 
@@ -64,7 +64,7 @@ export default function GuardNotification() {
     return () => clearInterval(interval);
   }, [guardId]);
 
-  /* ✅ UNREAD COUNT */
+  /*  UNREAD COUNT */
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   /* 🔊 SOUND ON NEW */
@@ -75,7 +75,7 @@ export default function GuardNotification() {
     prevUnreadCount.current = unreadCount;
   }, [unreadCount]);
 
-  /* ✅ SEARCH + FILTER */
+  /*  SEARCH + FILTER */
   const filteredData = useMemo(() => {
     const text = search.trim().toLowerCase();
 
@@ -97,7 +97,7 @@ export default function GuardNotification() {
     });
   }, [notifications, search, statusFilter]);
 
-  /* ✅ PAGINATION */
+  /*  PAGINATION */
   const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
 
   const paginatedData = filteredData.slice(
@@ -105,7 +105,7 @@ export default function GuardNotification() {
     currentPage * ITEMS_PER_PAGE
   );
 
-  /* ✅ MARK SINGLE READ (ID BUG FIXED) */
+  /*  MARK SINGLE READ (ID BUG FIXED) */
   const handleMarkAsRead = async (id) => {
     try {
       const token = localStorage.getItem("guardToken");
@@ -122,7 +122,7 @@ export default function GuardNotification() {
     }
   };
 
-  /* ✅ MARK ALL READ (FIXED id/_id BUG) */
+  /*  MARK ALL READ (FIXED id/_id BUG) */
   const handleMarkAllAsRead = async () => {
     const token = localStorage.getItem("guardToken");
     const unread = notifications.filter((n) => !n.read);
@@ -158,7 +158,7 @@ export default function GuardNotification() {
         Guard Notification Management ({unreadCount})
       </h2>
 
-      {/* ✅ FILTER ROW */}
+      {/*  FILTER ROW */}
       <div style={styles.filterRow}>
         <div style={styles.filterCard}>
           <label style={styles.filterLabel}>Search</label>
@@ -194,7 +194,7 @@ export default function GuardNotification() {
         </div>
       </div>
 
-      {/* ✅ TABLE */}
+      {/*  TABLE */}
       <div style={styles.card}>
         {loading ? (
           <div style={styles.noData}>Loading...</div>
@@ -262,7 +262,7 @@ export default function GuardNotification() {
         )}
       </div>
 
-      {/* ✅ PAGINATION */}
+      {/*  PAGINATION */}
       {totalPages > 1 && (
         <div
           style={{
@@ -309,7 +309,7 @@ export default function GuardNotification() {
   );
 }
 
-/* ✅ SAME PREMIUM STYLES */
+/*  SAME PREMIUM STYLES */
 const styles = {
   container: { padding: 30, background: "#fff" },
   title: { fontSize: 30, fontWeight: 800, marginBottom: 25, color: "#1967d2" },

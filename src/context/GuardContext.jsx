@@ -54,7 +54,7 @@ export const GuardProvider = ({ children }) => {
   const [profileImage, setProfileImage] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  /* ✅ AUTO FETCH PROFILE EACH TIME TOKEN EXISTS */
+  /*  AUTO FETCH PROFILE EACH TIME TOKEN EXISTS */
   useEffect(() => {
     const token = localStorage.getItem("guardToken");
     console.log("Guard Provider Activated",children);
@@ -67,7 +67,7 @@ export const GuardProvider = ({ children }) => {
     fetchGuardProfile();
   }, []);
 
-  /* ✅ FETCH PROFILE */
+  /*  FETCH PROFILE */
   const fetchGuardProfile = async () => {
     try {
       setLoading(true);
@@ -100,7 +100,7 @@ export const GuardProvider = ({ children }) => {
     }
   };
 
-  /* ✅ IMAGE UPLOAD */
+  /*  IMAGE UPLOAD */
   const uploadGuardImage = async (file) => {
     try {
       if (!selectedGuard) return;
@@ -128,7 +128,7 @@ export const GuardProvider = ({ children }) => {
     }
   };
 
-  /* ✅ RESET CONTEXT ON LOGOUT */
+  /*  RESET CONTEXT ON LOGOUT */
   const handleBack = () => {
     setSelectedGuard(null);
     setProfileImage(null);

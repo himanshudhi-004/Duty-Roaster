@@ -14,7 +14,7 @@ export default function UpdationHistory() {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(30);
 
-  // ✅ TOKEN LOGIC (UNCHANGED)
+  //  TOKEN LOGIC (UNCHANGED)
   const role = localStorage.getItem("role");
   const adminToken = localStorage.getItem("adminToken");
   const userToken = localStorage.getItem("userToken");
@@ -22,7 +22,7 @@ export default function UpdationHistory() {
 
   console.log("TOKEN =>", token, "ROLE =>", role);
 
-  // ✅ FETCH HISTORY
+  //  FETCH HISTORY
   const fetchHistory = async () => {
     try {
       setLoading(true);
@@ -226,7 +226,7 @@ export default function UpdationHistory() {
   );
 }
 
-/* ✅ SAME STYLE STRUCTURE */
+/*  SAME STYLE STRUCTURE */
 const styles = {
   container: { padding: 30, background: "#fff" },
   title: { fontSize: 30, fontWeight: 800, marginBottom: 25, color: "#1967d2" },
