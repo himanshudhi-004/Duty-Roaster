@@ -213,7 +213,7 @@ export default function AdminForm() {
             <FormInput label="Email Id" name="adminEmail" type='email'
               value={adminformData.adminEmail} onChange={handle_ad_Change}  required/>
 
-            <FormInput label="Password" name="adminPassword" type='password'
+            <FormInput label="Password" name="adminPassword" type='text'
               value={adminformData.adminPassword} onChange={handle_ad_Change}  required/>
 
             <FormInput label="Contact Number" name="contactNo" type='text'

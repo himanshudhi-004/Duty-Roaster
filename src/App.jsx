@@ -79,6 +79,8 @@ import UpdationHistory from "./components/UpdationHistory";
 
 import Notification from "./components/Notifications";
 import Registration from "./components/Registration";
+import DesignationForm from "./components/DesignationForm";
+import GuardRankCreate from "./components/GuardRankCreate";
 
 function App() {
 
@@ -118,6 +120,8 @@ function App() {
                 <Route path="/" element={<AdminLogin />} />
                 <Route path="/login" element={<AdminLogin />} />
                 <Route path="/logout" element={<Logout />} />
+                <Route path="/designation" element={<DesignationForm />} />
+                <Route path="/rank" element={<GuardRankCreate />} />
 
 
                 {/* ---------------- ADMIN ---------------- */}

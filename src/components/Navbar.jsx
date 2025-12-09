@@ -10,9 +10,9 @@ export default function Navbar() {
 
   const [leftMenuOpen, setLeftMenuOpen] = useState(false);
   const [userDropOpen, setUserDropOpen] = useState(false);
-  const [showNavbar, setShowNavbar] = useState(
-    typeof window !== "undefined" ? window.innerWidth <= 851 : false
-  );
+const [showNavbar, setShowNavbar] = useState(
+  typeof window !== "undefined" ? window.innerWidth <= 991 : false
+);
 
   const leftMenuRef = useRef(null);
   const userRef = useRef(null);
@@ -30,7 +30,7 @@ export default function Navbar() {
   /* RESPONSIVE WIDTH */
   useEffect(() => {
     const handleResize = () => {
-      const isMobile = window.innerWidth <= 851;
+      const isMobile = window.innerWidth <= 991;
       setShowNavbar(isMobile);
 
       if (!isMobile) {
@@ -100,6 +100,8 @@ export default function Navbar() {
             <NavLink to="/notify" style={styles.menuItem}>Notifications</NavLink>
             <NavLink to="/vipform" style={styles.menuItem}>VIP Form</NavLink>
             <NavLink to="/guardform" style={styles.menuItem}>Guard Form</NavLink>
+            {/* <NavLink to="/designation" style={styles.menuItem}>Add Designations</NavLink> */}
+            {/* <NavLink to="/rank" style={styles.menuItem}>Add Ranks</NavLink> */}
             <NavLink to="/viplist" style={styles.menuItem}>VIP Table</NavLink>
             <NavLink to="/guardlist" style={styles.menuItem}>Guard Table</NavLink>
             {/* <NavLink to="/vgmang" style={styles.menuItem}>VIP–Guard Management</NavLink> */}

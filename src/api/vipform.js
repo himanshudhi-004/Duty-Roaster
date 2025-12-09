@@ -74,7 +74,7 @@ export const getAdminById = async (id) => {
 // Update admin
 export const updateAdmin = async (id, adminformData) => {
   try {
-    const response = await api.post(`/auth/update/${id}`, adminformData);
+    const response = await api.post(`/auth/update/${id}/admin`, adminformData);
     return response.data;
   } catch (error) {
     console.error("Error updating Admin data:", error.message);
@@ -142,7 +142,7 @@ export const getUserById = async (id) => {
 // Update admin
 export const updateUser = async (id, userformData) => {
   try {
-    const response = await api.post(`/auth/usr/${id}`, userformData);
+    const response = await api.put(`/usr/${id}/manager`, userformData);
     return response.data;
   } catch (error) {
     console.error("Error updating User data:", error.message);

@@ -9,7 +9,7 @@
 //   const { selectedUser } = useUserStore();
 
 //   const [showNavbar, setShowNavbar] = useState(
-//     typeof window !== "undefined" ? window.innerWidth <= 851 : false
+//     typeof window !== "undefined" ? window.innerWidth <= 991 : false
 //   );
 //   const [leftMenuOpen, setLeftMenuOpen] = useState(false);
 //   const [userDropOpen, setUserDropOpen] = useState(false);
@@ -23,7 +23,7 @@
 //   /*  RESPONSIVE WIDTH CONTROL */
 //   useEffect(() => {
 //     const handleResize = () => {
-//       const isMobile = window.innerWidth <= 851;
+//       const isMobile = window.innerWidth <= 991;
 //       setShowNavbar(isMobile);
 
 //       if (!isMobile) {
@@ -324,7 +324,7 @@ export default function UserNavbar() {
   const { selectedUser } = useUserStore();
 
   const [showNavbar, setShowNavbar] = useState(
-    typeof window !== "undefined" ? window.innerWidth <= 851 : false
+    typeof window !== "undefined" ? window.innerWidth <= 991 : false
   );
   const [leftMenuOpen, setLeftMenuOpen] = useState(false);
   const [userDropOpen, setUserDropOpen] = useState(false);
@@ -338,7 +338,7 @@ export default function UserNavbar() {
   /*  RESPONSIVE WIDTH CONTROL */
   useEffect(() => {
     const handleResize = () => {
-      const isMobile = window.innerWidth <= 851;
+      const isMobile = window.innerWidth <= 991;
       setShowNavbar(isMobile);
 
       if (!isMobile) {

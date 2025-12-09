@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { getAllAdmin, deleteAdmin } from "../api/vipform";
+import { toast } from "react-toastify";
 
 export default function AdminDetails({ onEdit, refreshTrigger }) {
   const [adminList, setAdminList] = useState([]);
@@ -30,7 +31,7 @@ export default function AdminDetails({ onEdit, refreshTrigger }) {
       const updated = await getAllAdmin();
       setAdminList(Array.isArray(updated) ? updated : []);
 
-      alert("Admin deleted successfully!");
+      toast.success("Admin deleted successfully!");
     } catch (error) {
       console.error("Error deleting Admin:", error);
     }

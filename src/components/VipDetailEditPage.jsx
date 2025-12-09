@@ -45,6 +45,7 @@ export default function VipEditForm({ vipData, onBack }) {
         name="name"
         value={vipformData.name}
         onChange={handlechange}
+        isEdit={true}
       />
 
       <FormInput
@@ -52,6 +53,7 @@ export default function VipEditForm({ vipData, onBack }) {
         name="email"
         value={vipformData.email}
         onChange={handlechange}
+        isEdit={true}
       />
 
       <FormInput
@@ -59,6 +61,7 @@ export default function VipEditForm({ vipData, onBack }) {
         name="username"
         value={vipformData.username}
         onChange={handlechange}
+        isEdit={true}
       />
 
       {/* PASSWORD FIELD (EMPTY ALWAYS ON LOAD) */}
@@ -68,50 +71,19 @@ export default function VipEditForm({ vipData, onBack }) {
         type="text"
         value={vipformData.password}   // empty initially, updates normally
         onChange={handlechange}
+        isEdit={true}
       />
 
-      {/* RANK */}
-      {/* <div className="form-group">
-        <label>Vip Designation</label>
-        <select
-          name="rank"
-          value={vipformData.designation || ""}
-          onChange={handle_vp_change}
-          style={selectStyle}
-          required
-        >
-          <option value="">Select Rank</option>
-          <option value="">A Grade</option>
-          <option value="">B Grade</option>
-          <option value="">C Grade</option>
-          <option value="">D Grade</option>
-          <option value="E Grade">E Grade</option>
-        </select>
-      </div> */}
 
       <FormInput
         label="Contact No"
         name="contactno"
         value={vipformData.contactno}
         onChange={handlechange}
+        isEdit={true}
       />
 
-      {/*  STATUS FIXED */}
-      {/* <div className="form-group">
-        <label>Vip Status</label>
-        <select
-          name="status"
-          value={vipformData.status || ""}
-          onChange={handlechange}
-          style={selectStyle}
-          required
-        >
-          <option value="">Select status</option>
-          <option value="Active">Active</option>
-          <option value="Inactive">Inactive</option>
-        </select>
-      </div> */}
-
+     
       <SubmitButton label="Update" />
       <button
         type="button"

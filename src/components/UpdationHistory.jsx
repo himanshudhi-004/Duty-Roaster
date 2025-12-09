@@ -135,6 +135,7 @@ export default function UpdationHistory() {
                 <tr>
                   <th style={styles.th}>#</th>
                   <th style={styles.th}>Entities</th>
+                  <th style={styles.th}>Field Name</th>
                   <th style={styles.th}>Status</th>
                   <th style={styles.th}>Old Value</th>
                   <th style={styles.th}>New Value</th>
@@ -152,6 +153,7 @@ export default function UpdationHistory() {
                         {index + 1 + (currentPage - 1) * rowsPerPage}
                       </td>
                       <td style={styles.td}>{item.entityName}</td>
+                      <td style={styles.td}>{item.fieldName}</td>
                       
                       <td style={styles.td}>
                         <span style={styles.badge}>

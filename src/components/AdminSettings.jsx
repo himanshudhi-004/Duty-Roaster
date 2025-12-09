@@ -1,24 +1,23 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { getAllGuard } from "../api/vipform";
 import { jwtDecode } from "jwt-decode";
 import { useAdminStore } from "../context/AdminContext";
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 export default function AdminSettings() {
-  const { selectedAdmin } = useAdminStore();
+  const { selectedAdmin, guardRanks } = useAdminStore();
 
   const [adminName, setAdminName] = useState("");
-  const [guardList, setGuardList] = useState([]);
   const [gradeList, setGradeList] = useState([]);
   const [selectedGrade, setSelectedGrade] = useState("");
   const [loading, setLoading] = useState(false);
 
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
-  const [groupName] = useState(
+  //  EDITABLE GROUP NAME
+  const [groupName, setGroupName] = useState(
     `SEC-GRP-${Math.floor(1000 + Math.random() * 9000)}`
   );
 
@@ -29,10 +28,10 @@ export default function AdminSettings() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  /* ================= ADMIN FROM TOKEN / CONTEXT ================= */
+  /* ================= ADMIN NAME ================= */
   useEffect(() => {
-    if (selectedAdmin?.name) {
-      setAdminName(selectedAdmin.name);
+    if (selectedAdmin?.adminName) {
+      setAdminName(selectedAdmin.adminName);
       return;
     }
 
@@ -40,43 +39,8 @@ export default function AdminSettings() {
     if (!token) return;
 
     const decoded = jwtDecode(token);
-    const name = decoded?.name || decoded?.username || decoded?.email;
-
-    setAdminName(name);
+    setAdminName(decoded?.name || decoded?.username || decoded?.email);
   }, [selectedAdmin]);
-
-  /* ================= FETCH ALL GUARDS ================= */
-  useEffect(() => {
-    async function fetchGuards() {
-      try {
-        const data = await getAllGuard();
-
-        let finalData = [];
-        if (Array.isArray(data)) finalData = data;
-        else if (Array.isArray(data?.data)) finalData = data.data;
-        else if (Array.isArray(data?.guards)) finalData = data.guards;
-        else if (Array.isArray(data?.officers)) finalData = data.officers;
-
-        console.log("✅ Guards API Data:", finalData);
-
-        setGuardList(finalData);
-      } catch (err) {
-        console.error("❌ Guard Fetch Error:", err);
-        toast.error("Failed to load guard ranks!");
-      }
-    }
-
-    fetchGuards();
-  }, []);
-
-  /* ================= UNIQUE RANKS ================= */
-  const availableRanks = useMemo(() => {
-    const ranks = guardList
-      .map((g) => g.rank || g.designation || g.grade || g.rank_name)
-      .filter(Boolean);
-
-    return [...new Set(ranks)];
-  }, [guardList]);
 
   /* ================= ADD RANK ================= */
   const handleAddGrade = () => {
@@ -98,6 +62,13 @@ export default function AdminSettings() {
     setSelectedGrade("");
   };
 
+  /* ================= REMOVE ROW (INSIDE ROW)  ================= */
+  const handleRemoveGrade = (index) => {
+    const updated = [...gradeList];
+    updated.splice(index, 1);
+    setGradeList(updated);
+  };
+
   /* ================= INPUT CHANGE ================= */
   const handleChange = (index, value) => {
     const updated = [...gradeList];
@@ -105,7 +76,7 @@ export default function AdminSettings() {
     setGradeList(updated);
   };
 
-  /* ================= SUBMIT (ADMIN) ================= */
+  /* ================= SUBMIT ================= */
   const handleSubmit = async () => {
     if (gradeList.length === 0) {
       toast.error("Please add at least one rank");
@@ -120,11 +91,10 @@ export default function AdminSettings() {
     }
 
     const payload = {
-      admin: adminName,
-      securityGroup: groupName,
-      grades: gradeList.map((g) => ({
+      name: groupName,
+      values: gradeList.map((g) => ({
         rank: g.rank,
-        totalGuards: g.total,
+        value: g.total,
       })),
     };
 
@@ -133,7 +103,7 @@ export default function AdminSettings() {
       const token = localStorage.getItem("adminToken");
 
       await axios.post(
-        `${BASE_URL}/api/admin/settings`,
+        `${BASE_URL}/api/setting/set`,
         payload,
         {
           headers: {
@@ -143,7 +113,7 @@ export default function AdminSettings() {
         }
       );
 
-      toast.success("Security Group Saved Successfully ✅");
+      toast.success("Security Group Saved Successfully ");
       setGradeList([]);
     } catch (err) {
       console.error("Save Error:", err);
@@ -153,6 +123,7 @@ export default function AdminSettings() {
     }
   };
 
+  /* ================= YOUR UI ================= */
   return (
     <div style={styles.pageContainer}>
       <div style={styles.header}>
@@ -173,28 +144,50 @@ export default function AdminSettings() {
           <div style={{ ...styles.leftBox, width: isMobile ? "100%" : "32%" }}>
             <h4 style={styles.pointsTitle}>Security Group Rules</h4>
             <ul style={styles.pointList}>
-              <li>Ranks fetched from live Guard data</li>
-              <li>No duplicate ranks allowed</li>
-              <li>All selected ranks saved under one group</li>
+              <li>All ranks are automatically fetched from the Admin Dashboard.</li>
+              <li>Duplicate ranks are strictly blocked to avoid data conflicts.</li>
+              <li>All selected ranks are saved together under a single Security Group.</li>
+              <li>Each Security Group must have a unique name for proper identification.</li>
+              <li>Example Group Names: <b>SEC-GRP-1023</b>, <b>SEC-GRP-4589</b></li>
+
             </ul>
 
+            {/*  EDITABLE GROUP CODE */}
             <div style={styles.noteBox}>
-              🔒 Group Code: <b>{groupName}</b>
+              🔒 Group Code:
+              <input
+                value={groupName}
+                onChange={(e) => setGroupName(e.target.value)}
+                style={{
+                  marginLeft: 8,
+                  padding: 6,
+                  borderRadius: 6,
+                  border: "1px solid #ccc",
+                }}
+              />
             </div>
           </div>
 
           {/* RIGHT */}
           <div style={{ ...styles.rightBox, width: isMobile ? "100%" : "68%" }}>
-            <p>Ranks Found: {availableRanks.length}</p>
+            <p>Ranks Found: {guardRanks.length}</p>
 
-            <div style={{ ...styles.addBar, flexDirection: isMobile ? "column" : "row" }}>
+            <div
+              style={{
+                ...styles.addBar,
+                flexDirection: isMobile ? "column" : "row",
+              }}
+            >
               <select
                 value={selectedGrade}
                 onChange={(e) => setSelectedGrade(e.target.value)}
-                style={{ ...styles.select, width: isMobile ? "100%" : "70%" }}
+                style={{
+                  ...styles.select,
+                  width: isMobile ? "100%" : "70%",
+                }}
               >
                 <option value="">-- Select Rank --</option>
-                {availableRanks.map((r, i) => (
+                {guardRanks.map((r, i) => (
                   <option key={i} value={r}>
                     {r}
                   </option>
@@ -203,7 +196,10 @@ export default function AdminSettings() {
 
               <button
                 onClick={handleAddGrade}
-                style={{ ...styles.addBtn, width: isMobile ? "100%" : "30%" }}
+                style={{
+                  ...styles.addBtn,
+                  width: isMobile ? "100%" : "30%",
+                }}
               >
                 ➕ Add
               </button>
@@ -237,6 +233,22 @@ export default function AdminSettings() {
                         width: isMobile ? "100%" : "auto",
                       }}
                     />
+
+                    {/*  REMOVE BUTTON INSIDE SAME ROW */}
+                    <button
+                      onClick={() => handleRemoveGrade(index)}
+                      style={{
+                        background: "#ff4d4d",
+                        color: "white",
+                        border: "none",
+                        padding: "8px 12px",
+                        borderRadius: 8,
+                        fontWeight: 600,
+                        cursor: "pointer",
+                      }}
+                    >
+                      <i className="fas fa-trash"></i>
+                    </button>
                   </div>
                 ))}
               </div>
@@ -262,7 +274,7 @@ export default function AdminSettings() {
   );
 }
 
-/* ================= STYLES (UNCHANGED) ================= */
+/* ================= YOUR STYLES ================= */
 const styles = {
   pageContainer: {
     padding: 20,

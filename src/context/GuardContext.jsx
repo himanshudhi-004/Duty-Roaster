@@ -57,7 +57,7 @@ export const GuardProvider = ({ children }) => {
   /*  AUTO FETCH PROFILE EACH TIME TOKEN EXISTS */
   useEffect(() => {
     const token = localStorage.getItem("guardToken");
-    console.log("Guard Provider Activated",children);
+    //console.log("Guard Provider Activated",children);
     if (!token) {
       setSelectedGuard(null);
       setProfileImage(null);
@@ -82,7 +82,7 @@ export const GuardProvider = ({ children }) => {
         params: { username },
         headers: { Authorization: `Bearer ${token}` },
       });
-      console.log("Fetched Guard Profile:", await res.data);
+    //  console.log("Fetched Guard Profile:", await res.data);
       
       const profile = Array.isArray(res.data) ? res.data[0] : res.data;
 

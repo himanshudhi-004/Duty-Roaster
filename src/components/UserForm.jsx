@@ -3,6 +3,7 @@ import FormInput from './FormInput';
 import SubmitButton from './SubmitButton';
 import { submitUserFormData, updateUser } from '../api/vipform';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 export default function UserForm() {
   const [userformData, setuserFormData] = useState({
@@ -52,7 +53,7 @@ export default function UserForm() {
     try {
       if (isEditMode) {
         await updateUser(userformData.id, userformData);
-        alert("User details updated successfully!");
+        toast.success("User details updated successfully!");
       } else {
         await submitUserFormData(userformData);
         navigate("/login");

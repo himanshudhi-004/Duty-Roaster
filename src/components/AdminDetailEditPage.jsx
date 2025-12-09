@@ -67,6 +67,7 @@ export default function AdminEditForm({ adminData, onBack }) {
               name="adminName"
               value={adminformData.adminName}
               onChange={handle_ad_change}
+              isEdit={true}
             />
 
             <FormInput
@@ -74,6 +75,7 @@ export default function AdminEditForm({ adminData, onBack }) {
               name="adminUsername"
               value={adminformData.adminUsername}
               onChange={handle_ad_change}
+              isEdit={true}
             />
 
             <FormInput
@@ -81,15 +83,17 @@ export default function AdminEditForm({ adminData, onBack }) {
               name="adminEmail"
               value={adminformData.adminEmail}
               onChange={handle_ad_change}
+              isEdit={true}
             />
 
             {/* PASSWORD FIELD (EMPTY ALWAYS ON LOAD) */}
             <FormInput
               label="Password"
               name="Password"
-              type="password"
+              type="text"
               value={adminformData.Password}   // empty initially, updates normally
               onChange={handle_ad_change}
+              isEdit={true}
             />
 
             <FormInput
@@ -97,6 +101,7 @@ export default function AdminEditForm({ adminData, onBack }) {
               name="contactNo"
               value={adminformData.contactNo}
               onChange={handle_ad_change}
+              isEdit={true}
             />
 
             <SubmitButton label="Update" />

@@ -8,33 +8,34 @@ export const AdminProvider = ({ children }) => {
     return stored ? JSON.parse(stored) : null;
   });
 
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  //  STORE RANKS FROM ADMIN DASHBOARD
+  const [guardRanks, setGuardRanks] = useState([]);
 
-  //  Auto sync to localStorage
   useEffect(() => {
     if (selectedAdmin) {
       localStorage.setItem("selectedAdmin", JSON.stringify(selectedAdmin));
     }
   }, [selectedAdmin]);
 
-  const handleEdit = (admin) => {
-    setSelectedAdmin(admin);
-  };
+  const handleEdit = (admin) => setSelectedAdmin(admin);
 
   const handleBack = () => {
     setSelectedAdmin(null);
     localStorage.removeItem("selectedAdmin");
-    setRefreshTrigger((prev) => prev + 1);
+    setGuardRanks([]);
   };
 
   return (
     <AdminContext.Provider
       value={{
         selectedAdmin,
-        refreshTrigger,
+        setSelectedAdmin,
         handleEdit,
         handleBack,
-        setSelectedAdmin, //  REQUIRED FOR PROFILE & NAVBAR
+
+        //  RANK STORE
+        guardRanks,
+        setGuardRanks,
       }}
     >
       {children}

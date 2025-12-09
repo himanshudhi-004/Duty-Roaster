@@ -37,7 +37,7 @@ export default function AdminLogin() {
 
         // Fetch backend role
         const backendRole = response?.res?.data?.role?.toLowerCase();
-        console.log("Role from API:", backendRole);
+        //console.log("Role from API:", backendRole);
 
         // Save token with role key
         if (backendRole) {

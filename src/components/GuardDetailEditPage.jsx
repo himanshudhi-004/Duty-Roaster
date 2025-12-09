@@ -47,6 +47,7 @@ export default function GuardEditForm({ guardData, onBack }) {
         name="name"
         value={guardformData.name}
         onChange={handle_gd_change}
+        isEdit={true}
       />
 
       <FormInput
@@ -54,6 +55,7 @@ export default function GuardEditForm({ guardData, onBack }) {
         name="email"
         value={guardformData.email}
         onChange={handle_gd_change}
+        isEdit={true}
       />
 
       <FormInput
@@ -61,6 +63,7 @@ export default function GuardEditForm({ guardData, onBack }) {
         name="username"
         value={guardformData.username}
         onChange={handle_gd_change}
+        isEdit={true}
       />
 
       {/* PASSWORD FIELD (EMPTY ALWAYS ON LOAD) */}
@@ -70,6 +73,7 @@ export default function GuardEditForm({ guardData, onBack }) {
         type="text"
         value={guardformData.password}   // empty initially, updates normally
         onChange={handle_gd_change}
+        isEdit={true}
       />
 
       {/* RANK */}
@@ -80,7 +84,7 @@ export default function GuardEditForm({ guardData, onBack }) {
           value={guardformData.rank || ""}
           onChange={handle_gd_change}
           style={selectStyle}
-          required
+          isEdit={true}
         >
           <option value="">Select Rank</option>
           <option value="A Grade">A Grade</option>
@@ -97,6 +101,7 @@ export default function GuardEditForm({ guardData, onBack }) {
         type="number"
         value={guardformData.experience || ""}
         onChange={handle_gd_change}
+        isEdit={true}
       />
 
       <FormInput
@@ -104,23 +109,9 @@ export default function GuardEditForm({ guardData, onBack }) {
         name="contactno"
         value={guardformData.contactno}
         onChange={handle_gd_change}
+        isEdit={true}
       />
 
-      {/*  STATUS FIXED */}
-      {/* <div className="form-group">
-        <label>Guard Status</label>
-        <select
-          name="status"
-          value={guardformData.status || ""}
-          onChange={handle_gd_change}
-          style={selectStyle}
-          required
-        >
-          <option value="">Select status</option>
-          <option value="Active">Active</option>
-          <option value="Inactive">Inactive</option>
-        </select>
-      </div> */}
 
       <SubmitButton label="Update" />
       <button

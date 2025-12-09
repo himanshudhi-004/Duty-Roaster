@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useUserStore } from "../context/UserContext";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -8,16 +8,19 @@ const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 export default function UserProfile() {
   const navigate = useNavigate();
-  const { handle_us_Edit, setSelectedUser } = useUserStore();
+  const { handleEdit, setSelectedUser, selectedUser } = useUserStore();
 
   const [userDetails, setUserDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [profileImage, setProfileImage] = useState(null);
 
+  const fileRef = useRef(null);
+
   useEffect(() => {
     fetchProfile();
   }, []);
 
+  /* ---------------- FETCH PROFILE ---------------- */
   const fetchProfile = async () => {
     try {
       const token = localStorage.getItem("userToken");
@@ -34,11 +37,13 @@ export default function UserProfile() {
       const profile = Array.isArray(res.data) ? res.data[0] : res.data;
 
       setUserDetails(profile);
-      setSelectedUser(profile); //  STORE IN CONTEXT
-      localStorage.setItem("selectedUser", JSON.stringify(profile)); //  FOR REFRESH
+      setSelectedUser(profile);
+      localStorage.setItem("selectedUser", JSON.stringify(profile));
 
       if (profile?.image) {
         setProfileImage(`${BASE_URL}/${profile.image}`);
+      } else if (profile?.url) {
+        setProfileImage(profile.url);
       }
     } catch (err) {
       console.log("Profile Fetch Error:", err);
@@ -47,18 +52,19 @@ export default function UserProfile() {
     }
   };
 
-  /* ---------------- IMAGE UPLOAD ----------------- */
+  /* ---------------- IMAGE UPLOAD ---------------- */
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
-    if (!file) return;
+    if (!file || !userDetails?.id) return;
 
     const token = localStorage.getItem("userToken");
+
     const formData = new FormData();
-    formData.append("image", file);
+    formData.append("imaged", file);
 
     try {
       const res = await axios.post(
-        `${BASE_URL}/usr/upload-profile-image/${userDetails.id}`,
+        `${BASE_URL}/api/profile/upload/${selectedUser.id}/user`,
         formData,
         {
           headers: {
@@ -68,43 +74,71 @@ export default function UserProfile() {
         }
       );
 
-      setProfileImage(`${BASE_URL}/${res.data.image}`);
+      const imageUrl = res.data;
+
+      if (imageUrl) {
+        setProfileImage(imageUrl);
+
+        const updatedUser = {
+          ...selectedUser,
+          url: imageUrl,
+        };
+
+        setSelectedUser(updatedUser);
+        localStorage.setItem(
+          "selectedUser",
+          JSON.stringify(updatedUser)
+        );
+      }
     } catch (err) {
-      console.log("Image Upload Error:", err);
+      console.log(
+        "Image Upload Error:",
+        err.response?.data || err.message
+      );
+    }
+  };
+
+  /* ---------------- IMAGE PREVIEW ---------------- */
+  const openImage = () => {
+    if (profileImage) {
+      window.open(profileImage, "_blank");
     }
   };
 
   if (loading) {
     return (
-      <div className="text-center py-5">
-        <i className="fa fa-spinner fa-spin fa-2x text-primary mb-3"></i>
-        <h5>Loading profile...</h5>
+      <div style={styles.loaderWrap}>
+        <i className="fa fa-spinner fa-spin fa-3x"></i>
+        <p>Loading profile...</p>
       </div>
     );
   }
 
   if (!userDetails) {
     return (
-      <div className="text-center py-5 text-danger">
+      <div style={styles.errorWrap}>
         <h4>Unable to load profile.</h4>
       </div>
     );
   }
 
+  /* ===================  User PROFILE UI USED HERE =================== */
   return (
     <div style={styles.pageContainer}>
       <div style={styles.header}>
         <h2 style={styles.headerTitle}>
-          <i className="fa fa-user-circle me-2"></i> Manager Profile
+          <i className="fa fa-user me-2"></i> User Profile
         </h2>
-        <p style={styles.headerSubtitle}>Overview of user account details</p>
+        <p style={styles.headerSubtitle}>
+          Professional Identity & Account Info
+        </p>
       </div>
 
       <div style={styles.card}>
-        <div style={styles.cardBody}>
-          <div style={styles.profileRow}>
-            {/* ----------- IMAGE SECTION (ADDED ONLY) ----------- */}
-            <div style={styles.leftBox}>
+        <div style={styles.profileRow}>
+          {/* LEFT SECTION */}
+          <div style={styles.leftBox}>
+            <div style={styles.imageWrapper}>
               <img
                 src={
                   profileImage ||
@@ -112,59 +146,67 @@ export default function UserProfile() {
                 }
                 alt="Profile"
                 style={styles.profileImage}
+                onClick={openImage}
               />
 
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                style={{ marginTop: "10px" }}
-              />
-
-              <h4 style={styles.name}>{userDetails.name}</h4>
-              <p style={styles.role}>User</p>
+              <div
+                style={styles.uploadBtn}
+                onClick={() => fileRef.current.click()}
+              >
+                <i className="fa fa-camera"></i>
+              </div>
             </div>
 
-            {/* ----------- DETAILS SECTION (UNCHANGED) ----------- */}
-            <div style={styles.rightBox}>
-              {[
-                ["User ID", userDetails.id],
-                ["Username", userDetails.username],
-                ["Email", userDetails.email],
-                ["Contact No", userDetails.contactno],
-                [
-                  "Status",
-                  <span
-                    style={{
-                      ...styles.statusBadge,
-                      background:
-                        userDetails.status === "Active"
-                          ? "#28a745"
-                          : "#dc3545",
-                    }}
-                  >
-                    {userDetails.status}
-                  </span>,
-                ],
-              ].map(([label, value], i) => (
-                <div style={styles.detailRow} key={i}>
-                  <div style={styles.detailLabel}>{label}:</div>
-                  <div style={styles.detailValue}>{value}</div>
-                </div>
-              ))}
+            <input
+              type="file"
+              accept="image/*"
+              ref={fileRef}
+              onChange={handleImageUpload}
+              style={{ display: "none" }}
+            />
 
-              <div style={{ marginTop: "20px" }}>
-                <button
-                  style={styles.editBtn}
-                  onClick={() => {
-                    handle_us_Edit(userDetails);
-                    navigate("/useredit");
+            <h4 style={styles.name}>{userDetails.name}</h4>
+            <p style={styles.role}>User</p>
+          </div>
+
+          {/* RIGHT SECTION */}
+          <div style={styles.rightBox}>
+            {[
+              ["User ID", userDetails.id],
+              ["Username", userDetails.username],
+              ["Email", userDetails.email],
+              ["Contact No", userDetails.contactno],
+              [
+                "Status",
+                <span
+                  style={{
+                    ...styles.statusBadge,
+                    background:
+                      userDetails.status === "Active"
+                        ? "#28a745"
+                        : "#dc3545",
                   }}
                 >
-                  <i className="fa fa-edit me-1"></i> Edit Profile
-                </button>
+                  {userDetails.status}
+                </span>,
+              ],
+            ].map(([label, value], i) => (
+              <div style={styles.detailRow} key={i}>
+                <div style={styles.detailLabel}>{label}</div>
+                <div style={styles.detailValue}>{value}</div>
               </div>
+            ))}
 
+            <div style={styles.actionRow}>
+              <button
+                style={styles.editBtn}
+                onClick={() => {
+                  handleEdit(userDetails);
+                  navigate("/useredit");
+                }}
+              >
+                <i className="fa fa-edit me-2"></i> Edit Profile
+              </button>
             </div>
           </div>
         </div>
@@ -173,67 +215,128 @@ export default function UserProfile() {
   );
 }
 
-/* ------------------ UI THEME STYLES (UNCHANGED + IMAGE STYLE ADDED) ------------------ */
+/* ==================  Manager PROFILE STYLES ================== */
 const styles = {
   pageContainer: {
-    padding: "30px",
-    minHeight: "100vh",
-    background: "rgba(255,255,255,0.15)",
-    backdropFilter: "blur(6px)",
+    padding: "25px",
+    minHeight: "92.5vh",
+    background: "#f4f6f9",
   },
   header: {
     marginBottom: "25px",
-    padding: "20px",
-    background: "linear-gradient(135deg, #4e54c8, #8f94fb)",
-    borderRadius: "14px",
+    padding: "22px",
+    background: "linear-gradient(135deg,#1e73be,#4facfe)",
+    borderRadius: "16px",
     color: "white",
-    boxShadow: "0 6px 18px rgba(0,0,0,0.15)",
+    boxShadow: "0 6px 18px rgba(0,0,0,0.2)",
+    textAlign: "center",
   },
-  headerTitle: { margin: 0, fontSize: "26px", fontWeight: "700" },
-  headerSubtitle: { marginTop: "5px", opacity: 0.9 },
+  headerTitle: { margin: 0, fontSize: "26px", fontWeight: "800" },
+  headerSubtitle: { marginTop: "6px", opacity: 0.9 },
+
   card: {
-    background: "rgba(255,255,255,0.55)",
-    borderRadius: "18px",
-    padding: "25px",
-    backdropFilter: "blur(8px)",
-    boxShadow: "0 8px 20px rgba(0,0,0,0.15)",
+    background: "#ffffff",
+    borderRadius: "20px",
+    padding: "30px",
+    boxShadow: "0 12px 28px rgba(0,0,0,0.15)",
   },
+
   profileRow: {
     display: "flex",
-    gap: "40px",
+    gap: "35px",
     flexWrap: "wrap",
     alignItems: "center",
+    justifyContent: "center",
   },
-  leftBox: { flex: "1", textAlign: "center" },
 
-  /*  IMAGE STYLE ADDED */
+  leftBox: { flex: "1", minWidth: "260px", textAlign: "center" },
+
+  imageWrapper: {
+    position: "relative",
+    width: "150px",
+    height: "150px",
+    margin: "0 auto",
+  },
+
   profileImage: {
-    width: "140px",
-    height: "140px",
+    width: "100%",
+    height: "100%",
     borderRadius: "50%",
     objectFit: "cover",
-    border: "3px solid #4e54c8",
+    border: "4px solid #1e73be",
+    boxShadow: "0 8px 22px rgba(30,115,190,0.4)",
+    cursor: "pointer",
   },
 
-  name: { fontSize: "22px", fontWeight: "700", marginTop: "10px" },
-  role: { fontSize: "15px", color: "#777" },
-  rightBox: { flex: "2" },
-  detailRow: { display: "flex", marginBottom: "12px" },
-  detailLabel: { width: "150px", fontWeight: "600", color: "#333" },
-  detailValue: { flex: 1, fontWeight: "500", color: "#444" },
-  statusBadge: {
-    padding: "6px 12px",
-    borderRadius: "20px",
-    color: "white",
-    fontWeight: "600",
-  },
-  editBtn: {
+  uploadBtn: {
+    position: "absolute",
+    bottom: "8px",
+    right: "8px",
     background: "#1e73be",
     color: "white",
-    padding: "10px 18px",
-    borderRadius: "10px",
+    width: "34px",
+    height: "34px",
+    borderRadius: "50%",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    cursor: "pointer",
+    boxShadow: "0 4px 10px rgba(0,0,0,0.25)",
+  },
+
+  name: { fontSize: "22px", fontWeight: "800", marginTop: "14px" },
+  role: { fontSize: "15px", color: "#777" },
+
+  rightBox: { flex: "2", minWidth: "280px" },
+
+  detailRow: {
+    display: "flex",
+    justifyContent: "space-between",
+    padding: "12px 0",
+    borderBottom: "1px solid #eee",
+  },
+
+  detailLabel: { fontWeight: "600", color: "#555" },
+  detailValue: { fontWeight: "600", color: "#222" },
+
+  statusBadge: {
+    padding: "6px 14px",
+    borderRadius: "30px",
+    color: "white",
+    fontWeight: "700",
+    fontSize: "13px",
+  },
+
+  actionRow: { marginTop: "25px", textAlign: "right" },
+
+  editBtn: {
+    background: "linear-gradient(135deg,#1e73be,#4facfe)",
+    color: "white",
+    padding: "12px 22px",
+    borderRadius: "30px",
     border: "none",
     cursor: "pointer",
-    fontWeight: "600",
+    fontWeight: "700",
+    boxShadow: "0 8px 20px rgba(0,0,0,0.2)",
+  },
+
+  loaderWrap: {
+    minHeight: "100vh",
+    background: "#f4f6f9",
+    color: "#1e73be",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: "10px",
+  },
+
+  errorWrap: {
+    minHeight: "100vh",
+    background: "#f4f6f9",
+    color: "#dc3545",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
   },
 };

@@ -1,28 +1,28 @@
-// src/components/DesignationForm.jsx
+// components/DesignationForm.jsx
 import React, { useState } from "react";
-import { submit_vip_FormData } from "../api/vipform";
+import { createCategory } from "../api/designation";
 import { toast } from "react-toastify";
 
-export default function DesignationForm() {
-  const [designation, setDesignation] = useState("");
+export default function GuardRankCreate() {
+  const [category, setCategory] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!designation.trim()) {
-      alert("Please enter a designation name.");
+    if (!category.trim()) {
+      alert("Please enter a Category name.");
       return;
     }
 
     try {
       setLoading(true);
-      await submit_vip_FormData({ name: designation });
-      toast.success("Designation created successfully!");
-      setDesignation("");
+      await createCategory({ name: category });
+      toast.success("Rank created successfully!");
+      setCategory("");
     } catch (error) {
-      console.error("Error creating designation:", error);
-      toast.error("Failed to create designation.");
+      console.error("Error creating Rank:", error);
+      toast.error("Failed to create category.");
     } finally {
       setLoading(false);
     }
@@ -31,23 +31,23 @@ export default function DesignationForm() {
   return (
     <div style={containerStyle}>
       <div style={cardStyle}>
-        <h2 style={titleStyle}>Create VIP Designation</h2>
-        <p style={subTitleStyle}>Add a new VIP role or title</p>
+        <h2 style={titleStyle}>Create Guard Grade</h2>
+        <p style={subTitleStyle}>Add new guard rank or grade</p>
 
         <form onSubmit={handleSubmit}>
           <div style={inputGroup}>
-            <label style={labelStyle}>Designation Name</label>
+            <label style={labelStyle}>Grade Name</label>
             <input
               type="text"
-              value={designation}
-              onChange={(e) => setDesignation(e.target.value)}
-              placeholder="e.g. Minister, Governor, Chief Guest"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              placeholder="e.g. A Grade, B Grade"
               style={inputStyle}
             />
           </div>
 
           <button type="submit" style={buttonStyle} disabled={loading}>
-            {loading ? "Saving..." : "Add Designation"}
+            {loading ? "Saving..." : "Add Grade"}
           </button>
         </form>
       </div>

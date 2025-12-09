@@ -67,6 +67,7 @@ export default function UserDetailEditPage({ userData, onBack }) {
               name="name"
               value={userformData.name}
               onChange={handle_us_change}
+              isEdit={true}
             />
 
             <FormInput
@@ -74,6 +75,7 @@ export default function UserDetailEditPage({ userData, onBack }) {
               name="username"
               value={userformData.username}
               onChange={handle_us_change}
+              isEdit={true}
             />
 
             <FormInput
@@ -81,6 +83,7 @@ export default function UserDetailEditPage({ userData, onBack }) {
               name="email"
               value={userformData.email}
               onChange={handle_us_change}
+              isEdit={true}
             />
 
             {/* PASSWORD FIELD (EMPTY ALWAYS ON LOAD) */}
@@ -90,6 +93,7 @@ export default function UserDetailEditPage({ userData, onBack }) {
               type="text"
               value={userformData.password}   // empty initially, updates normally
               onChange={handle_us_change}
+              isEdit={true}
             />
 
             <FormInput
@@ -97,6 +101,7 @@ export default function UserDetailEditPage({ userData, onBack }) {
               name="contactno"
               value={userformData.contactno}
               onChange={handle_us_change}
+              isEdit={true}
             />
 
              <div className="form-group">
@@ -106,7 +111,7 @@ export default function UserDetailEditPage({ userData, onBack }) {
                 value={userformData.status}
                 onChange={handle_us_change}
                 style={styles.select}
-                required
+                isEdit={true}
               >
                 <option value="">Select Status</option>
                 <option value="Active">Active</option>

@@ -17,7 +17,7 @@ export const UserProvider = ({ children }) => {
     }
   }, [selectedUser]);
 
-  const handle_us_Edit = (user) => {
+  const handleEdit = (user) => {
     setSelectedUser(user);
   };
 
@@ -32,7 +32,7 @@ export const UserProvider = ({ children }) => {
       value={{
         selectedUser,
         refreshTrigger,
-        handle_us_Edit,
+        handleEdit,
         handleBack,
         setSelectedUser,   //  REQUIRED
       }}
