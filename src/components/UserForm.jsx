@@ -7,13 +7,12 @@ import { toast } from 'react-toastify';
 
 export default function UserForm() {
   const [userformData, setuserFormData] = useState({
-    id: '',
     name: '',
     username: '',
     password: '',
     email: '',
     contactno: '',
-    status: '',
+    status: "Active",
   });
 
   const [isEditMode, setIsEditMode] = useState(false);
@@ -31,13 +30,12 @@ export default function UserForm() {
 
   const resetForm = () => {
     setuserFormData({
-      id: '',
       name: '',
       username: '',
       password: '',
       email: '',
       contactno: '',
-      status: '',
+      status: "Active",
     });
     setIsEditMode(false);
     setSelectedUser(null);
@@ -112,7 +110,7 @@ export default function UserForm() {
             <FormInput label="Contact Number" name="contactno" type='text'
               value={userformData.contactno} onChange={handle_us_Change} required />
 
-            <div className="form-group">
+            {/* <div className="form-group">
               <label>Status</label>
               <select
                 name="status"
@@ -125,7 +123,7 @@ export default function UserForm() {
                 <option value="Active">Active</option>
                 <option value="InActive">InActive</option>
               </select>
-            </div>
+            </div> */}
 
             <SubmitButton label={isEditMode ? "Update User Details" : "Submit User Details"} />
 

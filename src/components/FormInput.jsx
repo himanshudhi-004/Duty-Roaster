@@ -6,7 +6,7 @@ export default function FormInput({
   value,
   onChange,
   type = "text",
-  isEdit = false, // ✅ default: create form
+  isEdit = false, //  default: create form
 }) {
   return (
     <div className="form-group" style={{ marginBottom: "15px" }}>
@@ -20,7 +20,7 @@ export default function FormInput({
         name={name}
         value={value}
         onChange={onChange}
-        required={!isEdit} // ✅ required ONLY for create form
+        required={!isEdit} //  required ONLY for create form
         style={{
           width: "100%",
           padding: "10px",

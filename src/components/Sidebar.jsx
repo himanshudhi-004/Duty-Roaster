@@ -99,7 +99,7 @@
 //               <span>Add Designations</span>
 //             </NavLink>
 //           </li> 
-          
+
 //           <li style={styles.menuItem}>
 //             <NavLink
 //               to="/rank"
@@ -110,7 +110,7 @@
 //               <span>Add Ranks</span>
 //             </NavLink>
 //           </li> 
-          
+
 //           */}
 
 
@@ -333,10 +333,12 @@ export default function Sidebar() {
   const navigate = useNavigate();
 
   const [open, setOpen] = useState({
-    forms: true,
-    tables: true,
-    others: true,
-  });
+  forms: false,
+  tables: false,
+  duty: false,
+  history: false,
+});
+
 
   const toggle = (key) =>
     setOpen((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -380,8 +382,13 @@ export default function Sidebar() {
             background: rgba(32, 178, 170, 0.08);
           }
 
-          .dropdown-others:hover {
+          .dropdown-duty:hover {
             border-left: 4px solid #ff8c00;
+            background: rgba(255, 140, 0, 0.08);
+          }
+            
+          .dropdown-history:hover {
+            border-left: 4px solid #28f68bff;
             background: rgba(255, 140, 0, 0.08);
           }
         `}
@@ -399,7 +406,7 @@ export default function Sidebar() {
 
           {/* Dashboard */}
           <li style={styles.menuItem}>
-            <NavLink to="/admindashboard" style={styles.menuLink} className="menu-link">
+            <NavLink to="/admindashboard" style={styles.menuLink} className="menu-link mt-3">
               <i className="fas fa-home" style={styles.icon}></i>
               <span>Dashboard</span>
             </NavLink>
@@ -484,17 +491,60 @@ export default function Sidebar() {
             </>
           )}
 
-          {/* ================= OTHERS ================= */}
+
+          {/* ================= Duty-Management ================= */}
           <li
-            style={styles.sectionTitleOthers}
-            className="dropdown-others"
-            onClick={() => toggle("others")}
+            style={styles.sectionTitleDuty}
+            className="dropdown-duty"
+            onClick={() => toggle("duty")}
           >
-            Others
-            <i className={`fas fa-chevron-${open.others ? "up" : "down"}`} style={styles.arrowOthers}></i>
+            Duty-Management
+            <i className={`fas fa-chevron-${open.duty ? "up" : "down"}`} style={styles.arrowDuty}></i>
           </li>
 
-          {open.others && (
+          {open.duty && (
+            <>
+              {/* <li style={styles.menuItem}>
+                <NavLink to="/updatehistory" style={styles.menuLink} className="menu-link">
+                  <i className="fas fa-history" style={styles.icon}></i>
+                  <span>Updation History</span>
+                </NavLink>
+              </li>
+
+              <li style={styles.menuItem}>
+                <NavLink to="/dutyhistory" style={styles.menuLink} className="menu-link">
+                  <i className="fas fa-history" style={styles.icon}></i>
+                  <span>Guard-Duty-History</span>
+                </NavLink>
+              </li> */}
+
+              <li style={styles.menuItem}>
+                <NavLink to="/adminrequestaccept" style={styles.menuLink} className="menu-link">
+                  <i className="fas fa-check-circle" style={styles.icon}></i>
+                  <span>Duty Accept/Reject</span>
+                </NavLink>
+              </li>
+
+              <li style={styles.menuItem}>
+                <NavLink to="/incidents" style={styles.menuLink} className="menu-link">
+                  <i className="fas fa-exclamation-triangle" style={styles.icon}></i>
+                  <span>Incidents</span>
+                </NavLink>
+              </li>
+
+            </>
+          )}
+
+          {/* ================= History ================= */}
+          <li
+            style={styles.sectionTitleHistory}
+            className="dropdown-history"
+            onClick={() => toggle("history")}
+          >
+            History
+            <i className={`fas fa-chevron-${open.history ? "up" : "down"}`} style={styles.arrowHistory}></i>
+          </li>
+          {open.history && (
             <>
               <li style={styles.menuItem}>
                 <NavLink to="/updatehistory" style={styles.menuLink} className="menu-link">
@@ -509,36 +559,26 @@ export default function Sidebar() {
                   <span>Guard-Duty-History</span>
                 </NavLink>
               </li>
-
-              <li style={styles.menuItem}>
-                <NavLink to="/incidents" style={styles.menuLink} className="menu-link">
-                  <i className="fas fa-exclamation-triangle" style={styles.icon}></i>
-                  <span>Incidents</span>
-                </NavLink>
-              </li>
-
-              <li style={styles.menuItem}>
-                <NavLink to="/adminrequestaccept" style={styles.menuLink} className="menu-link">
-                  <i className="fas fa-check-circle" style={styles.icon}></i>
-                  <span>Duty Accept/Reject</span>
-                </NavLink>
-              </li>
-
-              <li style={styles.menuItem}>
-                <NavLink to="/setting" style={styles.menuLink} className="menu-link">
-                  <i className="fas fa-cog" style={styles.icon}></i>
-                  <span>Settings</span>
-                </NavLink>
-              </li>
-
-              <li style={styles.menuItem}>
-                <NavLink to="/adminprofile" style={styles.menuLink} className="menu-link">
-                  <i className="fas fa-user" style={styles.icon}></i>
-                  <span>My Profile</span>
-                </NavLink>
-              </li>
             </>
           )}
+
+  <li style={styles.sectionTitle}>Others</li>
+          {/* Profile */}
+          <li style={styles.menuItem}>
+            <NavLink to="/adminprofile" style={styles.menuLink} className="menu-link">
+              <i className="fas fa-user" style={styles.icon}></i>
+              <span>My Profile</span>
+            </NavLink>
+          </li>
+          
+          {/* Setting */}
+          <li style={styles.menuItem}>
+            <NavLink to="/setting" style={styles.menuLink} className="menu-link">
+              <i className="fas fa-cog" style={styles.icon}></i>
+              <span>Settings</span>
+            </NavLink>
+          </li>
+
 
           {/* Logout */}
           <li style={styles.menuItem}>
@@ -638,7 +678,7 @@ const styles = {
     transition: "0.3s",
   },
 
-  sectionTitleOthers: {
+  sectionTitleDuty: {
     fontSize: "13px",
     fontWeight: "700",
     color: "#ff8c00",
@@ -648,7 +688,18 @@ const styles = {
     transition: "0.3s",
   },
 
+  sectionTitleHistory: {
+    fontSize: "13px",
+    fontWeight: "700",
+    color: "#3df646ff",
+    margin: "20px 10px 10px 10px",
+    cursor: "pointer",
+    padding: "6px 10px",
+    transition: "0.3s",
+  },
+
   arrowForms: { fontSize: "12px", marginLeft: "8px", color: "#6a5acd" },
   arrowTables: { fontSize: "12px", marginLeft: "8px", color: "#20b2aa" },
-  arrowOthers: { fontSize: "12px", marginLeft: "8px", color: "#ff8c00" },
+  arrowDuty: { fontSize: "12px", marginLeft: "8px", color: "#ff8c00" },
+  arrowHistory: { fontSize: "12px", marginLeft: "8px", color: "#4ce22eff" },
 };

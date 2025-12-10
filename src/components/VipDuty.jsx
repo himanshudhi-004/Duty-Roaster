@@ -182,7 +182,7 @@ export default function VipDuty() {
       }
 
       const res = await axios.post(
-        `${BASE_URL}/api/assignments/complete/vip/${selectedVip.id}`,
+        `${BASE_URL}/api/assignments/complete/vip/${selectedVip.id}/completed`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );

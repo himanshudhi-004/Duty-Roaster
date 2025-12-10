@@ -55,7 +55,7 @@ export default function DesignationForm() {
   );
 }
 
-/* ✅ Styles */
+/*  Styles */
 
 const containerStyle = {
   minHeight: "100vh",

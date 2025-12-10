@@ -439,7 +439,7 @@ export default function VipAutoAssign() {
       setLoading(true);
 
       const res = await api.post(
-        `/api/assignments/complete/vip/${vip.id}`
+        `/api/assignments/complete/vip/${vip.id}/completed`
       );
 
       toast.success(" Duty marked as Completed Successfully!");

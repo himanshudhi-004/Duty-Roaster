@@ -111,16 +111,17 @@ import FormInput from './FormInput';
 import SubmitButton from './SubmitButton';
 import { submitAdminFormData, updateAdmin } from '../api/vipform';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 export default function AdminForm() {
   const [adminformData, setadminFormData] = useState({
-    id: '',
+    
     adminName: '',
     adminUsername: '',
     adminEmail: '',
     adminPassword: '',
     contactNo: '',
-    role: '',
+    role: "admin",
   });
 
   const [isEditMode, setIsEditMode] = useState(false);
@@ -138,13 +139,13 @@ export default function AdminForm() {
 
   const resetForm = () => {
     setadminFormData({
-      id: '',
+     
       adminName: '',
       adminUsername: '',
       adminEmail: '',
       adminPassword: '',
       contactNo: '',
-      role: '',
+      role: "admin",
     });
     setIsEditMode(false);
     setSelectedAdmin(null);
@@ -160,7 +161,7 @@ export default function AdminForm() {
     try {
       if (isEditMode) {
         await updateAdmin(adminformData.id, adminformData);
-        alert("Admin details updated successfully!");
+        toast.success("Admin details updated successfully!");
       } else {
         await submitAdminFormData(adminformData);
         navigate("/login");
@@ -200,9 +201,9 @@ export default function AdminForm() {
           </h2>
 
           <form className="admin-form" onSubmit={handle_ad_Submit}>
-
+{/* 
             <FormInput label="Admin ID" name="id" type="text"
-              value={adminformData.id} onChange={handle_ad_Change}  required/>
+              value={adminformData.id} onChange={handle_ad_Change}  required/> */}
 
             <FormInput label="Full Name" name="adminName" type='text'
               value={adminformData.adminName} onChange={handle_ad_Change}  required/>
@@ -218,7 +219,7 @@ export default function AdminForm() {
 
             <FormInput label="Contact Number" name="contactNo" type='text'
               value={adminformData.contactNo} onChange={handle_ad_Change} required />
-
+{/* 
             <div className="form-group">
               <label>Role</label>
               <select
@@ -234,7 +235,7 @@ export default function AdminForm() {
                 <option value="GUARD">Guard</option>
                 <option value="USER">User</option>
               </select>
-            </div>
+            </div> */}
 
             <SubmitButton label={isEditMode ? "Update Admin Details" : "Submit Admin Details"} />
 

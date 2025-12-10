@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { getAllGuard, deleteGuard } from "../api/vipform";
 import { useGuardStore } from "../context/GuardContext";
 import { toast } from "react-toastify";
@@ -7,8 +7,6 @@ export default function GuardDetails() {
   const { handleEdit, refreshTrigger } = useGuardStore();
 
   const [guardList, setGuardList] = useState([]);
-  const [totalPages, setTotalPages] = useState(0);
-  const [totalElements, setTotalElements] = useState(0);
 
   const [selectedRank, setSelectedRank] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
@@ -17,26 +15,19 @@ export default function GuardDetails() {
   const [currentPage, setCurrentPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(20);
 
-  /*  FETCH (NO RANK SENT TO API) */
+  /*  FETCH ALL DATA ONCE (FOR PERFECT CLIENT FILTERING) */
   useEffect(() => {
     async function fetchGuards() {
       try {
-        const res = await getAllGuard(
-          currentPage,
-          rowsPerPage,
-          selectedStatus
-        );
-
+        const res = await getAllGuard(0, 10000);
         setGuardList(res.content || []);
-        setTotalPages(res.totalPages || 0);
-        setTotalElements(res.totalElements || 0);
       } catch (err) {
         toast.error("Failed to load guards!");
       }
     }
 
     fetchGuards();
-  }, [refreshTrigger, currentPage, rowsPerPage, selectedStatus]);
+  }, [refreshTrigger]);
 
   /*  DELETE */
   const handleDelete = async (g) => {
@@ -49,46 +40,60 @@ export default function GuardDetails() {
     }
   };
 
-  const goToPage = (page) => {
-    if (page >= 0 && page < totalPages) setCurrentPage(page);
-  };
+  /*  COMPLETE CLIENT FILTERING: STATUS + RANK + SEARCH */
+  const filteredGuards = useMemo(() => {
+    return guardList.filter((g) => {
+      const matchStatus = selectedStatus
+        ? g.status === selectedStatus
+        : true;
 
-  const getVisiblePages = () => {
-    const start = Math.floor(currentPage / 2) * 2;
-    const end = Math.min(start + 2, totalPages);
-    return [...Array(end - start)].map((_, i) => start + i);
-  };
+      const matchRank = selectedRank
+        ? g.rank === selectedRank
+        : true;
 
-  /*  SEARCH FILTER */
-  const searchedGuards = guardList.filter((g) =>
-    searchText
-      ? Object.values(g)
-        .join(" ")
-        .toLowerCase()
-        .includes(searchText.toLowerCase())
-      : true
-  );
+      const matchSearch = searchText
+        ? Object.values(g)
+            .join(" ")
+            .toLowerCase()
+            .includes(searchText.toLowerCase())
+        : true;
 
-  /*    VIP-STYLE DYNAMIC RANK FILTER    */
-  const rankFilteredGuards = searchedGuards.filter((g) =>
-    selectedRank ? g.rank === selectedRank : true
-  );
+      return matchStatus && matchRank && matchSearch;
+    });
+  }, [guardList, selectedStatus, selectedRank, searchText]);
 
-  /*    STATUS SORTING (UNCHANGED)    */
-  const sortedGuards = [...rankFilteredGuards].sort((a, b) => {
+  /*  STATUS SORTING */
+  const sortedGuards = useMemo(() => {
     const statusOrder = {
       Inactive: 0,
       Active: 1,
       Deleted: 2,
     };
 
-    const aOrder = statusOrder[a.status] ?? 3;
-    const bOrder = statusOrder[b.status] ?? 3;
+    return [...filteredGuards].sort((a, b) => {
+      const aOrder = statusOrder[a.status] ?? 3;
+      const bOrder = statusOrder[b.status] ?? 3;
+      return aOrder - bOrder;
+    });
+  }, [filteredGuards]);
 
-    return aOrder - bOrder;
-  });
+  /*  CLIENT PAGINATION */
+  const totalPages = Math.ceil(sortedGuards.length / rowsPerPage);
 
-  /*    DYNAMIC RANK LIST (LIKE VIP DESIGNATION)    */
+  const paginatedGuards = useMemo(() => {
+    const start = currentPage * rowsPerPage;
+    return sortedGuards.slice(start, start + rowsPerPage);
+  }, [sortedGuards, currentPage, rowsPerPage]);
+
+  const goToPage = (page) => {
+    if (page >= 0 && page < totalPages) setCurrentPage(page);
+  };
+
+  const getVisiblePages = () => {
+    return [...Array(totalPages)].map((_, i) => i);
+  };
+
+  /*  DYNAMIC RANK LIST */
   const ranks = [
     ...new Set(guardList.map((g) => g.rank || "Uncategorized")),
   ];
@@ -99,14 +104,13 @@ export default function GuardDetails() {
       <div style={styles.headerRow}>
         <h2 style={styles.title}>Guard Records</h2>
         <div style={styles.totalBox}>
-          <span style={styles.totalNumber}>{totalElements}</span>
+          <span style={styles.totalNumber}>{filteredGuards.length}</span>
           <span style={styles.totalLabel}>Total Guards</span>
         </div>
       </div>
 
       {/* FILTERS + SEARCH */}
       <div style={styles.filterRow}>
-        {/*  DYNAMIC RANK DROPDOWN */}
         <div style={styles.filterCard}>
           <label style={styles.filterLabel}>Rank</label>
           <select
@@ -160,7 +164,7 @@ export default function GuardDetails() {
       {/* TABLE */}
       <div style={styles.tableWrapper}>
         <div style={styles.tableCard}>
-          {sortedGuards.length === 0 ? (
+          {paginatedGuards.length === 0 ? (
             <div style={styles.noData}>No Guards Found</div>
           ) : (
             <table style={styles.table}>
@@ -179,7 +183,7 @@ export default function GuardDetails() {
               </thead>
 
               <tbody>
-                {sortedGuards.map((g, i) => (
+                {paginatedGuards.map((g, i) => (
                   <tr key={g.id} style={styles.row}>
                     <td style={styles.td}>
                       {i + 1 + currentPage * rowsPerPage}
