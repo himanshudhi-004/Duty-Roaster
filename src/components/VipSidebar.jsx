@@ -257,7 +257,7 @@ export default function VipSidebar() {
 
   return (
     <>
-      {/* ✅ SAME HOVER EFFECT AS GUARD SIDEBAR (NO ANIMATION, ONLY FILL) */}
+      {/*  SAME HOVER EFFECT AS GUARD SIDEBAR (NO ANIMATION, ONLY FILL) */}
       <style>
         {`
           .menu-link {
@@ -357,7 +357,7 @@ export default function VipSidebar() {
   );
 }
 
-/* ✅ ORIGINAL STYLES UNCHANGED */
+/*  ORIGINAL STYLES UNCHANGED */
 const styles = {
   sidebarContainer: {
     width: "260px",

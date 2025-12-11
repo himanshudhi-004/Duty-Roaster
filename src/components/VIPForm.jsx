@@ -406,9 +406,9 @@ export default function VIPForm() {
                 </div>
 
                 {showOtherDesignation && (
-                  <div className="other-rank-wrapper visible">
-                    <input
-                      placeholder="Enter Custom Designation"
+                  <div className="other-rank-wrapper visible ">
+                    <input className="w-100"
+                      placeholder="Examples:- Bollywood Actor, Chessmaster, Minister, Cricketers, User, etc..."
                       value={otherDesignation}
                       onChange={(e) => setOtherDesignation(e.target.value)}
                       required

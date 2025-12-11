@@ -121,8 +121,7 @@ function App() {
                 <Route path="/login" element={<AdminLogin />} />
                 <Route path="/logout" element={<Logout />} />
                 <Route path="/designation" element={<DesignationForm />} />
-                <Route path="/rank" element={<GuardRankCreate />} />
-
+                
 
                 {/* ---------------- ADMIN ---------------- */}
                 <Route path="/register" element={<AdminForm />} />
@@ -191,6 +190,16 @@ function App() {
                   element={
                     <PrivateRoute roles={["admin"]}>
                       <Adminlayout><GuardForm /></Adminlayout>
+                    </PrivateRoute>
+                  }
+                />
+
+
+                <Route
+                  path="/rank"
+                  element={
+                    <PrivateRoute roles={["admin"]}>
+                      <Adminlayout><GuardRankCreate /></Adminlayout>
                     </PrivateRoute>
                   }
                 />

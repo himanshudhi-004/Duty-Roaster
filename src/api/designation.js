@@ -1,9 +1,23 @@
 // src/api/designation.js
 import axios from "axios";
 
-//-------------------------VIP Degination
-// const BASE_URL = "https://4856b82510d5.ngrok-free.app";
-const BASE_URL = "http://192.168.29.46:8081"; // change to your backend URL
+
+const BASE_URL = process.env.REACT_APP_BASE_URL;
+
+// Create axios instance with token support
+const api = axios.create({
+  baseURL: BASE_URL,
+});
+
+
+api.interceptors.request.use((config) => {
+  const role = localStorage.getItem("role"); // admin or vip
+  const token = localStorage.getItem(`${role}Token`);
+  
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  
+  return config;
+});
 
 export const createDesignation = async (data) => {
   const res = await api.post("/api/categories", data);
@@ -18,10 +32,26 @@ export const getAllDesignations = async () => {
 
 //-------------------------GUARD Degination
 
-export const createCategory = async (data) => {
-  
-  const res = await axios.post("/api/officer", data);
-  return res.data;
+// Register new admin
+export const createCategory = async () => {
+  try {
+    const role = localStorage.getItem("role"); // admin or vip
+    const token = localStorage.getItem(`${role}Token`);
+    console.log("token", token)
+    const response = await axios.get(`${BASE_URL}/api/officer/unique-ranks`,
+      {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error while sending Rank form data:", error.message);
+    throw error;
+  }
 };
 
 export const getAllCategory = async () => {

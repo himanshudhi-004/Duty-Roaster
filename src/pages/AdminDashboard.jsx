@@ -4,13 +4,18 @@ import { getAllVip, getAllGuard } from "../api/vipform";
 import { useAdminStore } from "../context/AdminContext";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import * as ChartJS from "chart.js/auto"; // Option B — module version only
+
+// Remove global Chart.js to prevent conflicts
+if (window.Chart) {
+  delete window.Chart;
+}
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
 
-  //  ADDED setGuardRanks ONLY
   const { selectedAdmin, setSelectedAdmin, setGuardRanks } = useAdminStore();
 
   const [adminName, setAdminName] = useState("Admin");
@@ -18,16 +23,17 @@ export default function AdminDashboard() {
   const [guardList, setGuardList] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  /* ================= ADMIN NAME SYNC ================= */
+  /* -----------------------------------
+          ADMIN DETAILS LOAD
+  ------------------------------------ */
   useEffect(() => {
     if (selectedAdmin?.adminName) {
       setAdminName(selectedAdmin.adminName);
     }
   }, [selectedAdmin]);
 
-  /* ================= ADMIN PROFILE SYNC ================= */
   useEffect(() => {
-    const syncAdminProfile = async () => {
+    const syncAdmin = async () => {
       try {
         if (selectedAdmin?.adminName) return;
 
@@ -49,58 +55,57 @@ export default function AdminDashboard() {
           params: { userName },
           headers: { Authorization: `Bearer ${token}` },
         });
+        console.log("asdf",res)
 
         const profile = Array.isArray(res.data) ? res.data[0] : res.data;
 
         setSelectedAdmin(profile);
         setAdminName(profile.adminName);
+
         localStorage.setItem("selectedAdmin", JSON.stringify(profile));
       } catch (err) {
-        console.log("Admin Sync Error:", err);
+        console.log("Admin Load Error:", err);
       }
     };
 
-    syncAdminProfile();
+    syncAdmin();
   }, []);
 
-  /* ================= LOAD VIP ================= */
+  /* -----------------------------------
+        VIP & GUARD LOAD
+  ------------------------------------ */
   const loadVip = async () => {
     const data = await getAllVip();
     setVipList(Array.isArray(data) ? data : data?.data || []);
   };
 
-  /* ================= LOAD GUARDS + EXTRACT RANKS ================= */
   const loadGuards = async () => {
     try {
-      let allGuards = [];
+      let all = [];
       let page = 0;
       let totalPages = 1;
 
       while (page < totalPages) {
         const res = await getAllGuard(page, 100);
-        allGuards = [...allGuards, ...(res.content || [])];
+        all = [...all, ...(res.content || [])];
         totalPages = res.totalPages;
         page++;
       }
 
-      setGuardList(allGuards);
+      setGuardList(all);
 
-      //    EXTRACT UNIQUE RANKS FOR ADMIN SETTINGS
       const ranks = [
         ...new Set(
-          allGuards
-            .map((g) => g.rank || g.designation || g.grade)
-            .filter(Boolean)
+          all.map((g) => g.rank || g.designation || g.grade).filter(Boolean)
         ),
       ];
 
-      setGuardRanks(ranks); //  SHARED TO CONTEXT
+      setGuardRanks(ranks);
     } catch (err) {
       console.log("Guard Load Error:", err);
     }
   };
 
-  /* ================= LOAD ALL DATA ================= */
   useEffect(() => {
     const loadAll = async () => {
       setLoading(true);
@@ -112,95 +117,201 @@ export default function AdminDashboard() {
     loadAll();
   }, []);
 
-  /* ================= LOGOUT ================= */
+  /* -----------------------------------
+                LOGOUT
+  ------------------------------------ */
   const handleLogout = () => {
     localStorage.clear();
     sessionStorage.clear();
     navigate("/login");
   };
 
-  const totalUsers = vipList.length + guardList.length;
+  const vipCount = vipList.length;
+  const guardCount = guardList.length;
+  const totalUsers = vipCount + guardCount;
 
-  const stats = [
-    { title: "Total VIPs", value: vipList.length, icon: "fas fa-user", color: "#1e73be" },
-    { title: "Total Officers", value: guardList.length, icon: "fas fa-user-shield", color: "#3cb371" },
-    { title: "Total Users", value: totalUsers, icon: "fas fa-users", color: "#ffa500" },
-  ];
+  /* -----------------------------------
+          CHART.JS — FULL FIXED
+  ------------------------------------ */
+  useEffect(() => {
+    if (loading) return;
 
-  /* ================= YOUR UI (UNCHANGED) ================= */
+    // const vipTrend = [10, 25, 40, 60, 75, vipCount];
+    // const guardTrend = [15, 35, 55, 80, 100, guardCount];
+
+    if (window._lineChart) window._lineChart.destroy();
+    if (window._pieChart) window._pieChart.destroy();
+
+//    const growthCanvas = document.getElementById("growthChart");
+    const pieCanvas = document.getElementById("pieChart");
+
+    // // LINE CHART
+    // if (growthCanvas) {
+    //   window._lineChart = new ChartJS.Chart(growthCanvas, {
+    //     type: "line",
+    //     data: {
+    //       labels: [
+    //         "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    //         "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    //       ],
+    //       datasets: [
+    //         {
+    //           label: "VIPs",
+    //           data: vipTrend,
+    //           borderColor: "#1e40af",
+    //           backgroundColor: "rgba(30, 64, 175, 0.10)",
+    //           fill: true,
+    //           tension: 0.4,
+    //         },
+    //         {
+    //           label: "Officers",
+    //           data: guardTrend,
+    //           borderColor: "#16a34a",
+    //           backgroundColor: "rgba(22, 163, 74, 0.10)",
+    //           fill: true,
+    //           tension: 0.4,
+    //         },
+    //       ],
+    //     },
+    //     options: { responsive: true },
+    //   });
+    // }
+
+    // PIE CHART
+    if (pieCanvas) {
+      window._pieChart = new ChartJS.Chart(pieCanvas, {
+        type: "doughnut",
+        data: {
+          labels: ["VIPs", "Officers"],
+          datasets: [
+            {
+              data: [vipCount, guardCount],
+              backgroundColor: ["#1e40af", "#16a34a"],
+              borderWidth: 2,
+              borderColor: "#fff",
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { position: "bottom" },
+          },
+        },
+      });
+    }
+  }, [loading, vipCount, guardCount]);
+
+  /* -----------------------------------
+            UI TEMPLATE
+  ------------------------------------ */
   return (
-    <div style={styles.page}>
-      <div style={styles.headerSection}>
-        <div>
-          <h2 style={styles.pageTitle}>ADMIN DASHBOARD</h2>
-          <p style={styles.desc}>
-            Manage VIPs, Guards & Combined User Count.
-          </p>
+    <div>
+      {/* HEADER */}
+      <header className="bg-white shadow-sm border-bottom">
+        <div className="container-fluid px-4 py-3 d-flex justify-content-between align-items-center">
+          <div>
+            <h1 className="h3 mb-0 fw-bold text-primary">Admin Dashboard</h1>
+            <p className="text-muted small mb-0">
+              Manage VIPs, Officers & System Overview
+            </p>
+          </div>
+
+          <button
+            className="btn btn-danger d-flex align-items-center gap-2"
+            onClick={handleLogout}
+          >
+            <i className="fas fa-sign-out-alt"></i> Logout
+          </button>
         </div>
+      </header>
 
-        <button style={styles.logoutBtn} onClick={handleLogout}>
-          <i className="fas fa-sign-out-alt" style={{ marginRight: 8 }}></i>
-          Logout
-        </button>
-      </div>
+      {/* BODY */}
+      <div className="container-fluid px-4 py-5">
+        {/* WELCOME */}
+        <div className="bg-white rounded-3 shadow-sm p-4 p-md-5 mb-5">
+          <h2 className="display-6 fw-bold text-dark">
+            Welcome back, {adminName} 👋
+          </h2>
+          <p className="text-muted">Here is today's overview.</p>
 
-      <div style={styles.mainContent}>
-        <div style={styles.welcomeBox}>
-          <h2 style={styles.welcomeText}>Welcome {adminName} 👋</h2>
-
-          <div style={styles.buttonRow}>
-            <Link to="/vipform" style={styles.actionBtnBlue}>
-              Add VIPs
+          <div className="mt-4 d-flex gap-3 flex-wrap">
+            <Link to="/vipform" className="btn btn-primary btn-lg px-4">
+              <i className="fas fa-user-plus me-2"></i>Add VIP
             </Link>
-            <Link to="/guardform" style={styles.actionBtnGreen}>
-              Add Guards
+
+            <Link to="/guardform" className="btn btn-success btn-lg px-4">
+              <i className="fas fa-shield-alt me-2"></i>Add Officer
             </Link>
           </div>
         </div>
 
+        {/* LOADING SPINNER */}
         {loading ? (
-          <h3 style={{ textAlign: "center", marginTop: 40 }}>
-            Loading Dashboard...
-          </h3>
+          <div className="text-center py-5">
+            <div className="spinner-border text-primary"></div>
+            <p className="text-muted mt-3">Loading dashboard...</p>
+          </div>
         ) : (
           <>
-            <div style={styles.statsGrid}>
-              {stats.map((stat, index) => (
-                <div
-                  key={index}
-                  style={styles.statCard}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = "scale(1.05)";
-                    e.currentTarget.style.boxShadow =
-                      "0 10px 25px rgba(0,0,0,0.15)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = "scale(1)";
-                    e.currentTarget.style.boxShadow =
-                      "0 5px 20px rgba(0,0,0,0.08)";
-                  }}
-                >
-                  <div
-                    style={{
-                      ...styles.iconCircle,
-                      background: stat.color,
-                    }}
-                  >
-                    <i className={stat.icon} style={styles.icon}></i>
-                  </div>
-                  <h3 style={styles.statValue}>{stat.value}</h3>
-                  <p style={styles.statTitle}>{stat.title}</p>
-                </div>
-              ))}
+            {/* STATS CARDS */}
+            <div className="row g-4 mb-5">
+              <StatCard
+                label="Total VIPs"
+                value={vipCount}
+                color="bg-primary"
+                icon="fa-user"
+              />
+
+              <StatCard
+                label="Total Officers"
+                value={guardCount}
+                color="bg-success"
+                icon="fa-user-shield"
+              />
+
+              <StatCard
+                label="Total Users"
+                value={totalUsers}
+                color="bg-warning"
+                icon="fa-users"
+              />
             </div>
 
-            <div style={styles.activityBox}>
-              <h3 style={styles.activityTitle}>Recent Activity</h3>
-              <ul style={styles.activityList}>
-                <li>✔ VIP & Guards list updated</li>
-                <li>✔ Dashboard loaded successfully</li>
-                <li>✔ System running smoothly</li>
-              </ul>
+           
+            <div className="row justify-content-center g-4 mb-3 d-flex">
+              {/* PIE CHART */}
+              <div className="col-12 col-md-6 col-lg-5 flex-fill">
+                <div className="card shadow-sm w-90">
+                  <div className="card-body">
+                    <h5 className="fw-semibold mb-2 text-center">
+                      User Role Distribution
+                    </h5>
+                    <div style={{ height: "300px", paddingLeft: "120px" }}>
+                      <canvas id="pieChart"></canvas>
+                    </div>
+                  </div>
+                </div>
+              </div>
+             
+              <div className="col-12 col-md-6 col-lg-5 flex-fill">
+                <div className="card shadow-sm w-90">
+                  <div className="card-body">
+                    <div style={{ height: "300px" }}>
+                      <div style={styles.activityBox}>
+                        <h3 style={styles.activityTitle}>Recent Activity</h3>
+                        <ul style={styles.activityList}>
+                          <li>✔ VIP & Guards list updated</li>
+                          <li>✔ Dashboard loaded successfully</li>
+                          <li>✔ System running smoothly</li>
+                        </ul>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+
             </div>
           </>
         )}
@@ -209,85 +320,33 @@ export default function AdminDashboard() {
   );
 }
 
+/* -----------------------------------
+        STAT CARD COMPONENT
+------------------------------------ */
+function StatCard({ label, value, color, icon }) {
+  return (
+    <div className="col-md-4">
+      <div className="card border-0 shadow-sm">
+        <div className="card-body d-flex align-items-center">
+          <div className={`stat-icon ${color} me-4`}>
+            <i
+              className={`fas ${icon}`}
+              style={{ color: "#fff", fontSize: 22 }}
+            ></i>
+          </div>
+
+          <div>
+            <h6 className="text-muted">{label}</h6>
+            <h3 className="fw-bold">{value}</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ================= YOUR STYLES UNCHANGED ================= */
 const styles = {
-  page: { padding: 25 },
-  headerSection: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  pageTitle: { fontSize: 30, fontWeight: 700, color: "#1e73be" },
-  desc: { fontSize: 15, opacity: 0.6 },
-  logoutBtn: {
-    background: "#888",
-    padding: "10px 20px",
-    borderRadius: 8,
-    color: "#fff",
-    border: "none",
-    cursor: "pointer",
-    fontWeight: 600,
-    display: "flex",
-    alignItems: "center",
-  },
-  mainContent: {
-    background: "#fff",
-    padding: 25,
-    borderRadius: 12,
-    boxShadow: "0 5px 20px rgba(0,0,0,0.1)",
-  },
-  welcomeBox: { marginBottom: 25 },
-  welcomeText: {
-    fontSize: 26,
-    fontWeight: 700,
-    color: "#1e73be",
-    marginBottom: 20,
-  },
-  buttonRow: { display: "flex", gap: 15, flexWrap: "wrap" },
-  actionBtnBlue: {
-    background: "#1e73be",
-    padding: "10px 20px",
-    borderRadius: 8,
-    color: "white",
-    textDecoration: "none",
-    fontWeight: 600,
-  },
-  actionBtnGreen: {
-    background: "#3cb371",
-    padding: "10px 20px",
-    borderRadius: 8,
-    color: "white",
-    textDecoration: "none",
-    fontWeight: 600,
-  },
-  statsGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))",
-    gap: 25,
-    marginTop: 20,
-  },
-  statCard: {
-    background: "white",
-    borderRadius: 12,
-    padding: 25,
-    textAlign: "center",
-    boxShadow: "0 5px 20px rgba(0,0,0,0.08)",
-    transition: "all 0.3s ease",
-    cursor: "pointer",
-  },
-  iconCircle: {
-    width: 55,
-    height: 55,
-    borderRadius: "50%",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    margin: "0 auto 15px",
-  },
-  icon: { fontSize: 22, color: "white" },
-  statValue: { fontSize: 28, fontWeight: 700, color: "#333" },
-  statTitle: { opacity: 0.6 },
   activityBox: {
     marginTop: "2%",
     padding: 20,

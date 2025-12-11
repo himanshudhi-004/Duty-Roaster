@@ -7,6 +7,7 @@
     "@mui/icons-material": "^7.3.5",
     "@mui/material": "^7.3.5",
     "axios": "^1.13.2",
+    "chart.js": "^4.5.1",
     "dotenv": "^17.2.3",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.553.0",

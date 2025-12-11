@@ -1,3 +1,4 @@
+// src/components/AdminProfile.jsx
 import React, { useEffect, useState } from "react";
 import { useAdminStore } from "../context/AdminContext";
 import axios from "axios";
@@ -16,20 +17,47 @@ export default function AdminProfile() {
 
   useEffect(() => {
     fetchProfile();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   /* ---------------- FETCH PROFILE ---------------- */
   const fetchProfile = async () => {
     try {
-      const token = localStorage.getItem("adminToken");
-      if (!token) return;
+      const storedRole = localStorage.getItem("role");
+      const adminToken =
+        localStorage.getItem("adminToken") ||
+        (storedRole && localStorage.getItem(`${storedRole}Token`)) ||
+        localStorage.getItem("token");
 
-      const decoded = jwtDecode(token);
-      const userName = decoded.sub;
+      if (!adminToken) {
+        setLoading(false);
+        return;
+      }
+
+      let userName = localStorage.getItem("adminUsername");
+
+      if (!userName) {
+        try {
+          const decoded = jwtDecode(adminToken);
+          userName =
+            decoded?.sub ||
+            decoded?.username ||
+            decoded?.userName ||
+            decoded?.name ||
+            null;
+        } catch (err) {
+          console.warn("JWT decode failed:", err);
+        }
+      }
+
+      if (!userName) {
+        setLoading(false);
+        return;
+      }
 
       const res = await axios.get(`${BASE_URL}/auth/profile`, {
         params: { userName },
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${adminToken}` },
       });
 
       const profile = Array.isArray(res.data) ? res.data[0] : res.data;
@@ -39,7 +67,9 @@ export default function AdminProfile() {
       localStorage.setItem("selectedAdmin", JSON.stringify(profile));
 
       if (profile?.image) {
-        setProfileImage(`${BASE_URL}/${profile.image}`);
+        setProfileImage(
+          profile.image.startsWith("http") ? profile.image : `${BASE_URL}/${profile.image}`
+        );
       } else if (profile?.url) {
         setProfileImage(profile.url);
       }
@@ -53,9 +83,14 @@ export default function AdminProfile() {
   /* ---------------- IMAGE UPLOAD ---------------- */
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
-    if (!file || !userDetails?.id) return;
+    if (!file || !selectedAdmin?.id) return;
 
-    const token = localStorage.getItem("adminToken");
+    const token =
+      localStorage.getItem("adminToken") ||
+      (localStorage.getItem("role") &&
+        localStorage.getItem(`${localStorage.getItem("role")}Token`)) ||
+      localStorage.getItem("token");
+
     const formData = new FormData();
     formData.append("imaged", file);
 
@@ -74,11 +109,15 @@ export default function AdminProfile() {
       const imageUrl = res.data;
 
       if (imageUrl) {
-        setProfileImage(imageUrl);
+        const normalizedUrl = imageUrl.startsWith("http")
+          ? imageUrl
+          : `${BASE_URL}/${imageUrl}`;
+
+        setProfileImage(normalizedUrl);
 
         const updatedAdmin = {
           ...selectedAdmin,
-          url: imageUrl,
+          url: normalizedUrl,
         };
 
         setSelectedAdmin(updatedAdmin);
@@ -89,7 +128,6 @@ export default function AdminProfile() {
     }
   };
 
-  /* ---------------- IMAGE PREVIEW ---------------- */
   const openImage = () => {
     if (profileImage) {
       window.open(profileImage, "_blank");
@@ -113,20 +151,41 @@ export default function AdminProfile() {
     );
   }
 
-  /* ===================  Admin PROFILE UI USED HERE =================== */
+  /* ---------- FIXED: Added key prop to nested JSX element ---------- */
+  const detailItems = [
+    ["Admin ID", userDetails.id],
+    ["Username", userDetails.adminUsername || userDetails.username || localStorage.getItem("adminUsername")],
+    ["Email", userDetails.adminEmail],
+    ["Contact No", userDetails.contactNo],
+    [
+      "Role",
+      <span
+        key="role-badge" // <-- FIXED: Required key inside array
+        style={{
+          ...styles.statusBadge,
+          background:
+            (userDetails.role || localStorage.getItem("role") || "").toUpperCase() === "ADMIN"
+              ? "#28a745"
+              : "#dc3545",
+        }}
+      >
+        {userDetails.role || (localStorage.getItem("role") || "").toUpperCase()}
+      </span>,
+    ],
+  ];
+
   return (
     <div style={styles.pageContainer}>
       <div style={styles.header}>
         <h2 style={styles.headerTitle}>
           <i className="fa fa-user-shield me-2"></i> Admin Profile
         </h2>
-        <p style={styles.headerSubtitle}>
-          Professional Identity & Account Info
-        </p>
+        <p style={styles.headerSubtitle}>Professional Identity & Account Info</p>
       </div>
 
       <div style={styles.card}>
         <div style={styles.profileRow}>
+
           {/* LEFT SECTION */}
           <div style={styles.leftBox}>
             <div style={styles.imageWrapper}>
@@ -164,27 +223,8 @@ export default function AdminProfile() {
 
           {/* RIGHT SECTION */}
           <div style={styles.rightBox}>
-            {[
-              ["Admin ID", userDetails.id],
-              ["Username", userDetails.adminUsername],
-              ["Email", userDetails.adminEmail],
-              ["Contact No", userDetails.contactNo],
-              [
-                "Role",
-                <span
-                  style={{
-                    ...styles.statusBadge,
-                    background:
-                      userDetails.role === "ADMIN"
-                        ? "#28a745"
-                        : "#dc3545",
-                  }}
-                >
-                  {userDetails.role}
-                </span>,
-              ],
-            ].map(([label, value], i) => (
-              <div style={styles.detailRow} key={i}>
+            {detailItems.map(([label, value], index) => (
+              <div style={styles.detailRow} key={`detail-${index}`}>
                 <div style={styles.detailLabel}>{label}</div>
                 <div style={styles.detailValue}>{value}</div>
               </div>
@@ -202,13 +242,14 @@ export default function AdminProfile() {
               </button>
             </div>
           </div>
+
         </div>
       </div>
     </div>
   );
 }
 
-/* ==================  Admin UI STYLES ================== */
+/* ------------------ STYLES ------------------ */
 const styles = {
   pageContainer: {
     padding: "25px",
@@ -221,19 +262,17 @@ const styles = {
     background: "linear-gradient(135deg,#1e73be,#4facfe)",
     borderRadius: "16px",
     color: "white",
-    boxShadow: "0 6px 18px rgba(0,0,0,0.2)",
     textAlign: "center",
+    boxShadow: "0 6px 18px rgba(0,0,0,0.2)",
   },
   headerTitle: { margin: 0, fontSize: "26px", fontWeight: "800" },
   headerSubtitle: { marginTop: "6px", opacity: 0.9 },
-
   card: {
-    background: "#ffffff",
+    background: "#fff",
     borderRadius: "20px",
     padding: "30px",
     boxShadow: "0 12px 28px rgba(0,0,0,0.15)",
   },
-
   profileRow: {
     display: "flex",
     gap: "35px",
@@ -241,16 +280,13 @@ const styles = {
     alignItems: "center",
     justifyContent: "center",
   },
-
   leftBox: { flex: "1", minWidth: "260px", textAlign: "center" },
-
   imageWrapper: {
     position: "relative",
     width: "150px",
     height: "150px",
     margin: "0 auto",
   },
-
   profileImage: {
     width: "100%",
     height: "100%",
@@ -260,7 +296,6 @@ const styles = {
     boxShadow: "0 8px 22px rgba(30,115,190,0.4)",
     cursor: "pointer",
   },
-
   uploadBtn: {
     position: "absolute",
     bottom: "8px",
@@ -276,22 +311,17 @@ const styles = {
     cursor: "pointer",
     boxShadow: "0 4px 10px rgba(0,0,0,0.25)",
   },
-
   name: { fontSize: "22px", fontWeight: "800", marginTop: "14px" },
   role: { fontSize: "15px", color: "#777" },
-
   rightBox: { flex: "2", minWidth: "280px" },
-
   detailRow: {
     display: "flex",
     justifyContent: "space-between",
     padding: "12px 0",
     borderBottom: "1px solid #eee",
   },
-
   detailLabel: { fontWeight: "600", color: "#555" },
   detailValue: { fontWeight: "600", color: "#222" },
-
   statusBadge: {
     padding: "6px 14px",
     borderRadius: "30px",
@@ -299,9 +329,7 @@ const styles = {
     fontWeight: "700",
     fontSize: "13px",
   },
-
   actionRow: { marginTop: "25px", textAlign: "right" },
-
   editBtn: {
     background: "linear-gradient(135deg,#1e73be,#4facfe)",
     color: "white",

@@ -20,7 +20,7 @@ export default function UpdationHistory() {
   const userToken = localStorage.getItem("userToken");
   const token = role === "admin" ? adminToken : userToken;
 
-  console.log("TOKEN =>", token, "ROLE =>", role);
+
 
   //  FETCH HISTORY
   const fetchHistory = async () => {

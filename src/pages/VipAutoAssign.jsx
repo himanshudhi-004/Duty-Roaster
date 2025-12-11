@@ -456,6 +456,35 @@ export default function VipAutoAssign() {
       setLoading(false);
     }
   };
+  /* -------------------  MARK AS COMPLETED (FIXED) ------------------- */
+  const handleMarkCanceled = async () => {
+    const confirm = window.confirm(
+      "Are you sure you want to mark this duty as Incompleted?"
+    );
+
+    if (!confirm) return;
+
+    try {
+      setLoading(true);
+
+      const res = await api.post(
+        `/api/assignments/complete/vip/${vip.id}/canceled`
+      );
+
+      toast.success(" Duty marked as Incompleted Successfully!");
+      console.log("API Response:", res.data);
+
+      //  Update UI immediately
+      setVipStatus("inactive");
+      setResult(null);
+
+    } catch (err) {
+      console.error("Duty Incomplete Error:", err);
+      toast.error("❌ Failed to incomplete duty");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   /* ------------------- UI ------------------- */
   return (
@@ -469,25 +498,35 @@ export default function VipAutoAssign() {
         <p>📞 {vip?.contactno}</p>
 
         <span
-          className={`badge ${
-            vipStatus === "active" ? "bg-success" : "bg-danger"
-          }`}
+          className={`badge ${vipStatus === "active" ? "bg-success" : "bg-danger"
+            }`}
           style={{ padding: "8px 12px" }}
         >
           {vipStatus === "active" ? "Active" : "Inactive"}
         </span>
       </div>
 
-      {/*  ACTIVE → MARK COMPLETED */}
+      {/*  ACTIVE → MARK COMPLETED + CANCELED */}
       {vipStatus === "active" && (
-        <button
-          style={styles.btn}
-          onClick={handleMarkCompleted}
-          disabled={loading}
-        >
-          {loading ? "Completing..." : "Mark as Completed"}
-        </button>
+        <>
+          <button
+            style={styles.btn}
+            onClick={handleMarkCompleted}
+            disabled={loading}
+          >
+            {loading ? "Completing..." : "Mark as Completed"}
+          </button>
+
+          <button
+            style={styles.btncancel}
+            onClick={handleMarkCanceled}
+            disabled={loading}
+          >
+            {loading ? "Canceling..." : "Mark as Canceled"}
+          </button>
+        </>
       )}
+
 
       {/*  INACTIVE → AUTO ASSIGN */}
       {vipStatus === "inactive" && (
@@ -594,6 +633,17 @@ const styles = {
     color: "#fff",
     border: "none",
     padding: "12px 20px",
+    borderRadius: 10,
+    cursor: "pointer",
+    fontSize: 16,
+    marginBottom: 20,
+  },
+  btncancel: {
+    background: "#f94225ff",
+    color: "#fff",
+    border: "none",
+    padding: "14px 20px",
+    marginLeft: "3px",
     borderRadius: 10,
     cursor: "pointer",
     fontSize: 16,

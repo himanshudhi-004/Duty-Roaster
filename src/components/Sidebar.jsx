@@ -326,23 +326,60 @@
 // };
 
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { NavLink, useNavigate } from "react-router-dom";
+
+const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 export default function Sidebar() {
   const navigate = useNavigate();
 
+  /* DROPDOWN STATES */
   const [open, setOpen] = useState({
-  forms: false,
-  tables: false,
-  duty: false,
-  history: false,
-});
-
+    forms: false,
+    tables: false,
+    duty: false,
+    history: false,
+  });
 
   const toggle = (key) =>
     setOpen((prev) => ({ ...prev, [key]: !prev[key] }));
 
+  /* =====================  UNREAD COUNT ===================== */
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  const role = localStorage.getItem("role");
+  const token =
+    role === "admin"
+      ? localStorage.getItem("adminToken")
+      : localStorage.getItem("userToken");
+
+  const fetchUnreadCount = async () => {
+    try {
+      const res = await axios.get(`${BASE_URL}/api/notification/all`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const unread = Array.isArray(res.data)
+        ? res.data.filter((n) => !n.notificationStatus).length
+        : 0;
+
+      setUnreadCount(unread);
+    } catch (err) {
+      console.error("Unread count error:", err);
+    }
+  };
+
+  useEffect(() => {
+    if (!token) return;
+    fetchUnreadCount();
+
+    const interval = setInterval(fetchUnreadCount, 5000);
+    return () => clearInterval(interval);
+  }, [token]);
+
+  /* LOGOUT */
   const handleLogout = () => {
     localStorage.clear();
     sessionStorage.clear();
@@ -351,8 +388,7 @@ export default function Sidebar() {
 
   return (
     <div style={styles.sidebarContainer} className="sidebar">
-
-      {/* ===== Light Hover Animation + Dropdown Border CSS ===== */}
+      {/* HOVER ANIMATIONS */}
       <style>
         {`
           .menu-link {
@@ -371,7 +407,6 @@ export default function Sidebar() {
             color: #1e73be !important;
           }
 
-          /* ===== Dropdown Hover Borders ===== */
           .dropdown-forms:hover {
             border-left: 4px solid #6a5acd;
             background: rgba(106, 90, 205, 0.08);
@@ -388,8 +423,8 @@ export default function Sidebar() {
           }
             
           .dropdown-history:hover {
-            border-left: 4px solid #28f68bff;
-            background: rgba(255, 140, 0, 0.08);
+            border-left: 4px solid #28f68b;
+            background: rgba(40, 246, 139, 0.08);
           }
         `}
       </style>
@@ -412,16 +447,23 @@ export default function Sidebar() {
             </NavLink>
           </li>
 
-          {/* Notifications */}
+          {/* ===================== NOTIFICATIONS ===================== */}
           <li style={styles.sectionTitle}>Notifications</li>
+
           <li style={styles.menuItem}>
             <NavLink to="/notify" style={styles.menuLink} className="menu-link">
-              <i className="fas fa-bell" style={styles.icon}></i>
+              <div style={{ position: "relative" }}>
+                <i className="fas fa-bell" style={styles.icon}></i>
+
+                {unreadCount > 0 && (
+                  <span style={styles.badge}>{unreadCount}</span>
+                )}
+              </div>
               <span>Notifications</span>
             </NavLink>
           </li>
 
-          {/* ================= MANAGE FORMS ================= */}
+          {/* ===================== MANAGE FORMS ===================== */}
           <li
             style={styles.sectionTitleForms}
             className="dropdown-forms"
@@ -446,24 +488,16 @@ export default function Sidebar() {
                   <span>Guard Registration Form</span>
                 </NavLink>
               </li>
-
-              <li style={styles.menuItem}>
-                <NavLink to="/designation" style={styles.menuLink} className="menu-link">
-                  <i className="fas fa-pen-square" style={styles.icon}></i>
-                  <span>Add Designations</span>
-                </NavLink>
-              </li>
-
               <li style={styles.menuItem}>
                 <NavLink to="/rank" style={styles.menuLink} className="menu-link">
                   <i className="fas fa-pen-square" style={styles.icon}></i>
-                  <span>Add Ranks</span>
+                  <span>Rank Registration Form</span>
                 </NavLink>
               </li>
             </>
           )}
 
-          {/* ================= TABLES ================= */}
+          {/* ===================== TABLES ===================== */}
           <li
             style={styles.sectionTitleTables}
             className="dropdown-tables"
@@ -491,8 +525,7 @@ export default function Sidebar() {
             </>
           )}
 
-
-          {/* ================= Duty-Management ================= */}
+          {/* ===================== DUTY MANAGEMENT ===================== */}
           <li
             style={styles.sectionTitleDuty}
             className="dropdown-duty"
@@ -504,20 +537,6 @@ export default function Sidebar() {
 
           {open.duty && (
             <>
-              {/* <li style={styles.menuItem}>
-                <NavLink to="/updatehistory" style={styles.menuLink} className="menu-link">
-                  <i className="fas fa-history" style={styles.icon}></i>
-                  <span>Updation History</span>
-                </NavLink>
-              </li>
-
-              <li style={styles.menuItem}>
-                <NavLink to="/dutyhistory" style={styles.menuLink} className="menu-link">
-                  <i className="fas fa-history" style={styles.icon}></i>
-                  <span>Guard-Duty-History</span>
-                </NavLink>
-              </li> */}
-
               <li style={styles.menuItem}>
                 <NavLink to="/adminrequestaccept" style={styles.menuLink} className="menu-link">
                   <i className="fas fa-check-circle" style={styles.icon}></i>
@@ -531,11 +550,10 @@ export default function Sidebar() {
                   <span>Incidents</span>
                 </NavLink>
               </li>
-
             </>
           )}
 
-          {/* ================= History ================= */}
+          {/* ===================== HISTORY ===================== */}
           <li
             style={styles.sectionTitleHistory}
             className="dropdown-history"
@@ -544,6 +562,7 @@ export default function Sidebar() {
             History
             <i className={`fas fa-chevron-${open.history ? "up" : "down"}`} style={styles.arrowHistory}></i>
           </li>
+
           {open.history && (
             <>
               <li style={styles.menuItem}>
@@ -562,16 +581,16 @@ export default function Sidebar() {
             </>
           )}
 
-  <li style={styles.sectionTitle}>Others</li>
-          {/* Profile */}
+          {/* ===================== OTHERS ===================== */}
+          <li style={styles.sectionTitle}>Others</li>
+
           <li style={styles.menuItem}>
             <NavLink to="/adminprofile" style={styles.menuLink} className="menu-link">
               <i className="fas fa-user" style={styles.icon}></i>
               <span>My Profile</span>
             </NavLink>
           </li>
-          
-          {/* Setting */}
+
           <li style={styles.menuItem}>
             <NavLink to="/setting" style={styles.menuLink} className="menu-link">
               <i className="fas fa-cog" style={styles.icon}></i>
@@ -579,8 +598,6 @@ export default function Sidebar() {
             </NavLink>
           </li>
 
-
-          {/* Logout */}
           <li style={styles.menuItem}>
             <NavLink to="/login" onClick={handleLogout} style={styles.menuLink} className="menu-link">
               <i className="fas fa-sign-out-alt" style={styles.icon}></i>
@@ -628,9 +645,7 @@ const styles = {
   },
 
   menuWrapper: { padding: "0 10px" },
-
   menuList: { listStyle: "none", padding: 0 },
-
   menuItem: { marginBottom: "8px" },
 
   menuLink: {
@@ -645,10 +660,7 @@ const styles = {
     color: "#1e1e1e",
   },
 
-  icon: {
-    fontSize: "16px",
-    color: "#1e73be",
-  },
+  icon: { fontSize: "16px", color: "#1e73be" },
 
   sectionTitle: {
     fontSize: "13px",
@@ -691,7 +703,7 @@ const styles = {
   sectionTitleHistory: {
     fontSize: "13px",
     fontWeight: "700",
-    color: "#3df646ff",
+    color: "#28f68b",
     margin: "20px 10px 10px 10px",
     cursor: "pointer",
     padding: "6px 10px",
@@ -701,5 +713,18 @@ const styles = {
   arrowForms: { fontSize: "12px", marginLeft: "8px", color: "#6a5acd" },
   arrowTables: { fontSize: "12px", marginLeft: "8px", color: "#20b2aa" },
   arrowDuty: { fontSize: "12px", marginLeft: "8px", color: "#ff8c00" },
-  arrowHistory: { fontSize: "12px", marginLeft: "8px", color: "#4ce22eff" },
+  arrowHistory: { fontSize: "12px", marginLeft: "8px", color: "#28f68b" },
+
+  /*  BADGE STYLE */
+  badge: {
+    position: "absolute",
+    top: "-6px",
+    right: "-10px",
+    background: "red",
+    color: "#fff",
+    borderRadius: "50%",
+    padding: "2px 7px",
+    fontSize: "11px",
+    fontWeight: "700",
+  },
 };

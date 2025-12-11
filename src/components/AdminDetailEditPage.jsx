@@ -1,16 +1,19 @@
 // components/AdminEditForm.jsx
 import React, { useState } from "react";
+import PropTypes from "prop-types";
 import FormInput from "./FormInput";
 import SubmitButton from "./SubmitButton";
 import { updateAdmin } from "../api/vipform";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";   // ✅ ADD THIS
 
 export default function AdminEditForm({ adminData, onBack }) {
+  const navigate = useNavigate(); // ✅ INITIALIZE NAVIGATE
 
   // -------- INITIAL STATE --------
   const [adminformData, setAdminFormData] = useState({
     ...adminData,
-    Password: "",       // always start empty
+    adminPassword: "", // always start empty
   });
 
   // -------- INPUT CHANGE HANDLER --------
@@ -26,16 +29,20 @@ export default function AdminEditForm({ adminData, onBack }) {
   const handle_ad_submit = async (e) => {
     e.preventDefault();
 
-    // Remove password if empty
     const payload = { ...adminformData };
-    if (!payload.Password) {
-      delete payload.Password;
-    }
+
+    // Don't send empty password
+    if (!payload.adminPassword) delete payload.adminPassword;
 
     try {
       await updateAdmin(adminformData.id, payload);
       toast.success("Admin updated successfully!");
-      onBack();
+
+      // 🔥 Redirect to login after update
+      setTimeout(() => {
+        navigate("/login");
+      }, 1000);
+
     } catch (error) {
       console.error(error);
       toast.error("Failed to update Admin");
@@ -49,7 +56,9 @@ export default function AdminEditForm({ adminData, onBack }) {
         {/* LEFT BLUE SIDEBAR */}
         <div style={styles.leftBox}>
           <h2 style={styles.leftTitle}>ADMIN PROFILE</h2>
-          <p style={styles.desc}>Update your admin details securely and easily.</p>
+          <p style={styles.desc}>
+            Update your admin details securely and easily.
+          </p>
 
           <button style={styles.haveBtn} onClick={onBack}>
             Back to Profile
@@ -61,7 +70,6 @@ export default function AdminEditForm({ adminData, onBack }) {
           <h2 style={styles.formTitle}>Edit Admin Details</h2>
 
           <form onSubmit={handle_ad_submit}>
-
             <FormInput
               label="Full Name"
               name="adminName"
@@ -86,12 +94,12 @@ export default function AdminEditForm({ adminData, onBack }) {
               isEdit={true}
             />
 
-            {/* PASSWORD FIELD (EMPTY ALWAYS ON LOAD) */}
+            {/* PASSWORD FIELD */}
             <FormInput
               label="Password"
-              name="Password"
+              name="adminPassword"
               type="text"
-              value={adminformData.Password}   // empty initially, updates normally
+              value={adminformData.adminPassword}
               onChange={handle_ad_change}
               isEdit={true}
             />
@@ -115,13 +123,18 @@ export default function AdminEditForm({ adminData, onBack }) {
             </button>
           </form>
         </div>
-
       </div>
     </div>
   );
 }
 
-// ---------- STYLES ----------
+/* ---------- PROP VALIDATION ---------- */
+AdminEditForm.propTypes = {
+  adminData: PropTypes.object.isRequired,
+  onBack: PropTypes.func.isRequired,
+};
+
+/* ---------- STYLES ---------- */
 const styles = {
   page: {
     width: "100%",
