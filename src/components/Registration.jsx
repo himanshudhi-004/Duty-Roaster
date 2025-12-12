@@ -4,6 +4,9 @@ import SubmitButton from "./SubmitButton";
 import { submit_gd_FormData, submit_vip_FormData } from "../api/vipform";
 import { getAllCategory, getAllDesignations } from "../api/designation";
 import { toast } from "react-toastify";
+import axios from "axios";
+
+const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 export default function Registration() {
   const [activeType, setActiveType] = useState("guard");
@@ -41,13 +44,15 @@ export default function Registration() {
   /* ---------------------- FETCH DROPDOWNS ---------------------- */
   useEffect(() => {
     const fetchData = async () => {
+      /* ------------------ UPDATED: Fetch Guard Rank from API ------------------ */
       try {
-        const r = await getAllCategory();
-        setRanks(Array.isArray(r) ? r : ["A Grade", "B Grade", "C Grade", "D Grade", "E Grade"]);
+        const res = await axios.get(`${BASE_URL}/api/officer/unique-ranks`);
+        setRanks(Array.isArray(res.data) ? res.data : []);
       } catch {
-        setRanks(["A Grade", "B Grade", "C Grade", "D Grade", "E Grade"]);
+        setRanks([]);
       }
 
+      /* ------------------ VIP DESIGNATION (NO CHANGE) ------------------ */
       try {
         const d = await getAllDesignations();
         setDesignations(Array.isArray(d) ? d : ["Bollywood Actor", "Cricketer", "Chessmaster", "User"]);
@@ -336,3 +341,4 @@ const styles = {
     border: "1px solid #ccc",
   },
 };
+

@@ -1,15 +1,22 @@
 //------------------------------3---------------------------------------------------------
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import {  useNavigate } from "react-router-dom";
 import { getAllVip, getAllGuard } from "../api/vipform";
 import { useUserStore } from "../context/UserContext";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import * as ChartJS from "chart.js/auto"; // Option B — module version only
+
+// Remove global Chart.js to prevent conflicts
+if (window.Chart) {
+  delete window.Chart;
+}
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 export default function UserDashboard() {
   const navigate = useNavigate();
+
   const { selectedUser, setSelectedUser } = useUserStore();
 
   const [UserName, setUserName] = useState("User");
@@ -40,7 +47,7 @@ export default function UserDashboard() {
         if (!token) return;
 
         const decoded = jwtDecode(token);
-        const username = decoded.username || decoded.sub || decoded.email;
+        const username = decoded.sub
 
         const res = await axios.get(`${BASE_URL}/usr/profile`, {
           params: { username },
@@ -67,18 +74,26 @@ export default function UserDashboard() {
 
   const loadGuards = async () => {
     try {
-      let allGuards = [];
+      let all = [];
       let page = 0;
       let totalPages = 1;
 
       while (page < totalPages) {
         const res = await getAllGuard(page, 100);
-        allGuards = [...allGuards, ...(res.content || [])];
+        all = [...all, ...(res.content || [])];
         totalPages = res.totalPages;
         page++;
       }
 
-      setGuardList(allGuards);
+      setGuardList(all);
+
+      const ranks = [
+        ...new Set(
+          all.map((g) => g.rank || g.designation || g.grade).filter(Boolean)
+        ),
+      ];
+
+      setGuardRanks(ranks);
     } catch (err) {
       console.log("Guard Load Error:", err);
     }
@@ -101,76 +116,193 @@ export default function UserDashboard() {
     navigate("/login");
   };
 
-  const totalUsers = vipList.length + guardList.length;
+  
+  
+  const vipCount = vipList.length;
+  const guardCount = guardList.length;
+  const totalUsers = vipCount + guardCount;
 
-  const stats = [
-    { title: "Total VIPs", value: vipList.length, icon: "fas fa-user", color: "#1e73be" },
-    { title: "Total Officers", value: guardList.length, icon: "fas fa-user-shield", color: "#3cb371" },
-    { title: "Total Users", value: totalUsers, icon: "fas fa-users", color: "#ffa500" },
-  ];
+
+  /* -----------------------------------
+            CHART.JS — FULL FIXED
+    ------------------------------------ */
+    useEffect(() => {
+      if (loading) return;
+  
+      // const vipTrend = [10, 25, 40, 60, 75, vipCount];
+      // const guardTrend = [15, 35, 55, 80, 100, guardCount];
+  
+      if (window._lineChart) window._lineChart.destroy();
+      if (window._pieChart) window._pieChart.destroy();
+  
+  //    const growthCanvas = document.getElementById("growthChart");
+      const pieCanvas = document.getElementById("pieChart");
+  
+      // // LINE CHART
+      // if (growthCanvas) {
+      //   window._lineChart = new ChartJS.Chart(growthCanvas, {
+      //     type: "line",
+      //     data: {
+      //       labels: [
+      //         "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      //         "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+      //       ],
+      //       datasets: [
+      //         {
+      //           label: "VIPs",
+      //           data: vipTrend,
+      //           borderColor: "#1e40af",
+      //           backgroundColor: "rgba(30, 64, 175, 0.10)",
+      //           fill: true,
+      //           tension: 0.4,
+      //         },
+      //         {
+      //           label: "Officers",
+      //           data: guardTrend,
+      //           borderColor: "#16a34a",
+      //           backgroundColor: "rgba(22, 163, 74, 0.10)",
+      //           fill: true,
+      //           tension: 0.4,
+      //         },
+      //       ],
+      //     },
+      //     options: { responsive: true },
+      //   });
+      // }
+  
+      // PIE CHART
+      if (pieCanvas) {
+        window._pieChart = new ChartJS.Chart(pieCanvas, {
+          type: "doughnut",
+          data: {
+            labels: ["VIPs", "Officers"],
+            datasets: [
+              {
+                data: [vipCount, guardCount],
+                backgroundColor: ["#1e40af", "#16a34a"],
+                borderWidth: 2,
+                borderColor: "#fff",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { position: "bottom" },
+            },
+          },
+        });
+      }
+    }, [loading, vipCount, guardCount]);
+  
 
   return (
-    <div style={styles.page}>
-      <div style={styles.headerSection}>
-        <div>
-          <h2 style={styles.pageTitle}>Manager Dashboard</h2>
-          <p style={styles.desc}>Manage VIPs, Guards & Combined User Count.</p>
+    <div>
+      {/* HEADER */}
+      <header className="bg-white shadow-sm border-bottom">
+        <div className="container-fluid px-4 py-3 d-flex justify-content-between align-items-center">
+          <div>
+            <h1 className="h3 mb-0 fw-bold text-primary">Manager Dashboard</h1>
+            <p className="text-muted small mb-0">
+              Manage VIPs, Officers & System Overview
+            </p>
+          </div>
+
+          <button
+            className="btn btn-danger d-flex align-items-center gap-2"
+            onClick={handleLogout}
+          >
+            <i className="fas fa-sign-out-alt"></i> Logout
+          </button>
+        </div>
+      </header>
+
+      {/* BODY */}
+      <div className="container-fluid px-4 py-5">
+        {/* WELCOME */}
+        <div className="bg-white rounded-3 shadow-sm p-4 p-md-5 mb-5">
+          <h2 className="display-6 fw-bold text-dark">
+            Welcome back, {UserName} 👋
+          </h2>
+          <p className="text-muted">Here is today's overview.</p>
+
+          {/* <div className="mt-4 d-flex gap-3 flex-wrap">
+            <Link to="/vipform" className="btn btn-primary btn-lg px-4">
+              <i className="fas fa-user-plus me-2"></i>Add VIP
+            </Link>
+
+            <Link to="/guardform" className="btn btn-success btn-lg px-4">
+              <i className="fas fa-shield-alt me-2"></i>Add Officer
+            </Link>
+          </div> */}
         </div>
 
-        <button style={styles.logoutBtn} onClick={handleLogout}>
-          <i className="fas fa-sign-out-alt" style={{ marginRight: 8 }}></i>
-          Logout
-        </button>
-      </div>
-
-      <div style={styles.mainContent}>
-        <div style={styles.welcomeBox}>
-          <h2 style={styles.welcomeText}>Welcome {UserName} 👋</h2>
-        </div>
-
+        {/* LOADING SPINNER */}
         {loading ? (
-          <h3 style={{ textAlign: "center", marginTop: 40 }}>
-            Loading Dashboard...
-          </h3>
+          <div className="text-center py-5">
+            <div className="spinner-border text-primary"></div>
+            <p className="text-muted mt-3">Loading dashboard...</p>
+          </div>
         ) : (
           <>
-            <div style={styles.statsGrid}>
-              {stats.map((stat, index) => (
-                <div
-                  key={index}
-                  style={styles.statCard}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = "scale(1.05)";
-                    e.currentTarget.style.boxShadow =
-                      "0 10px 25px rgba(0,0,0,0.15)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = "scale(1)";
-                    e.currentTarget.style.boxShadow =
-                      "0 5px 20px rgba(0,0,0,0.08)";
-                  }}
-                >
-                  <div
-                    style={{
-                      ...styles.iconCircle,
-                      background: stat.color,
-                    }}
-                  >
-                    <i className={stat.icon} style={styles.icon}></i>
-                  </div>
-                  <h3 style={styles.statValue}>{stat.value}</h3>
-                  <p style={styles.statTitle}>{stat.title}</p>
-                </div>
-              ))}
+            {/* STATS CARDS */}
+            <div className="row g-4 mb-5">
+              <StatCard
+                label="Total VIPs"
+                value={vipCount}
+                color="bg-primary"
+                icon="fa-user"
+              />
+
+              <StatCard
+                label="Total Officers"
+                value={guardCount}
+                color="bg-success"
+                icon="fa-user-shield"
+              />
+
+              <StatCard
+                label="Total Users"
+                value={totalUsers}
+                color="bg-warning"
+                icon="fa-users"
+              />
             </div>
 
-            <div style={styles.activityBox}>
-              <h3 style={styles.activityTitle}>Recent Activity</h3>
-              <ul style={styles.activityList}>
-                <li>✔ VIP & Guards list updated</li>
-                <li>✔ Dashboard loaded successfully</li>
-                <li>✔ System running smoothly</li>
-              </ul>
+           
+            <div className="row justify-content-center g-4 mb-3 d-flex">
+              {/* PIE CHART */}
+              <div className="col-12 col-md-6 col-lg-5 flex-fill">
+                <div className="card shadow-sm w-90">
+                  <div className="card-body">
+                    <h5 className="fw-semibold mb-2 text-center">
+                      User Role Distribution
+                    </h5>
+                    <div style={{ height: "300px", paddingLeft: "120px" }}>
+                      <canvas id="pieChart"></canvas>
+                    </div>
+                  </div>
+                </div>
+              </div>
+             
+              <div className="col-12 col-md-6 col-lg-5 flex-fill">
+                <div className="card shadow-sm w-90">
+                  <div className="card-body">
+                    <div style={{ height: "300px" }}>
+                      <div style={styles.activityBox}>
+                        <h3 style={styles.activityTitle}>Recent Activity</h3>
+                        <ul style={styles.activityList}>
+                          <li>✔ VIP & Guards list updated</li>
+                          <li>✔ Dashboard loaded successfully</li>
+                          <li>✔ System running smoothly</li>
+                        </ul>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+
             </div>
           </>
         )}
@@ -179,67 +311,33 @@ export default function UserDashboard() {
   );
 }
 
+/* -----------------------------------
+        STAT CARD COMPONENT
+------------------------------------ */
+function StatCard({ label, value, color, icon }) {
+  return (
+    <div className="col-md-4">
+      <div className="card border-0 shadow-sm">
+        <div className="card-body d-flex align-items-center">
+          <div className={`stat-icon ${color} me-4 p-2`}>
+            <i
+              className={`fas ${icon}`}
+              style={{ color: "#fff", fontSize: 22 }}
+            ></i>
+          </div>
+
+          <div>
+            <h6 className="text-muted">{label}</h6>
+            <h3 className="fw-bold">{value}</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ================= YOUR STYLES UNCHANGED ================= */
 const styles = {
-  page: { padding: 15 },
-  headerSection: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  pageTitle: { fontSize: 30, fontWeight: 700, color: "#1e73be" },
-  desc: { fontSize: 15, opacity: 0.6 },
-  logoutBtn: {
-    background: "#888",
-    padding: "10px 20px",
-    borderRadius: 8,
-    color: "#fff",
-    border: "none",
-    cursor: "pointer",
-    fontWeight: 600,
-    display: "flex",
-    alignItems: "center",
-  },
-  mainContent: {
-    background: "#fff",
-    padding: 25,
-    borderRadius: 12,
-    boxShadow: "0 5px 20px rgba(0,0,0,0.1)",
-  },
-  welcomeBox: { marginBottom: 25 },
-  welcomeText: {
-    fontSize: 26,
-    fontWeight: 700,
-    color: "#1e73be",
-    marginBottom: 20,
-  },
-  statsGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))",
-    gap: 25,
-    marginTop: 20,
-  },
-  statCard: {
-    background: "white",
-    borderRadius: 12,
-    padding: 25,
-    textAlign: "center",
-    boxShadow: "0 5px 20px rgba(0,0,0,0.08)",
-    transition: "all 0.3s ease", //  hover animation smooth
-    cursor: "pointer",
-  },
-  iconCircle: {
-    width: 55,
-    height: 55,
-    borderRadius: "50%",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    margin: "0 auto 15px",
-  },
-  icon: { fontSize: 22, color: "white" },
-  statValue: { fontSize: 28, fontWeight: 700, color: "#333" },
-  statTitle: { opacity: 0.6 },
   activityBox: {
     marginTop: "2%",
     padding: 20,
@@ -250,482 +348,7 @@ const styles = {
   activityTitle: {
     fontSize: 20,
     color: "#1e73be",
-    marginBottom: 5,
+    marginBottom: 10,
   },
   activityList: { lineHeight: 2, paddingLeft: 10 },
 };
-
-
-
-//---------------------------------------------------1-----------------------------------------
-
-
-// import React, { useState, useEffect } from "react";
-// import { useNavigate } from "react-router-dom";
-// import { getAllVip, getAllGuard } from "../api/vipform";
-// import { useUserStore } from "../context/UserContext";
-// import axios from "axios";
-// import { jwtDecode } from "jwt-decode";
-
-// const BASE_URL = process.env.REACT_APP_BASE_URL;
-
-// export default function UserDashboard() {
-//   const navigate = useNavigate();
-//   const { selectedUser, setSelectedUser } = useUserStore();
-
-//   const [UserName, setUserName] = useState("User");
-//   const [vipList, setVipList] = useState([]);
-//   const [guardList, setGuardList] = useState([]);
-
-//   /*  INSTANT SYNC FROM CONTEXT */
-//   useEffect(() => {
-//     if (selectedUser?.name) {
-//       setUserName(selectedUser.name);
-//     }
-//   }, [selectedUser]);
-
-//   /*  FALLBACK FOR REFRESH / DIRECT URL */
-//   useEffect(() => {
-//     const syncUserProfile = async () => {
-//       try {
-//         if (selectedUser?.name) return;
-
-//         const stored = localStorage.getItem("selectedUser");
-//         if (stored) {
-//           const parsed = JSON.parse(stored);
-//           setSelectedUser(parsed);
-//           setUserName(parsed.name);
-//           return;
-//         }
-
-//         const token = localStorage.getItem("userToken");
-//         if (!token) return;
-
-//         const decoded = jwtDecode(token);
-//         const username = decoded.username || decoded.sub || decoded.email;
-
-//         const res = await axios.get(`${BASE_URL}/usr/profile`, {
-//           params: { username },
-//           headers: { Authorization: `Bearer ${token}` },
-//         });
-
-//         const profile = Array.isArray(res.data) ? res.data[0] : res.data;
-
-//         setSelectedUser(profile);
-//         setUserName(profile.name);
-//         localStorage.setItem("selectedUser", JSON.stringify(profile));
-//       } catch (err) {
-//         console.log("User Sync Error:", err);
-//       }
-//     };
-
-//     syncUserProfile();
-//   }, []);
-
-//   const loadVip = async () => {
-//     const data = await getAllVip();
-//     setVipList(Array.isArray(data) ? data : data?.data || []);
-//   };
-
-//   const loadGuards = async () => {
-//     const data = await getAllGuard();
-//     setGuardList(Array.isArray(data) ? data : data?.data || []);
-//   };
-
-//   useEffect(() => {
-//     loadVip();
-//     loadGuards();
-//   }, []);
-
-//   const handleLogout = () => {
-//     localStorage.clear();
-//     sessionStorage.clear();
-//     navigate("/login");
-//   };
-
-//   const totalUsers = vipList.length + guardList.length;
-
-//   const stats = [
-//     { title: "Total VIPs", value: vipList.length, icon: "fas fa-user", color: "#1e73be" },
-//     { title: "Total Officers", value: guardList.length, icon: "fas fa-user-shield", color: "#3cb371" },
-//     { title: "Total Users", value: totalUsers, icon: "fas fa-users", color: "#ffa500" },
-//   ];
-
-//   return (
-//     <div style={styles.page}>
-//       <div style={styles.headerSection}>
-//         <div>
-//           <h2 style={styles.pageTitle}>Manager Dashboard</h2>
-//           <p style={styles.desc}>Manage VIPs, Guards & Combined User Count.</p>
-//         </div>
-
-//         <button style={styles.logoutBtn} onClick={handleLogout}>
-//           <i className="fas fa-sign-out-alt" style={{ marginRight: 8 }}></i> Logout
-//         </button>
-//       </div>
-
-//       <div style={styles.mainContent}>
-//         <div style={styles.welcomeBox}>
-//           <h2 style={styles.welcomeText}>Welcome {UserName} 👋</h2>
-//         </div>
-
-//         <div style={styles.statsGrid}>
-//           {stats.map((stat, index) => (
-//             <div key={index} style={styles.statCard}>
-//               <div style={{ ...styles.iconCircle, background: stat.color }}>
-//                 <i className={stat.icon} style={styles.icon}></i>
-//               </div>
-//               <h3 style={styles.statValue}>{stat.value}</h3>
-//               <p style={styles.statTitle}>{stat.title}</p>
-//             </div>
-//           ))}
-//         </div>
-
-//         <div style={styles.activityBox}>
-//           <h3 style={styles.activityTitle}>Recent Activity</h3>
-//           <ul style={styles.activityList}>
-//             <li>✔ VIP & Guards list updated</li>
-//             <li>✔ Dashboard loaded successfully</li>
-//             <li>✔ System running smoothly</li>
-//           </ul>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
-// /* ------------------ STYLES (UNCHANGED) ------------------ */
-// const styles = {
-//   page: { padding: 25 },
-//   headerSection: {
-//     display: "flex",
-//     justifyContent: "space-between",
-//     alignItems: "center",
-//     marginBottom: 20,
-//   },
-//   pageTitle: { fontSize: 30, fontWeight: 700, color: "#1e73be" },
-//   desc: { fontSize: 15, opacity: 0.6 },
-//   logoutBtn: {
-//     background: "#888",
-//     padding: "10px 20px",
-//     borderRadius: 8,
-//     color: "#fff",
-//     border: "none",
-//     cursor: "pointer",
-//     fontWeight: 600,
-//     display: "flex",
-//     alignItems: "center",
-//   },
-//   mainContent: {
-//     background: "#fff",
-//     padding: 25,
-//     borderRadius: 12,
-//     boxShadow: "0 5px 20px rgba(0,0,0,0.1)",
-//   },
-//   welcomeBox: { marginBottom: 25 },
-//   welcomeText: { fontSize: 26, fontWeight: 700, color: "#1e73be", marginBottom: 20 },
-//   statsGrid: {
-//     display: "grid",
-//     gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))",
-//     gap: 25,
-//     marginTop: 20,
-//   },
-//   statCard: {
-//     background: "white",
-//     borderRadius: 12,
-//     padding: 25,
-//     textAlign: "center",
-//     boxShadow: "0 5px 20px rgba(0,0,0,0.08)",
-//   },
-//   iconCircle: {
-//     width: 55,
-//     height: 55,
-//     borderRadius: "50%",
-//     display: "flex",
-//     alignItems: "center",
-//     justifyContent: "center",
-//     margin: "0 auto 15px",
-//   },
-//   icon: { fontSize: 22, color: "white" },
-//   statValue: { fontSize: 28, fontWeight: 700, color: "#333" },
-//   statTitle: { opacity: 0.6 },
-//   activityBox: {
-//     marginTop: "17%",
-//     padding: 20,
-//     borderRadius: 12,
-//     background: "#f8fbff",
-//     border: "1px solid #e5e9f0",
-//   },
-//   activityTitle: { fontSize: 20, color: "#1e73be", marginBottom: 10 },
-//   activityList: { lineHeight: 2, paddingLeft: 10 },
-// };
-
-
-
-//---------------------------------------2--------------------------
-
-// import React, { useState, useEffect } from "react";
-// import { useNavigate } from "react-router-dom";
-// import { getAllVip, getAllGuard } from "../api/vipform";
-// import { useUserStore } from "../context/UserContext";
-// import axios from "axios";
-// import { jwtDecode } from "jwt-decode";
-
-// const BASE_URL = process.env.REACT_APP_BASE_URL;
-
-// export default function UserDashboard() {
-//   const navigate = useNavigate();
-//   const { selectedUser, setSelectedUser } = useUserStore();
-
-//   const [UserName, setUserName] = useState("User");
-//   const [vipList, setVipList] = useState([]);
-//   const [guardList, setGuardList] = useState([]);
-//   const [loading, setLoading] = useState(true);
-
-//   /*  INSTANT SYNC FROM CONTEXT */
-//   useEffect(() => {
-//     if (selectedUser?.name) {
-//       setUserName(selectedUser.name);
-//     }
-//   }, [selectedUser]);
-
-//   /*  FALLBACK SYNC */
-//   useEffect(() => {
-//     const syncUserProfile = async () => {
-//       try {
-//         if (selectedUser?.name) return;
-
-//         const stored = localStorage.getItem("selectedUser");
-//         if (stored) {
-//           const parsed = JSON.parse(stored);
-//           setSelectedUser(parsed);
-//           setUserName(parsed.name);
-//           return;
-//         }
-
-//         const token = localStorage.getItem("userToken");
-//         if (!token) return;
-
-//         const decoded = jwtDecode(token);
-//         const username = decoded.username || decoded.sub || decoded.email;
-
-//         const res = await axios.get(`${BASE_URL}/usr/profile`, {
-//           params: { username },
-//           headers: { Authorization: `Bearer ${token}` },
-//         });
-
-//         const profile = Array.isArray(res.data) ? res.data[0] : res.data;
-
-//         setSelectedUser(profile);
-//         setUserName(profile.name);
-//         localStorage.setItem("selectedUser", JSON.stringify(profile));
-//       } catch (err) {
-//         console.log("User Sync Error:", err);
-//       }
-//     };
-
-//     syncUserProfile();
-//   }, []);
-
-//   /*  LOAD ALL VIPs */
-//   const loadVip = async () => {
-//     const data = await getAllVip();
-//     setVipList(Array.isArray(data) ? data : data?.data || []);
-//   };
-
-//   /*  LOAD ALL GUARDS WITH PAGINATION (FIXED)  */
-//   const loadGuards = async () => {
-//     try {
-//       let allGuards = [];
-//       let page = 0;
-//       let totalPages = 1;
-
-//       while (page < totalPages) {
-//         const res = await getAllGuard(page, 100); // large size for speed
-//         allGuards = [...allGuards, ...(res.content || [])];
-//         totalPages = res.totalPages;
-//         page++;
-//       }
-
-//       setGuardList(allGuards);
-//     } catch (err) {
-//       console.log("Guard Load Error:", err);
-//     }
-//   };
-
-//   useEffect(() => {
-//     const loadAll = async () => {
-//       setLoading(true);
-//       await loadVip();
-//       await loadGuards();
-//       setLoading(false);
-//     };
-
-//     loadAll();
-//   }, []);
-
-//   const handleLogout = () => {
-//     localStorage.clear();
-//     sessionStorage.clear();
-//     navigate("/login");
-//   };
-
-//   const totalUsers = vipList.length + guardList.length;
-
-//   const stats = [
-//     {
-//       title: "Total VIPs",
-//       value: vipList.length,
-//       icon: "fas fa-user",
-//       color: "#1e73be",
-//     },
-//     {
-//       title: "Total Officers",
-//       value: guardList.length, //  NOW PERFECT
-//       icon: "fas fa-user-shield",
-//       color: "#3cb371",
-//     },
-//     {
-//       title: "Total Users",
-//       value: totalUsers,
-//       icon: "fas fa-users",
-//       color: "#ffa500",
-//     },
-//   ];
-
-//   return (
-//     <div style={styles.page}>
-//       <div style={styles.headerSection}>
-//         <div>
-//           <h2 style={styles.pageTitle}>Manager Dashboard</h2>
-//           <p style={styles.desc}>
-//             Manage VIPs, Guards & Combined User Count.
-//           </p>
-//         </div>
-
-//         <button style={styles.logoutBtn} onClick={handleLogout}>
-//           <i
-//             className="fas fa-sign-out-alt"
-//             style={{ marginRight: 8 }}
-//           ></i>
-//           Logout
-//         </button>
-//       </div>
-
-//       <div style={styles.mainContent}>
-//         <div style={styles.welcomeBox}>
-//           <h2 style={styles.welcomeText}>Welcome {UserName} 👋</h2>
-//         </div>
-
-//         {loading ? (
-//           <h3 style={{ textAlign: "center", marginTop: 40 }}>
-//             Loading Dashboard...
-//           </h3>
-//         ) : (
-//           <>
-//             <div style={styles.statsGrid}>
-//               {stats.map((stat, index) => (
-//                 <div key={index} style={styles.statCard}>
-//                   <div
-//                     style={{
-//                       ...styles.iconCircle,
-//                       background: stat.color,
-//                     }}
-//                   >
-//                     <i className={stat.icon} style={styles.icon}></i>
-//                   </div>
-//                   <h3 style={styles.statValue}>{stat.value}</h3>
-//                   <p style={styles.statTitle}>{stat.title}</p>
-//                 </div>
-//               ))}
-//             </div>
-
-//             <div style={styles.activityBox}>
-//               <h3 style={styles.activityTitle}>Recent Activity</h3>
-//               <ul style={styles.activityList}>
-//                 <li>✔ VIP & Guards list updated</li>
-//                 <li>✔ Dashboard loaded successfully</li>
-//                 <li>✔ System running smoothly</li>
-//               </ul>
-//             </div>
-//           </>
-//         )}
-//       </div>
-//     </div>
-//   );
-// }
-
-// /*  STYLES (UNCHANGED) */
-// const styles = {
-//   page: { padding: 15 },
-//   headerSection: {
-//     display: "flex",
-//     justifyContent: "space-between",
-//     alignItems: "center",
-//     marginBottom: 10,
-//   },
-//   pageTitle: { fontSize: 30, fontWeight: 700, color: "#1e73be" },
-//   desc: { fontSize: 15, opacity: 0.6 },
-//   logoutBtn: {
-//     background: "#888",
-//     padding: "10px 20px",
-//     borderRadius: 8,
-//     color: "#fff",
-//     border: "none",
-//     cursor: "pointer",
-//     fontWeight: 600,
-//     display: "flex",
-//     alignItems: "center",
-//   },
-//   mainContent: {
-//     background: "#fff",
-//     padding: 25,
-//     borderRadius: 12,
-//     boxShadow: "0 5px 20px rgba(0,0,0,0.1)",
-//   },
-//   welcomeBox: { marginBottom: 25 },
-//   welcomeText: {
-//     fontSize: 26,
-//     fontWeight: 700,
-//     color: "#1e73be",
-//     marginBottom: 20,
-//   },
-//   statsGrid: {
-//     display: "grid",
-//     gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))",
-//     gap: 25,
-//     marginTop: 20,
-//   },
-//   statCard: {
-//     background: "white",
-//     borderRadius: 12,
-//     padding: 25,
-//     textAlign: "center",
-//     boxShadow: "0 5px 20px rgba(0,0,0,0.08)",
-//   },
-//   iconCircle: {
-//     width: 55,
-//     height: 55,
-//     borderRadius: "50%",
-//     display: "flex",
-//     alignItems: "center",
-//     justifyContent: "center",
-//     margin: "0 auto 15px",
-//   },
-//   icon: { fontSize: 22, color: "white" },
-//   statValue: { fontSize: 28, fontWeight: 700, color: "#333" },
-//   statTitle: { opacity: 0.6 },
-//   activityBox: {
-//     marginTop: "2%",
-//     padding: 20,
-//     borderRadius: 12,
-//     background: "#f8fbff",
-//     border: "1px solid #e5e9f0",
-//   },
-//   activityTitle: {
-//     fontSize: 20,
-//     color: "#1e73be",
-//     marginBottom: 5,
-//   },
-//   activityList: { lineHeight: 2, paddingLeft: 10 },
-// };

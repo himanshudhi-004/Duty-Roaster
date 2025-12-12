@@ -27,7 +27,7 @@ export default function GuardDutyHistory() {
         fetchDutyHistory(guardObj.id);
       }
     }
-  }, []);
+  }, []); // <-- eslint warns about this empty dependency
 
   //  API CALL WITH TOKEN
   const fetchDutyHistory = async (guardId) => {

@@ -5,10 +5,10 @@ import FormInput from "./FormInput";
 import SubmitButton from "./SubmitButton";
 import { updateAdmin } from "../api/vipform";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";   // ✅ ADD THIS
+import { useNavigate } from "react-router-dom";   //  ADD THIS
 
 export default function AdminEditForm({ adminData, onBack }) {
-  const navigate = useNavigate(); // ✅ INITIALIZE NAVIGATE
+  const navigate = useNavigate(); //  INITIALIZE NAVIGATE
 
   // -------- INITIAL STATE --------
   const [adminformData, setAdminFormData] = useState({
@@ -38,7 +38,7 @@ export default function AdminEditForm({ adminData, onBack }) {
       await updateAdmin(adminformData.id, payload);
       toast.success("Admin updated successfully!");
 
-      // 🔥 Redirect to login after update
+      //  Redirect to login after update
       setTimeout(() => {
         navigate("/login");
       }, 1000);

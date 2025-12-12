@@ -154,6 +154,7 @@ export default function GuardProfile() {
               ["Username", selectedGuard.username],
               ["Email", selectedGuard.email],
               ["Contact No", selectedGuard.contactno],
+              ["Rank", selectedGuard.rank],
               [
                 "Status",
                 <span

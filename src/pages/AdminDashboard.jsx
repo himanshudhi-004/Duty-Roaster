@@ -55,7 +55,7 @@ export default function AdminDashboard() {
           params: { userName },
           headers: { Authorization: `Bearer ${token}` },
         });
-        console.log("asdf",res)
+       
 
         const profile = Array.isArray(res.data) ? res.data[0] : res.data;
 
@@ -136,47 +136,14 @@ export default function AdminDashboard() {
   useEffect(() => {
     if (loading) return;
 
-    // const vipTrend = [10, 25, 40, 60, 75, vipCount];
-    // const guardTrend = [15, 35, 55, 80, 100, guardCount];
-
+    
     if (window._lineChart) window._lineChart.destroy();
     if (window._pieChart) window._pieChart.destroy();
 
 //    const growthCanvas = document.getElementById("growthChart");
     const pieCanvas = document.getElementById("pieChart");
 
-    // // LINE CHART
-    // if (growthCanvas) {
-    //   window._lineChart = new ChartJS.Chart(growthCanvas, {
-    //     type: "line",
-    //     data: {
-    //       labels: [
-    //         "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-    //         "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-    //       ],
-    //       datasets: [
-    //         {
-    //           label: "VIPs",
-    //           data: vipTrend,
-    //           borderColor: "#1e40af",
-    //           backgroundColor: "rgba(30, 64, 175, 0.10)",
-    //           fill: true,
-    //           tension: 0.4,
-    //         },
-    //         {
-    //           label: "Officers",
-    //           data: guardTrend,
-    //           borderColor: "#16a34a",
-    //           backgroundColor: "rgba(22, 163, 74, 0.10)",
-    //           fill: true,
-    //           tension: 0.4,
-    //         },
-    //       ],
-    //     },
-    //     options: { responsive: true },
-    //   });
-    // }
-
+    
     // PIE CHART
     if (pieCanvas) {
       window._pieChart = new ChartJS.Chart(pieCanvas, {
@@ -256,7 +223,7 @@ export default function AdminDashboard() {
           <>
             {/* STATS CARDS */}
             <div className="row g-4 mb-5">
-              <StatCard
+              <StatCard 
                 label="Total VIPs"
                 value={vipCount}
                 color="bg-primary"
@@ -287,7 +254,7 @@ export default function AdminDashboard() {
                     <h5 className="fw-semibold mb-2 text-center">
                       User Role Distribution
                     </h5>
-                    <div style={{ height: "300px", paddingLeft: "120px" }}>
+                    <div style={{ height: "300px", paddingLeft: "200px" }}>
                       <canvas id="pieChart"></canvas>
                     </div>
                   </div>
@@ -328,7 +295,7 @@ function StatCard({ label, value, color, icon }) {
     <div className="col-md-4">
       <div className="card border-0 shadow-sm">
         <div className="card-body d-flex align-items-center">
-          <div className={`stat-icon ${color} me-4`}>
+          <div className={`stat-icon ${color} me-4 p-2`}>
             <i
               className={`fas ${icon}`}
               style={{ color: "#fff", fontSize: 22 }}

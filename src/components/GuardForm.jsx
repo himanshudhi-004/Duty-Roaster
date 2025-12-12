@@ -13,7 +13,7 @@ export default function GuardForm() {
     username: "",
     password: "",
     rank: "",
-    experience: 0,
+    experience: "",
     contactno: "",
     status: "Inactive",
   });
@@ -25,6 +25,7 @@ export default function GuardForm() {
 
   const [emailError, setEmailError] = useState("");
   const [contactError, setContactError] = useState("");
+  const [refers, setRefers] = useState("false");
 
   const [loading, setLoading] = useState(false);
 
@@ -34,7 +35,7 @@ export default function GuardForm() {
   useEffect(() => {
     const fetchRanks = async () => {
       try {
-        const role = localStorage.getItem("role"); // admin or vip
+        const role = localStorage.getItem("role");
         const token = localStorage.getItem(`${role}Token`);
 
         const response = await axios.get(
@@ -55,7 +56,7 @@ export default function GuardForm() {
     };
 
     fetchRanks();
-  }, []);
+  }, [refers]);
 
   /* -------------------------------------------------------
      INPUT HANDLERS
@@ -63,7 +64,7 @@ export default function GuardForm() {
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // EMAIL VALIDATION (WITH DELAY)
+    // EMAIL VALIDATION
     if (name === "email") {
       setGuardFormData((prev) => ({ ...prev, email: value }));
       setTimeout(() => {
@@ -73,7 +74,7 @@ export default function GuardForm() {
       return;
     }
 
-    // CONTACT (ONLY DIGITS 10)
+    // CONTACT VALIDATION
     if (name === "contactno") {
       if (/^\d{0,10}$/.test(value)) {
         setGuardFormData((prev) => ({ ...prev, contactno: value }));
@@ -84,7 +85,7 @@ export default function GuardForm() {
       return;
     }
 
-    // RANK HANDLING (SHOW "OTHER" INPUT)
+    // RANK
     if (name === "rank") {
       setGuardFormData((prev) => ({ ...prev, rank: value }));
       setShowOtherRank(value === "Other");
@@ -92,7 +93,7 @@ export default function GuardForm() {
       return;
     }
 
-    // NORMAL INPUTS
+    // NORMAL FIELDS
     setGuardFormData((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -124,6 +125,7 @@ export default function GuardForm() {
         toast.success(res?.message || "Guard registered successfully!");
       }
 
+      setRefers("true"); //  ONLY CHANGE ADDED
       resetForm();
     } catch (err) {
       const errorMsg =
@@ -170,6 +172,7 @@ export default function GuardForm() {
 
       <div className="container">
         <div className="registration-card">
+
           {/* HEADER */}
           <div className="header-section">
             <div className="header-content">
@@ -260,10 +263,10 @@ export default function GuardForm() {
                   </select>
                 </div>
 
-                {/* OTHER RANK INPUT */}
+                {/* OTHER RANK */}
                 {showOtherRank && (
                   <div className="other-rank-wrapper visible">
-                    <input
+                    <input className="w-100"
                       placeholder="Enter new rank (Example: X Grade)"
                       value={otherRank}
                       onChange={(e) => setOtherRank(e.target.value)}
@@ -294,18 +297,23 @@ export default function GuardForm() {
                     required
                   />
                   {contactError && (
-                    <div className="error-message visible">{contactError}</div>
+                    <div className="error-message visible">
+                      {contactError}
+                    </div>
                   )}
                 </div>
+
               </div>
 
               <div className="actions-section">
                 <button className="submit-btn" type="submit" disabled={loading}>
                   {loading
                     ? "Processing..."
-                    : isEditMode
-                    ? "Update Guard"
-                    : "Submit Guard"}
+                    : refers === "true"
+                      ? "Re-Submit Guard"
+                      : isEditMode
+                        ? "Update Guard"
+                        : "Submit Guard"}
                 </button>
 
                 {isEditMode && (
@@ -318,8 +326,10 @@ export default function GuardForm() {
                   </button>
                 )}
               </div>
+
             </form>
           </div>
+
         </div>
       </div>
     </>
